@@ -14,6 +14,7 @@ import { query } from '@/lib/db';
 import DateSelector from './DateSelector';
 import DashboardChart from './DashboardChart';
 import VentasTable from './VentasTable';
+import DatePresets from '@/components/DatePresets';
 
 export const dynamic = 'force-dynamic';
 
@@ -139,10 +140,10 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ st
     }).format(ticketPromedio);
 
     const stats = [
-        { name: 'Ventas del día', value: formattedVentas, change: 'Hoy', icon: DollarSign, trend: 'stable', color: 'blue' },
-        { name: 'Operaciones del día', value: totalOperaciones.toString(), change: 'Hoy', icon: ShoppingBag, trend: 'stable', color: 'blue' },
+        { name: 'Ventas del día', value: formattedVentas, change: 'Hoy', icon: DollarSign, trend: 'stable', color: 'emerald' },
+        { name: 'Operaciones del día', value: totalOperaciones.toString(), change: 'Hoy', icon: ShoppingBag, trend: 'stable', color: 'amber' },
         { name: 'Aperturas Activas', value: totalAperturas.toString(), change: 'En curso', icon: Store, trend: 'stable', color: 'blue' },
-        { name: 'Ticket Promedio', value: formattedTicket, change: 'Hoy', icon: Receipt, trend: 'stable', color: 'blue' },
+        { name: 'Ticket Promedio', value: formattedTicket, change: 'Hoy', icon: Receipt, trend: 'stable', color: 'purple' },
     ];
 
     return (
@@ -150,11 +151,14 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ st
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Panel Principal</h1>
-                    <p className="text-slate-500 mt-1">Resumen de operaciones y ventas del {startDate} al {endDate}</p>
                 </div>
-                <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-xl shadow-sm border border-slate-100">
-                    <CalendarDays size={18} className="text-slate-400" />
-                    <DateSelector defaultStartDate={startDate} defaultEndDate={endDate} />
+                <div className="flex flex-wrap items-center gap-3 bg-white px-4 py-2 rounded-xl shadow-sm border border-slate-100">
+                    <DatePresets />
+                    <div className="w-px h-6 bg-slate-100 mx-1 hidden sm:block"></div>
+                    <div className="flex items-center gap-3">
+                        <CalendarDays size={18} className="text-slate-400" />
+                        <DateSelector defaultStartDate={startDate} defaultEndDate={endDate} />
+                    </div>
                 </div>
             </div>
 
@@ -163,10 +167,13 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ st
                     <div key={stat.name} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 transition-all duration-200 hover:shadow-md hover:border-blue-100 group">
                         <div className="flex items-start justify-between">
                             <div className={cn(
-                                "p-3 rounded-xl transition-colors shrink-0",
-                                stat.color === 'blue' ? "bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white" : "bg-red-50 text-red-600 group-hover:bg-red-600 group-hover:text-white"
+                                "flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-110",
+                                stat.color === 'emerald' && "text-emerald-500",
+                                stat.color === 'amber' && "text-amber-500",
+                                stat.color === 'blue' && "text-blue-500",
+                                stat.color === 'purple' && "text-purple-500"
                             )}>
-                                <stat.icon size={24} />
+                                <stat.icon size={32} strokeWidth={2.5} />
                             </div>
                         </div>
                         <div className="mt-4">
@@ -179,7 +186,7 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ st
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div>
-                    <DashboardChart data={ventasSucursal} />
+                    <DashboardChart data={ventasSucursal} startDate={startDate} endDate={endDate} />
                 </div>
 
                 <VentasTable data={ventasSucursal} startDate={startDate} endDate={endDate} />

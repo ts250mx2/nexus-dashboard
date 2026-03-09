@@ -16,6 +16,7 @@ import {
 } from 'recharts';
 import { TrendingUp, BarChart3, PieChart as PieChartIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import VentasDetailModal from '@/components/VentasDetailModal';
 
 interface SucursalData {
     id: number;
@@ -28,15 +29,29 @@ interface SucursalData {
 
 interface DashboardChartProps {
     data: SucursalData[];
+    startDate: string;
+    endDate: string;
 }
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#f97316', '#6366f1'];
 
 type MetricType = 'total' | 'operaciones' | 'ticketPromedio';
 
-export default function DashboardChart({ data }: DashboardChartProps) {
+export default function DashboardChart({ data, startDate, endDate }: DashboardChartProps) {
     const [metric, setMetric] = useState<MetricType>('total');
     const [chartType, setChartType] = useState<'bar' | 'pie'>('bar');
+
+    // Modal State
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedSucursalId, setSelectedSucursalId] = useState<number>(0);
+    const [selectedSucursalName, setSelectedSucursalName] = useState<string>('');
+
+    const handleChartClick = (entry: SucursalData) => {
+        if (!entry) return;
+        setSelectedSucursalId(entry.id);
+        setSelectedSucursalName(entry.sucursal);
+        setIsModalOpen(true);
+    };
 
     const formatCurrency = (value: number) => {
         return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(value);
@@ -63,6 +78,7 @@ export default function DashboardChart({ data }: DashboardChartProps) {
                     <p className="text-blue-300">
                         {getMetricLabel()}: <span className="text-white font-semibold">{formatValue(payload[0].value)}</span>
                     </p>
+                    <p className="text-[10px] text-slate-400 mt-2 italic">Haz clic para ver detalles</p>
                 </div>
             );
         }
@@ -77,7 +93,7 @@ export default function DashboardChart({ data }: DashboardChartProps) {
             <div className="p-6 border-b border-slate-50 bg-gradient-to-r from-blue-50/50 to-white">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-2">
-                        <TrendingUp className="text-blue-600" size={20} />
+                        <TrendingUp className="text-emerald-500" size={20} />
                         <h2 className="text-lg font-bold text-slate-900">Métricas por Sucursal</h2>
                     </div>
 
@@ -142,20 +158,39 @@ export default function DashboardChart({ data }: DashboardChartProps) {
                 </div>
             </div>
 
-            <div className="p-6 flex-1 flex items-center justify-center bg-slate-50/20 min-h-[350px]">
+            <div className="p-6 flex-1 flex items-center justify-center bg-slate-50/20 min-h-[500px]">
                 {displayData.length === 0 ? (
                     <div className="text-slate-500 font-medium">No hay datos suficientes para mostrar en esta métrica.</div>
                 ) : (
-                    <ResponsiveContainer width="100%" height={300}>
+                    <ResponsiveContainer width="100%" height={450}>
                         {chartType === 'bar' ? (
-                            <BarChart data={displayData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                            <BarChart data={displayData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }} barCategoryGap="15%">
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                                 <XAxis
                                     dataKey="sucursal"
                                     axisLine={false}
                                     tickLine={false}
-                                    tick={{ fill: '#64748b', fontSize: 12, fontWeight: 500 }}
-                                    dy={10}
+                                    interval={0}
+                                    height={100}
+                                    tick={(props: any) => {
+                                        const { x, y, payload } = props;
+                                        return (
+                                            <g transform={`translate(${x},${y})`}>
+                                                <text
+                                                    x={0}
+                                                    y={0}
+                                                    dy={16}
+                                                    textAnchor="end"
+                                                    fill="#64748b"
+                                                    fontSize={11}
+                                                    fontWeight={500}
+                                                    transform="rotate(-45)"
+                                                >
+                                                    {payload.value}
+                                                </text>
+                                            </g>
+                                        );
+                                    }}
                                 />
                                 <YAxis
                                     axisLine={false}
@@ -168,9 +203,10 @@ export default function DashboardChart({ data }: DashboardChartProps) {
                                 <Bar
                                     dataKey={metric}
                                     fill="#3b82f6"
-                                    radius={[4, 4, 0, 0]}
-                                    barSize={40}
+                                    radius={[6, 6, 0, 0]}
                                     animationDuration={1000}
+                                    onClick={(data) => data && handleChartClick(data.payload)}
+                                    className="cursor-pointer"
                                 >
                                     {displayData.map((entry, index) => (
                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -190,6 +226,8 @@ export default function DashboardChart({ data }: DashboardChartProps) {
                                     nameKey="sucursal"
                                     animationDuration={1000}
                                     labelLine={false}
+                                    onClick={(data) => handleChartClick(data.payload)}
+                                    className="cursor-pointer outline-none"
                                 >
                                     {displayData.map((entry, index) => (
                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -207,6 +245,15 @@ export default function DashboardChart({ data }: DashboardChartProps) {
                     </ResponsiveContainer>
                 )}
             </div>
+
+            <VentasDetailModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                sucursalId={selectedSucursalId}
+                sucursalName={selectedSucursalName}
+                startDate={startDate}
+                endDate={endDate}
+            />
         </div>
     );
 }

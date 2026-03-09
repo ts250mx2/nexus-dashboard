@@ -20,29 +20,33 @@ import {
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
-type SubItem = { name: string; href: string; icon: React.ElementType };
+type SubItem = { name: string; href: string; icon: React.ElementType; color: string };
 type SidebarItem = {
     name: string;
     href?: string;
     icon: React.ElementType;
+    color: string;
     subItems?: SubItem[];
 };
 
 const sidebarItems: SidebarItem[] = [
-    { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+    { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, color: 'text-indigo-500' },
     {
         name: 'Reportes',
         icon: FileText,
+        color: 'text-orange-500',
         subItems: [
-            { name: 'Agente IA', href: '/dashboard/reports/ai-agent', icon: Bot }
+            { name: 'Reporte Ventas', href: '/dashboard/reportes/ventas', icon: FileText, color: 'text-emerald-500' },
+            { name: 'Agente IA', href: '/dashboard/reports/ai-agent', icon: Bot, color: 'text-violet-500' }
         ]
     },
     {
         name: 'Configuración',
         icon: Settings,
+        color: 'text-pink-500',
         subItems: [
-            { name: 'Aprendizaje IA', href: '/dashboard/settings/ai-learning', icon: Brain },
-            { name: 'Historial de Preguntas', href: '/dashboard/settings/ai-history', icon: History }
+            { name: 'Aprendizaje IA', href: '/dashboard/settings/ai-learning', icon: Brain, color: 'text-cyan-500' },
+            { name: 'Historial de Preguntas', href: '/dashboard/settings/ai-history', icon: History, color: 'text-slate-400' }
         ]
     },
 ];
@@ -115,8 +119,8 @@ export default function Sidebar() {
                                                 : "text-slate-400 hover:bg-slate-800 hover:text-white"
                                         )}
                                     >
-                                        <item.icon size={20} className={cn(hasActiveChild ? "text-blue-400" : "text-slate-400 group-hover:text-blue-400", "shrink-0")} />
-                                        {isOpen && <span className="font-medium flex-1 truncate">{item.name}</span>}
+                                        <item.icon size={22} className={cn(hasActiveChild ? item.color : "text-slate-500 group-hover:" + item.color, "shrink-0 transition-all duration-300 group-hover:scale-110")} />
+                                        {isOpen && <span className="font-semibold flex-1 truncate">{item.name}</span>}
                                         {isOpen && (
                                             isExpanded ? <ChevronDown size={16} className="shrink-0" /> : <ChevronRight size={16} className="shrink-0" />
                                         )}
@@ -132,8 +136,8 @@ export default function Sidebar() {
                                         )}
                                         title={!isOpen ? item.name : undefined}
                                     >
-                                        <item.icon size={20} className={cn(isActive ? "text-white" : "text-slate-400 group-hover:text-blue-400", "shrink-0")} />
-                                        {isOpen && <span className="font-medium truncate">{item.name}</span>}
+                                        <item.icon size={22} className={cn(isActive ? "text-white" : "text-slate-500 group-hover:" + item.color, "shrink-0 transition-all duration-300 group-hover:scale-110")} />
+                                        {isOpen && <span className="font-semibold truncate">{item.name}</span>}
                                     </Link>
                                 )}
 
@@ -153,8 +157,8 @@ export default function Sidebar() {
                                                             : "text-slate-400 hover:text-white hover:bg-slate-800"
                                                     )}
                                                 >
-                                                    <sub.icon size={16} className={cn(isSubActive ? "text-white" : "text-slate-500 group-hover:text-blue-400", "shrink-0")} />
-                                                    <span className="truncate">{sub.name}</span>
+                                                    <sub.icon size={18} className={cn(isSubActive ? "text-blue-400" : "text-slate-500 group-hover:" + sub.color, "shrink-0 transition-all duration-300 group-hover:scale-110")} />
+                                                    <span className="truncate font-medium">{sub.name}</span>
                                                 </Link>
                                             )
                                         })}
