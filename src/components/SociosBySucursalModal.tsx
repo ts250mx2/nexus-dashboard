@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useMemo } from 'react';
-import { X, Loader2, Users, ArrowUpDown, Filter, TrendingUp, FileSpreadsheet, FileText } from 'lucide-react';
+import { X, Loader2, Users, ArrowUpDown, Filter, TrendingUp, FileSpreadsheet, FileText, Store } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
@@ -117,10 +117,40 @@ export default function SociosBySucursalModal({
 
     const handleExportExcel = () => {
         if (sortedAndFilteredData.length === 0) return;
-        const worksheet = XLSX.utils.json_to_sheet(sortedAndFilteredData);
+
+        // Prepare data with localized headers
+        const exportData = sortedAndFilteredData.map(row => ({
+            'Profesor': row.Cliente,
+            'Sucursal': row.Sucursal,
+            'Ventas': row.TotalVentas,
+            'Ticket Promedio': row.TicketPromedio,
+            'Importe Total': row.ImporteTotal
+        }));
+
+        const worksheet = XLSX.utils.json_to_sheet(exportData);
         const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Socios");
-        XLSX.writeFile(workbook, `Socios_${sucursalName.replace(/ /g, '_')}_${startDate}_al_${endDate}.xlsx`);
+
+        // Apply column widths
+        worksheet['!cols'] = [
+            { wch: 35 }, // Profesor
+            { wch: 20 }, // Sucursal
+            { wch: 10 }, // Ventas
+            { wch: 18 }, // Ticket Promedio
+            { wch: 18 }  // Importe Total
+        ];
+
+        // Apply number formats (currency)
+        const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1');
+        for (let R = range.s.r + 1; R <= range.e.r; ++R) {
+            // Column D (Ticket Promedio) and E (Importe Total)
+            const cellD = worksheet[XLSX.utils.encode_cell({ r: R, c: 3 })];
+            const cellE = worksheet[XLSX.utils.encode_cell({ r: R, c: 4 })];
+            if (cellD) cellD.z = '"$"#,##0.00';
+            if (cellE) cellE.z = '"$"#,##0.00';
+        }
+
+        XLSX.utils.book_append_sheet(workbook, worksheet, "ReporteProfesores");
+        XLSX.writeFile(workbook, `Reporte_Profesores_${sucursalName.replace(/ /g, '_')}_${startDate}_al_${endDate}.xlsx`);
     };
 
     const handleExportPDF = () => {
@@ -133,9 +163,10 @@ export default function SociosBySucursalModal({
         doc.text(`Periodo: ${startDate} al ${endDate}`, 14, 28);
         doc.text(`Generado el: ${new Date().toLocaleString()}`, 14, 33);
 
-        const tableColumn = ["Profesor", "# Ventas", "Ticket Promedio", "Importe Total"];
+        const tableColumn = ["Profesor", "Sucursal", "# Ventas", "T. Promedio", "Importe Total"];
         const tableRows = sortedAndFilteredData.map(row => [
             row.Cliente,
+            row.Sucursal,
             row.TotalVentas,
             formatCurrency(row.TicketPromedio),
             formatCurrency(row.ImporteTotal)
@@ -148,20 +179,20 @@ export default function SociosBySucursalModal({
             theme: 'striped',
             headStyles: { fillColor: [37, 99, 235] },
             columnStyles: {
-                1: { halign: 'center' },
-                2: { halign: 'right' },
-                3: { halign: 'right' }
+                2: { halign: 'center' },
+                3: { halign: 'right' },
+                4: { halign: 'right' }
             }
         });
 
-        doc.save(`Socios_${sucursalName.replace(/ /g, '_')}_${startDate}_al_${endDate}.pdf`);
+        doc.save(`Reporte_Profesores_${sucursalName.replace(/ /g, '_')}_${startDate}_al_${endDate}.pdf`);
     };
 
     if (!isOpen) return null;
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-            <div className="bg-white rounded-2xl shadow-xl w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="bg-white rounded-2xl shadow-xl w-full max-w-6xl max-h-[90vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-slate-100 bg-slate-50">
                     <div>
@@ -176,6 +207,7 @@ export default function SociosBySucursalModal({
                             onClick={handleExportExcel}
                             disabled={loading || data.length === 0}
                             className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors border border-slate-200"
+                            title="Exportar Excel Formateado"
                         >
                             <FileSpreadsheet size={20} />
                         </button>
@@ -183,6 +215,7 @@ export default function SociosBySucursalModal({
                             onClick={handleExportPDF}
                             disabled={loading || data.length === 0}
                             className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors border border-slate-200"
+                            title="Exportar PDF"
                         >
                             <FileText size={20} />
                         </button>
@@ -217,6 +250,12 @@ export default function SociosBySucursalModal({
                                             <ArrowUpDown size={14} className={cn("text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig?.key === 'Cliente' && "opacity-100 text-blue-500")} />
                                         </div>
                                     </th>
+                                    <th className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors select-none group" onClick={() => handleSort('Sucursal')}>
+                                        <div className="flex items-center gap-1 justify-between">
+                                            Sucursal
+                                            <ArrowUpDown size={14} className={cn("text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig?.key === 'Sucursal' && "opacity-100 text-blue-500")} />
+                                        </div>
+                                    </th>
                                     <th className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors select-none group text-center" onClick={() => handleSort('TotalVentas')}>
                                         <div className="flex items-center gap-1 justify-center">
                                             # Ventas
@@ -249,6 +288,18 @@ export default function SociosBySucursalModal({
                                             <Filter size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
                                         </div>
                                     </th>
+                                    <th className="px-3 py-2">
+                                        <div className="relative">
+                                            <input
+                                                type="text"
+                                                placeholder={`Filtrar...`}
+                                                value={filters['Sucursal'] || ''}
+                                                onChange={(e) => handleFilterChange('Sucursal', e.target.value)}
+                                                className="w-full pl-8 pr-3 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 bg-white font-normal"
+                                            />
+                                            <Store size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                                        </div>
+                                    </th>
                                     <th className="px-3 py-2"></th>
                                     <th className="px-3 py-2"></th>
                                     <th className="px-3 py-2"></th>
@@ -257,7 +308,7 @@ export default function SociosBySucursalModal({
                             <tbody className="divide-y divide-slate-100">
                                 {sortedAndFilteredData.length === 0 ? (
                                     <tr>
-                                        <td colSpan={4} className="px-6 py-12 text-center text-slate-400">
+                                        <td colSpan={5} className="px-6 py-12 text-center text-slate-400">
                                             No se encontraron socios para esta sucursal.
                                         </td>
                                     </tr>
@@ -270,6 +321,9 @@ export default function SociosBySucursalModal({
                                         >
                                             <td className="px-6 py-4 font-medium text-slate-900 group-hover:text-blue-600 transition-colors">
                                                 {row.Cliente}
+                                            </td>
+                                            <td className="px-6 py-4 text-slate-500 italic">
+                                                {row.Sucursal}
                                             </td>
                                             <td className="px-6 py-4 text-center text-slate-600 font-mono">
                                                 {row.TotalVentas}
