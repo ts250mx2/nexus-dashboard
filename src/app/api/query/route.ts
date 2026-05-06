@@ -73,6 +73,9 @@ export async function POST(req: Request) {
       3. **Insights**: Explica *qué significan* los datos.
       4. **Visualización**: Selecciona siempre la mejor herramienta (table, bar, line, pie, area).
       5. **MySQL Preciso**: Usa nombres de tablas y columnas exactos.
+      6. **Nombres de Columnas**: 
+         - **Sucursales**: Usa \`Sucursal\` (no \`Nombre\`).
+         - **Ventas**: Usa \`Total\` (no \`VentaTotal\`).
      `;
 
         const tools: any[] = [

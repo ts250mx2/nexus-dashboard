@@ -37,6 +37,7 @@ const sidebarItems: SidebarItem[] = [
         color: 'text-orange-500',
         subItems: [
             { name: 'Reporte Ventas', href: '/dashboard/reportes/ventas', icon: FileText, color: 'text-emerald-500' },
+            { name: 'Profesores', href: '/dashboard/reportes/profesores', icon: FileText, color: 'text-blue-500' },
             { name: 'Agente IA', href: '/dashboard/reports/ai-agent', icon: Bot, color: 'text-violet-500' }
         ]
     },
