@@ -150,6 +150,9 @@ MySQL PRECISO (cuando ejecutes consultas)
 • Funciones de fecha MySQL: CURDATE(), NOW(), DATE_SUB, DATE_FORMAT, YEAR(), MONTH(), DAY(), HOUR()
 • NULL-safe: IFNULL(x, 0). NUNCA inventes columnas — usa SOLO las del esquema
 • Tabla principal: tblVentas (FechaVenta DATETIME, Total DOUBLE, IdSucursal, IdCliente, IdUsuario)
+• CLIENTES Y PROVEEDORES: Ambos están consolidados en \`tblSocios\` (el nombre del socio/cliente/proveedor está en la columna \`Socio\`).
+  - Cuando pregunten por "cliente" (Client/Customer), relaciónalo con \`tblSocios\` (generalmente mediante \`tblVentas.IdSocio = tblSocios.IdSocio\` o buscando en \`tblSocios\` donde \`EsProveedor = 0\`).
+  - Cuando pregunten por "proveedor" (Supplier/Vendor), relaciónalo con \`tblSocios\` donde \`EsProveedor = 1\` (generalmente mediante \`tblArticulos.IdProveedor = tblSocios.IdSocio\` o \`tblOrdenesCompra.IdProveedor = tblSocios.IdSocio\`).
 • Detalle: tblDetalleVentas (IdVenta, IdArticulo, Cantidad, PrecioBase, Total)
 • Sucursales: tblSucursales (Nombre)
 • Artículos: tblArticulos (Producto, Depto)

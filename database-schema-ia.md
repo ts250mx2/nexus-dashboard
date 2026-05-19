@@ -182,8 +182,24 @@ Cada cambio de precio queda registrado. Columnas: `IdZona, IdArticulo, Anio, Mes
 | Iniciales | varchar | Abreviación |
 | Status | int | |
 
-### tblSocios — Profesores / socios comerciales
-Usado para reporte de profesores y consignaciones.
+### tblSocios — Clientes y Proveedores / Profesores / Socios comerciales (7K filas)
+**Tabla clave para Clientes y Proveedores.** Tanto los clientes (asociados a ventas, consignaciones, profesores) como los proveedores del negocio están consolidados en la tabla `tblSocios`.
+
+| Columna | Tipo | Notas |
+|---|---|---|
+| IdSocio | int | PK (Se relaciona con `tblVentas.IdSocio`, `tblArticulos.IdProveedor` y `tblOrdenesCompra.IdProveedor`) |
+| Socio | varchar | **Nombre del Cliente o Proveedor** |
+| EsProveedor | int | **1 si es Proveedor, 0 si es Cliente / Socio** |
+| RFC | varchar | Registro Federal de Contribuyentes |
+| CorreoElectronico | varchar | Email |
+| Telefonos | varchar | Teléfono de contacto |
+| Direccion, Colonia, Municipio, Estado, CP | varchar | Datos de dirección |
+| Status | int | 0 = Activo, 1 = Inactivo |
+| EsMayoreo | int | 1 si aplica precio de mayoreo |
+| Credito, LimiteCredito | double | Montos de crédito |
+
+- **Clientes**: Representados por registros en `tblSocios` (normalmente `EsProveedor = 0`). Se relacionan mediante `tblVentas.IdSocio = tblSocios.IdSocio`. El nombre del cliente está en la columna `Socio`.
+- **Proveedores**: Representados por registros en `tblSocios` con `EsProveedor = 1`. Se relacionan mediante `tblArticulos.IdProveedor = tblSocios.IdSocio` o `tblOrdenesCompra.IdProveedor = tblSocios.IdSocio`. El nombre del proveedor está en la columna `Socio`.
 
 ### tblUsuarios — Cajeros / empleados
 Tabla de usuarios del sistema.
