@@ -15,7 +15,11 @@ import {
     CircleUser,
     Bot,
     Brain,
-    History
+    History,
+    ShoppingBag,
+    TrendingUp,
+    DollarSign,
+    LayoutGrid
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
@@ -31,14 +35,26 @@ type SidebarItem = {
 
 const sidebarItems: SidebarItem[] = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, color: 'text-indigo-500' },
+    { name: 'Agente IA', href: '/dashboard/reports/ai-agent', icon: Bot, color: 'text-violet-500' },
     {
-        name: 'Reportes',
-        icon: FileText,
-        color: 'text-orange-500',
+        name: 'Ventas',
+        icon: ShoppingBag,
+        color: 'text-emerald-500',
         subItems: [
+            { name: 'Tendencias de Venta', href: '/dashboard/ventas/tendencias', icon: TrendingUp, color: 'text-emerald-500' },
+            { name: 'Operaciones', href: '/dashboard/ventas/operaciones', icon: LayoutGrid, color: 'text-indigo-500' },
             { name: 'Reporte Ventas', href: '/dashboard/reportes/ventas', icon: FileText, color: 'text-emerald-500' },
             { name: 'Profesores', href: '/dashboard/reportes/profesores', icon: FileText, color: 'text-blue-500' },
-            { name: 'Agente IA', href: '/dashboard/reports/ai-agent', icon: Bot, color: 'text-violet-500' }
+            { name: 'Margen & Rentabilidad', href: '/dashboard/reportes/margen', icon: DollarSign, color: 'text-emerald-500' },
+            { name: 'Retiros', href: '/dashboard/ventas/retiros', icon: DollarSign, color: 'text-amber-500' }
+        ]
+    },
+    {
+        name: 'Compras',
+        icon: ShoppingBag,
+        color: 'text-blue-500',
+        subItems: [
+            { name: 'Órdenes de Compra', href: '/dashboard/compras/ordenes', icon: FileText, color: 'text-blue-500' }
         ]
     },
     {
@@ -46,6 +62,7 @@ const sidebarItems: SidebarItem[] = [
         icon: Settings,
         color: 'text-pink-500',
         subItems: [
+            { name: 'Diseñador de Consultas', href: '/dashboard/settings/query-designer', icon: LayoutGrid, color: 'text-pink-500' },
             { name: 'Aprendizaje IA', href: '/dashboard/settings/ai-learning', icon: Brain, color: 'text-cyan-500' },
             { name: 'Historial de Preguntas', href: '/dashboard/settings/ai-history', icon: History, color: 'text-slate-400' }
         ]
@@ -56,7 +73,8 @@ export default function Sidebar() {
     const pathname = usePathname();
     const [isOpen, setIsOpen] = useState(true);
     const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>({
-        'Reportes': pathname.includes('/reports'),
+        'Ventas': pathname.includes('/ventas') || pathname.includes('/reportes'),
+        'Compras': pathname.includes('/compras'),
         'Configuración': pathname.includes('/settings'),
     });
 
@@ -70,7 +88,8 @@ export default function Sidebar() {
             setExpandedMenus({});
         } else {
             setExpandedMenus({
-                'Reportes': pathname.includes('/reports'),
+                'Ventas': pathname.includes('/ventas') || pathname.includes('/reportes'),
+                'Compras': pathname.includes('/compras'),
                 'Configuración': pathname.includes('/settings'),
             });
         }

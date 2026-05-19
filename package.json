@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.96.0",
     "clsx": "^2.1.1",
     "html2canvas": "^1.4.1",
     "jose": "^6.1.3",

@@ -1,5 +1,5 @@
 import Sidebar from '@/components/Sidebar';
-import { ChatAgent } from '@/components/chat-agent';
+import { FloatingChatAgent } from '@/components/floating-chat-agent';
 
 export default function DashboardLayout({
     children,
@@ -13,7 +13,7 @@ export default function DashboardLayout({
                 <div className="max-w-7xl mx-auto">
                     {children}
                 </div>
-                <ChatAgent />
+                <FloatingChatAgent />
             </main>
         </div>
     );

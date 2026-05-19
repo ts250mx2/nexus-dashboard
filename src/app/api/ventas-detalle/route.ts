@@ -49,6 +49,8 @@ export async function GET(request: NextRequest) {
               AND DATE(FechaVenta) <= ? 
               AND A.IdSucursal = ?
             GROUP BY 
+                A.IdVenta,
+                A.IdSucursal,
                 A.FolioVenta, 
                 A.FechaVenta, 
                 A.Cliente, 

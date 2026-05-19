@@ -1,0 +1,47 @@
+[
+    {
+        "id": "schema_mpbwnhyg",
+        "name": "Ventas",
+        "description": "Este esquema se refiere a todo lo relacionado a Ventas",
+        "tables": [
+            "tblVentas",
+            "tblDetalleVentas",
+            "tblSocios"
+        ],
+        "relationships": [
+            {
+                "tableA": "tblVentas",
+                "joinType": "INNER JOIN",
+                "tableB": "tblDetalleVentas",
+                "fieldPairs": [
+                    {
+                        "fieldA": "IdVenta",
+                        "fieldB": "IdVenta"
+                    },
+                    {
+                        "fieldA": "IdSucursal",
+                        "fieldB": "IdSucursal"
+                    }
+                ]
+            },
+            {
+                "tableA": "tblVentas",
+                "joinType": "INNER JOIN",
+                "tableB": "tblSocios",
+                "fieldPairs": [
+                    {
+                        "fieldA": "IdSocio",
+                        "fieldB": "IdSocio"
+                    }
+                ]
+            }
+        ],
+        "fieldDescriptions": {
+            "tblVentas.IdVenta": "Folio de Venta",
+            "tblVentas.IdComputadora": "Numero de caja",
+            "tblVentas.IdSucursal": "Id de la sucursal",
+            "tblVentas.EsTarjeta": "Si se pago con tarjeta",
+            "tblVentas.FolioVenta": ""
+        }
+    }
+]
