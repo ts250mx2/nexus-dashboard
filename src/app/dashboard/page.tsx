@@ -240,7 +240,9 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ st
                     <DashboardChart data={ventasSucursal} startDate={startDate} endDate={endDate} />
                 </div>
 
-                <VentasTable data={ventasSucursal} startDate={startDate} endDate={endDate} />
+                <div>
+                    <VentasTable data={ventasSucursal} startDate={startDate} endDate={endDate} />
+                </div>
             </div>
         </div>
     );

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useMemo } from 'react';
-import { X, Loader2, Users, ArrowUpDown, Filter, TrendingUp, FileSpreadsheet, FileText, Store } from 'lucide-react';
+import { X, Loader2, Users, ArrowUpDown, Filter, TrendingUp, FileSpreadsheet, FileText, Store, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
@@ -196,11 +196,21 @@ export default function SociosBySucursalModal({
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-slate-100 bg-slate-50">
                     <div>
-                        <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+                        <div className="flex items-center gap-1 text-xs font-bold text-slate-400 select-none mb-1">
+                            <button
+                                onClick={onClose}
+                                className="hover:text-blue-600 hover:underline transition-colors duration-150"
+                            >
+                                Sucursales
+                            </button>
+                            <ChevronRight size={12} className="text-slate-300" />
+                            <span className="text-slate-850 font-extrabold">{sucursalName}</span>
+                        </div>
+                        <h2 className="text-xl font-black text-slate-800 tracking-tight uppercase flex items-center gap-2 select-none">
                             <Users className="text-blue-600" size={24} />
                             Profesores de {sucursalName}
                         </h2>
-                        <p className="text-sm text-slate-500 mt-1">Periodo: {startDate} al {endDate}</p>
+                        <p className="text-xs font-semibold text-slate-500 mt-1">Periodo: {startDate} al {endDate}</p>
                     </div>
                     <div className="flex items-center gap-2">
                         <button

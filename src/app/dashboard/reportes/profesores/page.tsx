@@ -14,7 +14,9 @@ import {
     ChevronRight,
     ArrowUpRight,
     LayoutGrid,
-    RefreshCcw
+    RefreshCcw,
+    Search,
+    X
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import * as XLSX from 'xlsx';
@@ -109,6 +111,18 @@ function ReportContent() {
     const [sucursalesSummary, setSucursalesSummary] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const filteredBranches = useMemo(() => {
+        return sucursalesSummary.filter(suc => 
+            suc.Nombre.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }, [sucursalesSummary, searchTerm]);
+
+    const showAllBranchesCard = useMemo(() => {
+        if (!searchTerm) return true;
+        return 'todas las sucursales'.includes(searchTerm.toLowerCase());
+    }, [searchTerm]);
 
     // Modal State Stack
     const [isSociosModalOpen, setIsSociosModalOpen] = useState(false);
@@ -256,117 +270,152 @@ function ReportContent() {
                     <p className="font-medium">No se encontraron ventas en este periodo.</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                    {/* Special Card: All Branches */}
-                    {allBranchesSummary && (() => {
-                        const theme = getCardTheme(0);
-                        return (
-                            <div
-                                onClick={() => {
-                                    setSelectedSucursal({ id: 'all', name: 'Todas las Sucursales' });
-                                    setIsSociosModalOpen(true);
-                                }}
-                                className={cn(
-                                    'cursor-pointer rounded-xl border p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg relative overflow-hidden group select-none flex flex-col justify-between min-h-[140px]',
-                                    `bg-white ${theme.border} ${theme.bg}`
-                                )}
-                            >
-                                {/* Top-Right Soft Decorative Radial Gradient */}
-                                <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-indigo-500/10 to-transparent rounded-bl-full pointer-events-none transition-transform duration-500 group-hover:scale-110"></div>
-                                
-                                {/* Left color bar indicator */}
-                                <div className="absolute left-0 top-0 bottom-0 w-1 bg-slate-200 group-hover:bg-indigo-500 transition-colors duration-300"></div>
+                <div className="space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200/60 shadow-xs animate-in fade-in duration-200">
+                        <div>
+                            <h2 className="text-xl font-semibold text-slate-900">Sucursales</h2>
+                            <p className="text-sm text-slate-500">Haz clic en una sucursal para ver los profesores en ella.</p>
+                        </div>
+                        {/* Search Bar */}
+                        <div className="relative flex items-center bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 focus-within:ring-2 focus-within:ring-blue-500/10 focus-within:border-blue-500 transition-all w-full sm:w-64 max-w-sm">
+                            <Search size={16} className="text-slate-400 mr-2 shrink-0" />
+                            <input
+                                type="text"
+                                placeholder="Buscar sucursal..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="bg-transparent text-xs font-semibold text-slate-700 outline-none p-0 border-none h-auto w-full"
+                            />
+                            {searchTerm && (
+                                <button
+                                    onClick={() => setSearchTerm('')}
+                                    className="p-1 hover:bg-slate-200/60 rounded-full transition-colors text-slate-400 hover:text-slate-650"
+                                >
+                                    <X size={12} />
+                                </button>
+                            )}
+                        </div>
+                    </div>
 
-                                <div>
-                                    <div className="flex items-center justify-between gap-2 mb-3">
-                                        <div className="flex items-center gap-2">
-                                            <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 shadow-xs", theme.iconContainer)}>
-                                                <LayoutGrid size={16} />
-                                            </div>
-                                            <div>
-                                                <h3 className="text-sm font-extrabold text-slate-800 truncate max-w-[125px] tracking-tight">{allBranchesSummary.Nombre}</h3>
-                                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Global</p>
-                                            </div>
-                                        </div>
-                                        <div className={cn("transition-all duration-300 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5", theme.arrowColor)}>
-                                            <ArrowUpRight size={16} />
-                                        </div>
-                                    </div>
-                                </div>
+                    {filteredBranches.length === 0 && !showAllBranchesCard ? (
+                        <div className="bg-slate-50 border border-slate-200 text-slate-400 p-12 rounded-2xl flex flex-col items-center text-center">
+                            <MapPin size={48} className="mb-4 opacity-20" />
+                            <p className="font-medium">No se encontraron sucursales que coincidan con su búsqueda.</p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                            {/* Special Card: All Branches */}
+                            {showAllBranchesCard && allBranchesSummary && (() => {
+                                const theme = getCardTheme(0);
+                                return (
+                                    <div
+                                        onClick={() => {
+                                            setSelectedSucursal({ id: 'all', name: 'Todas las Sucursales' });
+                                            setIsSociosModalOpen(true);
+                                        }}
+                                        className={cn(
+                                            'cursor-pointer rounded-xl border p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg relative overflow-hidden group select-none flex flex-col justify-between min-h-[140px]',
+                                            `bg-white ${theme.border} ${theme.bg}`
+                                        )}
+                                    >
+                                        {/* Top-Right Soft Decorative Radial Gradient */}
+                                        <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-indigo-500/10 to-transparent rounded-bl-full pointer-events-none transition-transform duration-500 group-hover:scale-110"></div>
+                                        
+                                        {/* Left color bar indicator */}
+                                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-slate-200 group-hover:bg-indigo-500 transition-colors duration-300"></div>
 
-                                <div className="space-y-2 mt-auto pt-2 border-t border-slate-100/80">
-                                    <div className="flex items-baseline justify-between gap-1">
-                                        <span className="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Venta Global</span>
-                                        <span className={cn("text-base font-black tracking-tight", theme.accentText)}>
-                                            {formatCurrency(allBranchesSummary.TotalVenta)}
-                                        </span>
-                                    </div>
-                                    <div className="flex items-center justify-between text-[11px]">
-                                        <span className="text-slate-400 font-semibold">Clientes Totales</span>
-                                        <span className={cn("font-bold text-[10px] px-2 py-0.25 rounded-full", theme.pillBg)}>
-                                            {allBranchesSummary.TotalClientes}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    })()}
-
-                    {/* Branch Cards */}
-                    {sucursalesSummary.map((suc, idx) => {
-                        const theme = getCardTheme(idx + 1);
-                        return (
-                            <div 
-                                key={suc.IdSucursal}
-                                onClick={() => {
-                                    setSelectedSucursal({ id: suc.IdSucursal, name: suc.Nombre });
-                                    setIsSociosModalOpen(true);
-                                }}
-                                className={cn(
-                                    'cursor-pointer rounded-xl border p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg relative overflow-hidden group select-none flex flex-col justify-between min-h-[140px]',
-                                    `bg-white ${theme.border} ${theme.bg}`
-                                )}
-                            >
-                                {/* Top-Right Soft Decorative Radial Gradient */}
-                                <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-current opacity-[0.04] rounded-bl-full pointer-events-none transition-transform duration-500 group-hover:scale-110"></div>
-                                
-                                {/* Left color bar indicator */}
-                                <div className="absolute left-0 top-0 bottom-0 w-1 bg-slate-200 group-hover:bg-blue-500 transition-colors duration-300"></div>
-
-                                <div>
-                                    <div className="flex items-center justify-between gap-2 mb-3">
-                                        <div className="flex items-center gap-2">
-                                            <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 shadow-xs", theme.iconContainer)}>
-                                                <Store size={16} />
-                                            </div>
-                                            <div>
-                                                <h3 className="text-sm font-extrabold text-slate-800 truncate max-w-[125px] tracking-tight group-hover:text-blue-600 transition-colors">{suc.Nombre}</h3>
-                                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Sucursal</p>
+                                        <div>
+                                            <div className="flex items-center justify-between gap-2 mb-3">
+                                                <div className="flex items-center gap-2">
+                                                    <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 shadow-xs", theme.iconContainer)}>
+                                                        <LayoutGrid size={16} />
+                                                    </div>
+                                                    <div>
+                                                        <h3 className="text-sm font-extrabold text-slate-800 truncate max-w-[125px] tracking-tight">{allBranchesSummary.Nombre}</h3>
+                                                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Global</p>
+                                                    </div>
+                                                </div>
+                                                <div className={cn("transition-all duration-300 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5", theme.arrowColor)}>
+                                                    <ArrowUpRight size={16} />
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className={cn("transition-all duration-300 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5", theme.arrowColor)}>
-                                            <ArrowUpRight size={16} />
+
+                                        <div className="space-y-2 mt-auto pt-2 border-t border-slate-100/80">
+                                            <div className="flex items-baseline justify-between gap-1">
+                                                <span className="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Venta Global</span>
+                                                <span className={cn("text-base font-black tracking-tight", theme.accentText)}>
+                                                    {formatCurrency(allBranchesSummary.TotalVenta)}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center justify-between text-[11px]">
+                                                <span className="text-slate-400 font-semibold">Clientes Totales</span>
+                                                <span className={cn("font-bold text-[10px] px-2 py-0.25 rounded-full", theme.pillBg)}>
+                                                    {allBranchesSummary.TotalClientes}
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
+                                );
+                            })()}
 
-                                <div className="space-y-2 mt-auto pt-2 border-t border-slate-100/80">
-                                    <div className="flex items-baseline justify-between gap-1">
-                                        <span className="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Venta Total</span>
-                                        <span className={cn("text-base font-black tracking-tight", theme.accentText)}>
-                                            {formatCurrency(suc.TotalVenta)}
-                                        </span>
+                            {/* Branch Cards */}
+                            {filteredBranches.map((suc, idx) => {
+                                const theme = getCardTheme(idx + 1);
+                                return (
+                                    <div 
+                                        key={suc.IdSucursal}
+                                        onClick={() => {
+                                            setSelectedSucursal({ id: suc.IdSucursal, name: suc.Nombre });
+                                            setIsSociosModalOpen(true);
+                                        }}
+                                        className={cn(
+                                            'cursor-pointer rounded-xl border p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg relative overflow-hidden group select-none flex flex-col justify-between min-h-[140px]',
+                                            `bg-white ${theme.border} ${theme.bg}`
+                                        )}
+                                    >
+                                        {/* Top-Right Soft Decorative Radial Gradient */}
+                                        <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-current opacity-[0.04] rounded-bl-full pointer-events-none transition-transform duration-500 group-hover:scale-110"></div>
+                                        
+                                        {/* Left color bar indicator */}
+                                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-slate-200 group-hover:bg-blue-500 transition-colors duration-300"></div>
+
+                                        <div>
+                                            <div className="flex items-center justify-between gap-2 mb-3">
+                                                <div className="flex items-center gap-2">
+                                                    <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 shadow-xs", theme.iconContainer)}>
+                                                        <Store size={16} />
+                                                    </div>
+                                                    <div>
+                                                        <h3 className="text-sm font-extrabold text-slate-800 truncate max-w-[125px] tracking-tight group-hover:text-blue-600 transition-colors">{suc.Nombre}</h3>
+                                                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Sucursal</p>
+                                                    </div>
+                                                </div>
+                                                <div className={cn("transition-all duration-300 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5", theme.arrowColor)}>
+                                                    <ArrowUpRight size={16} />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-2 mt-auto pt-2 border-t border-slate-100/80">
+                                            <div className="flex items-baseline justify-between gap-1">
+                                                <span className="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Venta Total</span>
+                                                <span className={cn("text-base font-black tracking-tight", theme.accentText)}>
+                                                    {formatCurrency(suc.TotalVenta)}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center justify-between text-[11px]">
+                                                <span className="text-slate-400 font-semibold">Clientes</span>
+                                                <span className={cn("font-bold text-[10px] px-2 py-0.25 rounded-full", theme.pillBg)}>
+                                                    {suc.TotalClientes}
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="flex items-center justify-between text-[11px]">
-                                        <span className="text-slate-400 font-semibold">Clientes</span>
-                                        <span className={cn("font-bold text-[10px] px-2 py-0.25 rounded-full", theme.pillBg)}>
-                                            {suc.TotalClientes}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    })}
+                                );
+                            })}
+                        </div>
+                    )}
                 </div>
             )}
 
@@ -395,9 +444,14 @@ function ReportContent() {
                 startDate={startDate}
                 endDate={endDate}
                 sucursalId={String(selectedSucursal?.id || 'all')}
+                sucursalName={selectedSucursal?.name || ''}
                 onSaleClick={(sale) => {
                     setSelectedVenta(sale);
                     setIsVentaModalOpen(true);
+                }}
+                onGoBackToBranches={() => {
+                    setIsProfesorModalOpen(false);
+                    setIsSociosModalOpen(false);
                 }}
             />
 

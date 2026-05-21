@@ -10,8 +10,23 @@ import {
     Loader2,
     Store,
     Users,
-    RefreshCcw
+    RefreshCcw,
+    TrendingUp,
+    X,
+    Search,
+    ChevronRight
 } from 'lucide-react';
+import {
+    ResponsiveContainer,
+    AreaChart,
+    Area,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    Legend,
+    Line
+} from 'recharts';
 import DatePresetsProfesores from '@/components/DatePresetsProfesores';
 import VentasItemDetailModal from '@/components/VentasItemDetailModal';
 import { cn } from '@/lib/utils';
@@ -34,6 +49,7 @@ interface Profesor {
 
 interface Articulo {
     IdArticulo: number;
+    Codigo?: string | null;
     Articulo: string;
     Cantidad: number;
     Total: number;
@@ -65,6 +81,15 @@ function getFirstOfMonth() {
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, '0');
     return `${year}-${month}-01`;
+}
+
+function getPastDate(monthsAgo: number) {
+    const now = new Date();
+    now.setMonth(now.getMonth() - monthsAgo);
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
 }
 
 const CARD_THEMES = [
@@ -174,6 +199,303 @@ export default function ProfesoresGlobalPage() {
     const [initialSucursalId, setInitialSucursalId] = useState<string | null>(null);
     const [initialProfesorId, setInitialProfesorId] = useState<string | null>(null);
 
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const filteredBranches = useMemo(() => {
+        return branches.filter(b => b.Nombre.toLowerCase().includes(searchTerm.toLowerCase()));
+    }, [branches, searchTerm]);
+
+    const showAllBranchesCard = useMemo(() => {
+        if (!searchTerm) return true;
+        return 'todas las sucursales'.includes(searchTerm.toLowerCase());
+    }, [searchTerm]);
+
+    const filteredProfesores = useMemo(() => {
+        return profesores.filter(p => p.Cliente.toLowerCase().includes(searchTerm.toLowerCase()));
+    }, [profesores, searchTerm]);
+
+    const filteredArticulos = useMemo(() => {
+        const query = searchTerm.toLowerCase();
+        return articulos.filter(a => 
+            a.Articulo.toLowerCase().includes(query) || 
+            (a.Codigo && a.Codigo.toLowerCase().includes(query)) ||
+            String(a.IdArticulo).toLowerCase().includes(query)
+        );
+    }, [articulos, searchTerm]);
+
+    // Profesor Trends States
+    const [selectedProfesorForTrends, setSelectedProfesorForTrends] = useState<Profesor | null>(null);
+    const [isTrendsModalOpen, setIsTrendsModalOpen] = useState(false);
+    const [trendsData, setTrendsData] = useState<any[]>([]);
+    const [loadingTrends, setLoadingTrends] = useState(false);
+    const [errorTrends, setErrorTrends] = useState<string | null>(null);
+    const [trendsStartDate, setTrendsStartDate] = useState(getPastDate(6));
+    const [trendsEndDate, setTrendsEndDate] = useState(getToday());
+    const [trendsGroupBy, setTrendsGroupBy] = useState<'dia' | 'semana' | 'mes'>('semana');
+    const [trendsPeriod, setTrendsPeriod] = useState<'1m' | '3m' | '6m' | '1y' | 'custom'>('6m');
+
+    // Article Trends States (for selected teacher's article trends)
+    const [selectedArticleForTrends, setSelectedArticleForTrends] = useState<Articulo | null>(null);
+    const [isArticleTrendsModalOpen, setIsArticleTrendsModalOpen] = useState(false);
+    const [articleTrendsData, setArticleTrendsData] = useState<any[]>([]);
+    const [loadingArticleTrends, setLoadingArticleTrends] = useState(false);
+    const [errorArticleTrends, setErrorArticleTrends] = useState<string | null>(null);
+    const [articleTrendsStartDate, setArticleTrendsStartDate] = useState(getPastDate(6));
+    const [articleTrendsEndDate, setArticleTrendsEndDate] = useState(getToday());
+    const [articleTrendsGroupBy, setArticleTrendsGroupBy] = useState<'dia' | 'semana' | 'mes'>('semana');
+    const [articleTrendsPeriod, setArticleTrendsPeriod] = useState<'1m' | '3m' | '6m' | '1y' | 'custom'>('6m');
+
+    const handleArticleTrendsSelect = (e: React.MouseEvent, art: Articulo) => {
+        e.stopPropagation();
+        setSelectedArticleForTrends(art);
+        setArticleTrendsPeriod('6m');
+        setArticleTrendsStartDate(getPastDate(6));
+        setArticleTrendsEndDate(getToday());
+        setArticleTrendsGroupBy('semana');
+        setIsArticleTrendsModalOpen(true);
+    };
+
+    const handleArticleTrendsPeriodChange = (period: '1m' | '3m' | '6m' | '1y' | 'custom') => {
+        setArticleTrendsPeriod(period);
+        if (period === '1m') {
+            setArticleTrendsStartDate(getPastDate(1));
+            setArticleTrendsEndDate(getToday());
+        } else if (period === '3m') {
+            setArticleTrendsStartDate(getPastDate(3));
+            setArticleTrendsEndDate(getToday());
+        } else if (period === '6m') {
+            setArticleTrendsStartDate(getPastDate(6));
+            setArticleTrendsEndDate(getToday());
+        } else if (period === '1y') {
+            setArticleTrendsStartDate(getPastDate(12));
+            setArticleTrendsEndDate(getToday());
+        }
+    };
+
+    useEffect(() => {
+        if (!isArticleTrendsModalOpen || !selectedArticleForTrends || !selectedProfesor) {
+            return;
+        }
+
+        let isMounted = true;
+        const fetchArticleTrends = async () => {
+            setLoadingArticleTrends(true);
+            setErrorArticleTrends(null);
+            setArticleTrendsData([]);
+
+            try {
+                const response = await fetch(
+                    `/api/reportes/productos/tendencias?startDate=${articleTrendsStartDate}&endDate=${articleTrendsEndDate}&idArticulo=${selectedArticleForTrends.IdArticulo}&idSocio=${selectedProfesor.IdSocio}&sucursalId=${selectedSucursal?.IdSucursal || 'all'}&groupBy=${articleTrendsGroupBy}`
+                );
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'No se pudieron cargar las tendencias');
+                if (isMounted) setArticleTrendsData(result.data || []);
+            } catch (err: any) {
+                if (isMounted) setErrorArticleTrends(err.message || 'Error desconocido');
+            } finally {
+                if (isMounted) setLoadingArticleTrends(false);
+            }
+        };
+
+        fetchArticleTrends();
+        return () => { isMounted = false; };
+    }, [isArticleTrendsModalOpen, selectedArticleForTrends, selectedProfesor, selectedSucursal, articleTrendsStartDate, articleTrendsEndDate, articleTrendsGroupBy]);
+
+    const aggregateArticleTrends = useMemo(() => {
+        let totalSales = 0;
+        let totalQuantity = 0;
+        let totalTickets = 0;
+
+        articleTrendsData.forEach((row) => {
+            totalSales += Number(row.Total) || 0;
+            totalQuantity += Number(row.Quantity) || Number(row.Cantidad) || 0;
+            totalTickets += Number(row.NumeroTickets) || 0;
+        });
+
+        const averageTicket = totalTickets > 0 ? totalSales / totalTickets : 0;
+
+        return {
+            totalSales,
+            totalQuantity,
+            totalTickets,
+            averageTicket
+        };
+    }, [articleTrendsData]);
+
+    const CustomArticleTooltip = ({ active, payload, label }: any) => {
+        if (active && payload && payload.length) {
+            const dateStr = formatDateTick(label, articleTrendsGroupBy);
+            return (
+                <div className="bg-white/95 backdrop-blur-md p-4 rounded-xl shadow-xl border border-slate-200/60 max-w-xs space-y-2.5">
+                    <p className="text-xs font-black text-slate-800 tracking-tight uppercase border-b border-slate-100 pb-1.5">{dateStr}</p>
+                    <div className="space-y-1 text-xs">
+                        <div className="flex items-center justify-between gap-6">
+                            <span className="flex items-center gap-1.5 text-slate-500 font-semibold">
+                                <span className="w-2 h-2 rounded-full bg-blue-600"></span>
+                                Venta total:
+                            </span>
+                            <span className="font-extrabold text-blue-700">{formatCurrency(payload[0].value)}</span>
+                        </div>
+                        <div className="flex items-center justify-between gap-6">
+                            <span className="flex items-center gap-1.5 text-slate-500 font-semibold">
+                                <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                                Cantidad:
+                            </span>
+                            <span className="font-extrabold text-amber-700">{Number(payload[1]?.value || 0).toLocaleString()} un.</span>
+                        </div>
+                        {payload[0]?.payload?.NumeroTickets !== undefined && (
+                            <div className="flex items-center justify-between gap-6 border-t border-slate-100/80 pt-1 mt-1 text-[11px]">
+                                <span className="flex items-center gap-1.5 text-slate-400 font-medium">
+                                    Tickets:
+                                </span>
+                                <span className="font-bold text-slate-650">{payload[0].payload.NumeroTickets} tkt</span>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+        return null;
+    };
+
+    const handleTrendsSelect = (e: React.MouseEvent, prof: Profesor) => {
+        e.stopPropagation();
+        setSelectedProfesorForTrends(prof);
+        setTrendsPeriod('6m');
+        setTrendsStartDate(getPastDate(6));
+        setTrendsEndDate(getToday());
+        setTrendsGroupBy('semana');
+        setIsTrendsModalOpen(true);
+    };
+
+    const handleTrendsPeriodChange = (period: '1m' | '3m' | '6m' | '1y' | 'custom') => {
+        setTrendsPeriod(period);
+        if (period === '1m') {
+            setTrendsStartDate(getPastDate(1));
+            setTrendsEndDate(getToday());
+        } else if (period === '3m') {
+            setTrendsStartDate(getPastDate(3));
+            setTrendsEndDate(getToday());
+        } else if (period === '6m') {
+            setTrendsStartDate(getPastDate(6));
+            setTrendsEndDate(getToday());
+        } else if (period === '1y') {
+            setTrendsStartDate(getPastDate(12));
+            setTrendsEndDate(getToday());
+        }
+    };
+
+    const formatDateTick = (dateStr: string, groupBy: 'dia' | 'semana' | 'mes') => {
+        if (!dateStr) return '';
+        try {
+            const parts = dateStr.split('-');
+            if (parts.length < 3) return dateStr;
+            const year = parts[0];
+            const month = parts[1];
+            const day = parts[2].substring(0, 2);
+
+            const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+            const monthName = months[parseInt(month, 10) - 1] || month;
+
+            if (groupBy === 'mes') {
+                return `${monthName} ${year}`;
+            } else if (groupBy === 'semana') {
+                return `Sem. ${day}/${monthName}`;
+            } else {
+                return `${day} ${monthName}`;
+            }
+        } catch (e) {
+            return dateStr;
+        }
+    };
+
+    useEffect(() => {
+        if (!isTrendsModalOpen || !selectedProfesorForTrends) {
+            return;
+        }
+
+        let isMounted = true;
+        const fetchTrends = async () => {
+            setLoadingTrends(true);
+            setErrorTrends(null);
+            setTrendsData([]);
+
+            try {
+                const response = await fetch(
+                    `/api/reportes/profesores/tendencias?startDate=${trendsStartDate}&endDate=${trendsEndDate}&idSocio=${selectedProfesorForTrends.IdSocio}&sucursalId=${selectedSucursal?.IdSucursal || 'all'}&groupBy=${trendsGroupBy}`
+                );
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'No se pudieron cargar las tendencias');
+                if (isMounted) setTrendsData(result.data || []);
+            } catch (err: any) {
+                if (isMounted) setErrorTrends(err.message || 'Error desconocido');
+            } finally {
+                if (isMounted) setLoadingTrends(false);
+            }
+        };
+
+        fetchTrends();
+        return () => { isMounted = false; };
+    }, [isTrendsModalOpen, selectedProfesorForTrends, selectedSucursal, trendsStartDate, trendsEndDate, trendsGroupBy]);
+
+    const aggregateTrends = useMemo(() => {
+        let totalSales = 0;
+        let totalQuantity = 0;
+        let totalTickets = 0;
+
+        trendsData.forEach((row) => {
+            totalSales += Number(row.Total) || 0;
+            totalQuantity += Number(row.Quantity) || Number(row.Cantidad) || 0;
+            totalTickets += Number(row.NumeroTickets) || 0;
+        });
+
+        const averageTicket = totalTickets > 0 ? totalSales / totalTickets : 0;
+
+        return {
+            totalSales,
+            totalQuantity,
+            totalTickets,
+            averageTicket
+        };
+    }, [trendsData]);
+
+    const CustomTooltip = ({ active, payload, label }: any) => {
+        if (active && payload && payload.length) {
+            const dateStr = formatDateTick(label, trendsGroupBy);
+            return (
+                <div className="bg-white/95 backdrop-blur-md p-4 rounded-xl shadow-xl border border-slate-200/60 max-w-xs space-y-2.5">
+                    <p className="text-xs font-black text-slate-800 tracking-tight uppercase border-b border-slate-100 pb-1.5">{dateStr}</p>
+                    <div className="space-y-1 text-xs">
+                        <div className="flex items-center justify-between gap-6">
+                            <span className="flex items-center gap-1.5 text-slate-500 font-semibold">
+                                <span className="w-2 h-2 rounded-full bg-blue-600"></span>
+                                Venta total:
+                            </span>
+                            <span className="font-extrabold text-blue-700">{formatCurrency(payload[0].value)}</span>
+                        </div>
+                        <div className="flex items-center justify-between gap-6">
+                            <span className="flex items-center gap-1.5 text-slate-500 font-semibold">
+                                <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                                Cantidad:
+                            </span>
+                            <span className="font-extrabold text-amber-700">{Number(payload[1]?.value || 0).toLocaleString()} un.</span>
+                        </div>
+                        {payload[0]?.payload?.NumeroTickets !== undefined && (
+                            <div className="flex items-center justify-between gap-6">
+                                <span className="flex items-center gap-1.5 text-slate-500 font-semibold">
+                                    <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                    Tickets:
+                                </span>
+                                <span className="font-extrabold text-emerald-700">{Number(payload[0].payload.NumeroTickets).toLocaleString()} tkts.</span>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+        return null;
+    };
+
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
         const start = params.get('startDate') || getFirstOfMonth();
@@ -195,6 +517,7 @@ export default function ProfesoresGlobalPage() {
     };
 
     const handleSucursalSelect = (branch: Branch) => {
+        setSearchTerm('');
         setSelectedSucursal(branch);
         setSelectedProfesor(null);
         setSelectedArticleForSales(null);
@@ -204,6 +527,7 @@ export default function ProfesoresGlobalPage() {
     };
 
     const handleProfesorSelect = (prof: Profesor) => {
+        setSearchTerm('');
         setSelectedProfesor(prof);
         setSelectedArticleForSales(null);
         setArticleSales([]);
@@ -383,6 +707,7 @@ export default function ProfesoresGlobalPage() {
     };
 
     const clearSucursalSelection = () => {
+        setSearchTerm('');
         setSelectedSucursal(null);
         setSelectedProfesor(null);
         setSelectedArticleForSales(null);
@@ -392,6 +717,7 @@ export default function ProfesoresGlobalPage() {
     };
 
     const clearProfesorSelection = () => {
+        setSearchTerm('');
         setSelectedProfesor(null);
         setSelectedArticleForSales(null);
         setArticleSales([]);
@@ -400,6 +726,7 @@ export default function ProfesoresGlobalPage() {
     };
 
     const clearArticleSelection = () => {
+        setSearchTerm('');
         setSelectedArticleForSales(null);
         setArticleSales([]);
         setSelectedVenta(null);
@@ -465,11 +792,30 @@ export default function ProfesoresGlobalPage() {
             </div>
 
             {!selectedSucursal && (
-                <section className="space-y-4">
-                    <div className="flex items-center justify-between gap-3">
+                <section className="space-y-4 animate-in fade-in duration-300">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200/60 shadow-xs">
                         <div>
                             <h2 className="text-xl font-semibold text-slate-900">Sucursales</h2>
                             <p className="text-sm text-slate-500">Haz clic en una sucursal para ver profesores por sucursal.</p>
+                        </div>
+                        {/* Search Bar */}
+                        <div className="relative flex items-center bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 focus-within:ring-2 focus-within:ring-blue-500/10 focus-within:border-blue-500 transition-all w-full sm:w-64 max-w-sm">
+                            <Search size={16} className="text-slate-400 mr-2 shrink-0" />
+                            <input
+                                type="text"
+                                placeholder="Buscar sucursal..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="bg-transparent text-xs font-semibold text-slate-700 outline-none p-0 border-none h-auto w-full"
+                            />
+                            {searchTerm && (
+                                <button
+                                    onClick={() => setSearchTerm('')}
+                                    className="p-1 hover:bg-slate-200/60 rounded-full transition-colors text-slate-400 hover:text-slate-650"
+                                >
+                                    <X size={12} />
+                                </button>
+                            )}
                         </div>
                     </div>
 
@@ -479,9 +825,11 @@ export default function ProfesoresGlobalPage() {
                     </div>
                 ) : errorBranches ? (
                     <div className="rounded-3xl bg-red-50 border border-red-200 text-red-700 p-6">{errorBranches}</div>
+                ) : filteredBranches.length === 0 && !showAllBranchesCard ? (
+                    <div className="rounded-3xl bg-slate-50 border border-slate-200 text-slate-500 p-8 text-center">No se encontraron sucursales que coincidan con su búsqueda.</div>
                 ) : (
                     <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                        {allBranchesTotal && (() => {
+                        {showAllBranchesCard && allBranchesTotal && (() => {
                             const theme = getCardTheme(0);
                             const isSelected = (selectedSucursal as any)?.IdSucursal === 'all';
                             return (
@@ -533,7 +881,7 @@ export default function ProfesoresGlobalPage() {
                             );
                         })()}
 
-                        {branches.map((branch, idx) => {
+                        {filteredBranches.map((branch, idx) => {
                             const theme = getCardTheme(idx + 1);
                             const isSelected = (selectedSucursal as any)?.IdSucursal === branch.IdSucursal;
                             return (
@@ -592,17 +940,41 @@ export default function ProfesoresGlobalPage() {
 
             {selectedSucursal && !selectedProfesor && (
                 <section className="space-y-4">
-                    <div className="flex items-center justify-between gap-3">
-                        <div>
-                            <h2 className="text-xl font-semibold text-slate-900">Profesores en {selectedSucursal.Nombre}</h2>
-                            <p className="text-sm text-slate-500">Haz clic en un profesor para ver los artículos que vendió.</p>
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200/60 shadow-xs animate-in fade-in duration-250">
+                        <div className="flex flex-col gap-1">
+                            {/* Breadcrumbs */}
+                            <div className="flex items-center flex-wrap gap-1.5 text-xs font-bold text-slate-400 select-none">
+                                <button
+                                    onClick={clearSucursalSelection}
+                                    className="hover:text-blue-600 hover:underline transition-colors duration-150"
+                                >
+                                    Sucursales
+                                </button>
+                                <ChevronRight size={12} className="text-slate-300" />
+                                <span className="text-slate-800 font-extrabold">{selectedSucursal.Nombre}</span>
+                            </div>
+                            <h2 className="text-lg font-black text-slate-800 tracking-tight uppercase mt-0.5">Profesores en {selectedSucursal.Nombre}</h2>
                         </div>
-                        <button
-                            onClick={clearSucursalSelection}
-                            className="text-sm text-slate-500 hover:text-slate-900 transition-colors"
-                        >
-                            Regresar a sucursales
-                        </button>
+
+                        {/* Search Bar */}
+                        <div className="relative flex items-center bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 focus-within:ring-2 focus-within:ring-blue-500/10 focus-within:border-blue-500 transition-all w-full md:w-64 max-w-sm">
+                            <Search size={16} className="text-slate-400 mr-2 shrink-0" />
+                            <input
+                                type="text"
+                                placeholder="Buscar profesor..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="bg-transparent text-xs font-semibold text-slate-700 outline-none p-0 border-none h-auto w-full"
+                            />
+                            {searchTerm && (
+                                <button
+                                    onClick={() => setSearchTerm('')}
+                                    className="p-1 hover:bg-slate-200/60 rounded-full transition-colors text-slate-400 hover:text-slate-650"
+                                >
+                                    <X size={12} />
+                                </button>
+                            )}
+                        </div>
                     </div>
 
                     {loadingProfesores ? (
@@ -611,11 +983,11 @@ export default function ProfesoresGlobalPage() {
                         </div>
                     ) : errorProfesores ? (
                         <div className="rounded-3xl bg-red-50 border border-red-200 text-red-700 p-6">{errorProfesores}</div>
-                    ) : profesores.length === 0 ? (
-                        <div className="rounded-3xl bg-slate-50 border border-slate-200 text-slate-500 p-6">No se encontraron profesores para esta sucursal.</div>
+                    ) : filteredProfesores.length === 0 ? (
+                        <div className="rounded-3xl bg-slate-50 border border-slate-200 text-slate-500 p-6">No se encontraron profesores para su búsqueda.</div>
                     ) : (
                         <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                            {profesores.map((prof, idx) => {
+                            {filteredProfesores.map((prof, idx) => {
                                 const theme = getCardTheme(idx + 2); // Rotate colors beautifully
                                 const isSelected = (selectedProfesor as any)?.IdSocio === prof.IdSocio;
                                 return (
@@ -644,8 +1016,17 @@ export default function ProfesoresGlobalPage() {
                                                         <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Profesor</p>
                                                     </div>
                                                 </div>
-                                                <div className={cn("transition-all duration-300 transform group-hover:translate-x-0.5", theme.arrowColor)}>
-                                                    <ArrowRight size={14} />
+                                                <div className="flex items-center gap-2 shrink-0">
+                                                    <button
+                                                        onClick={(e) => handleTrendsSelect(e, prof)}
+                                                        className="p-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-700 rounded-lg transition-all border border-blue-100 hover:border-blue-200"
+                                                        title="Ver tendencias de ventas"
+                                                    >
+                                                        <TrendingUp size={13} />
+                                                    </button>
+                                                    <div className={cn("transition-all duration-300 transform group-hover:translate-x-0.5", theme.arrowColor)}>
+                                                        <ArrowRight size={14} />
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -678,17 +1059,48 @@ export default function ProfesoresGlobalPage() {
 
             {selectedProfesor && (
                 <section className="space-y-4">
-                    <div className="flex items-center justify-between gap-3">
-                        <div>
-                            <h2 className="text-xl font-semibold text-slate-900">Artículos de {selectedProfesor.Cliente}</h2>
-                            <p className="text-sm text-slate-500">Selecciona un artículo para ver el detalle de ventas.</p>
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200/60 shadow-xs animate-in fade-in duration-250">
+                        <div className="flex flex-col gap-1">
+                            {/* Breadcrumbs */}
+                            <div className="flex items-center flex-wrap gap-1.5 text-xs font-bold text-slate-400 select-none">
+                                <button
+                                    onClick={clearSucursalSelection}
+                                    className="hover:text-blue-600 hover:underline transition-colors duration-150"
+                                >
+                                    Sucursales
+                                </button>
+                                <ChevronRight size={12} className="text-slate-300" />
+                                <button
+                                    onClick={clearProfesorSelection}
+                                    className="hover:text-blue-600 hover:underline transition-colors duration-150"
+                                >
+                                    {selectedSucursal?.Nombre}
+                                </button>
+                                <ChevronRight size={12} className="text-slate-300" />
+                                <span className="text-slate-800 font-extrabold">{selectedProfesor.Cliente}</span>
+                            </div>
+                            <h2 className="text-lg font-black text-slate-800 tracking-tight uppercase mt-0.5">Artículos de {selectedProfesor.Cliente}</h2>
                         </div>
-                        <button
-                            onClick={clearProfesorSelection}
-                            className="text-sm text-slate-500 hover:text-slate-900 transition-colors"
-                        >
-                            Volver a profesores
-                        </button>
+
+                        {/* Search Bar */}
+                        <div className="relative flex items-center bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 focus-within:ring-2 focus-within:ring-blue-500/10 focus-within:border-blue-500 transition-all w-full md:w-64 max-w-sm">
+                            <Search size={16} className="text-slate-400 mr-2 shrink-0" />
+                            <input
+                                type="text"
+                                placeholder="Buscar artículo..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="bg-transparent text-xs font-semibold text-slate-700 outline-none p-0 border-none h-auto w-full"
+                            />
+                            {searchTerm && (
+                                <button
+                                    onClick={() => setSearchTerm('')}
+                                    className="p-1 hover:bg-slate-200/60 rounded-full transition-colors text-slate-400 hover:text-slate-650"
+                                >
+                                    <X size={12} />
+                                </button>
+                            )}
+                        </div>
                     </div>
 
                     {loadingArticulos ? (
@@ -697,11 +1109,11 @@ export default function ProfesoresGlobalPage() {
                         </div>
                     ) : errorArticulos ? (
                         <div className="rounded-3xl bg-red-50 border border-red-200 text-red-700 p-6">{errorArticulos}</div>
-                    ) : articulos.length === 0 ? (
-                        <div className="rounded-3xl bg-slate-50 border border-slate-200 text-slate-500 p-6">No se encontraron artículos para este profesor.</div>
+                    ) : filteredArticulos.length === 0 ? (
+                        <div className="rounded-3xl bg-slate-50 border border-slate-200 text-slate-500 p-6">No se encontraron artículos para su búsqueda.</div>
                     ) : (
                         <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                            {articulos.map((art) => (
+                            {filteredArticulos.map((art) => (
                                 <div
                                     key={art.IdArticulo}
                                     onClick={() => handleArticleSelect(art)}
@@ -711,14 +1123,26 @@ export default function ProfesoresGlobalPage() {
                                     )}
                                 >
                                     <div>
-                                        <div className="flex items-center justify-between gap-2 mb-2">
-                                            <div className="flex items-center gap-1.5 min-w-0">
-                                                <div className="bg-amber-500/10 w-7 h-7 rounded-md flex items-center justify-center text-amber-600 border border-amber-500/20 shrink-0">
+                                        <div className="flex items-start justify-between gap-2 mb-2">
+                                            <div className="flex items-start gap-1.5 min-w-0">
+                                                <div className="bg-amber-500/10 w-7 h-7 rounded-md flex items-center justify-center text-amber-600 border border-amber-500/20 shrink-0 mt-0.5">
                                                     <FileText size={14} />
                                                 </div>
-                                                <h3 className="text-xs font-extrabold text-slate-800 truncate tracking-tight min-w-0" title={art.Articulo}>{art.Articulo}</h3>
+                                                <div className="min-w-0 flex flex-col">
+                                                    <h3 className="text-xs font-extrabold text-slate-800 truncate tracking-tight min-w-0" title={art.Articulo}>{art.Articulo}</h3>
+                                                    <span className="text-[10px] text-slate-400 font-bold select-none tracking-wider mt-0.5">Código: #{art.Codigo || art.IdArticulo}</span>
+                                                </div>
                                             </div>
-                                            <div className="text-slate-400 group-hover:translate-x-0.5 transition-transform shrink-0"><ArrowRight size={14} /></div>
+                                            <div className="flex items-center gap-2 shrink-0">
+                                                <button
+                                                    onClick={(e) => handleArticleTrendsSelect(e, art)}
+                                                    className="p-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-700 rounded-lg transition-all border border-blue-100 hover:border-blue-200"
+                                                    title="Ver tendencias de ventas"
+                                                >
+                                                    <TrendingUp size={13} />
+                                                </button>
+                                                <div className="text-slate-400 group-hover:translate-x-0.5 transition-transform"><ArrowRight size={14} /></div>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -802,6 +1226,480 @@ export default function ProfesoresGlobalPage() {
                                     </table>
                                 </div>
                             )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {isTrendsModalOpen && selectedProfesorForTrends && (
+                <div className="fixed inset-0 z-[110] flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm">
+                    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-5xl max-h-[95vh] overflow-hidden flex flex-col animate-in scale-in duration-200">
+                        {/* Header */}
+                        <div className="flex items-center justify-between gap-4 border-b border-slate-200 px-6 py-4 bg-slate-50">
+                            <div>
+                                <h2 className="text-lg font-extrabold text-slate-900 tracking-tight uppercase flex items-center gap-2 select-none">
+                                    <TrendingUp size={20} className="text-blue-600" />
+                                    Tendencias de venta de profesor
+                                </h2>
+                                <p className="text-xs font-semibold text-slate-500">
+                                    {selectedProfesorForTrends.Cliente} · <span className="font-bold text-blue-600">{selectedSucursal?.Nombre || 'Todas las sucursales'}</span>
+                                </p>
+                            </div>
+                            <button
+                                onClick={() => {
+                                    setIsTrendsModalOpen(false);
+                                    setSelectedProfesorForTrends(null);
+                                    setTrendsData([]);
+                                }}
+                                className="p-2 hover:bg-slate-200/80 rounded-full transition-all text-slate-400 hover:text-slate-700"
+                                title="Cerrar modal"
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        {/* Content Scrollable */}
+                        <div className="flex-1 overflow-auto p-6 space-y-6">
+                            {/* Controls Row */}
+                            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200/60 shadow-xs">
+                                {/* Periodo selectors */}
+                                <div className="flex flex-wrap items-center gap-2">
+                                    <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mr-1">Periodo:</span>
+                                    {(['1m', '3m', '6m', '1y', 'custom'] as const).map((p) => {
+                                        const labels = { '1m': '1 Mes', '3m': '3 Meses', '6m': '6 Meses', '1y': '1 Año', 'custom': 'Personalizado' };
+                                        const active = trendsPeriod === p;
+                                        return (
+                                            <button
+                                                key={p}
+                                                onClick={() => handleTrendsPeriodChange(p)}
+                                                className={cn(
+                                                    "px-3 py-1.5 text-xs font-bold rounded-xl border transition-all duration-200",
+                                                    active
+                                                        ? "bg-blue-600 border-blue-600 text-white shadow-xs"
+                                                        : "bg-white border-slate-200 text-slate-650 hover:bg-slate-50"
+                                                )}
+                                            >
+                                                {labels[p]}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+
+                                {/* Date pickers for custom period */}
+                                {trendsPeriod === 'custom' && (
+                                    <div className="flex flex-wrap items-center gap-2 animate-in fade-in slide-in-from-left-2 duration-200">
+                                        <div className="flex items-center gap-1.5 bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 shadow-2xs">
+                                            <span className="text-[9px] font-bold text-slate-400 uppercase">Del:</span>
+                                            <input
+                                                type="date"
+                                                value={trendsStartDate}
+                                                onChange={(e) => setTrendsStartDate(e.target.value)}
+                                                className="bg-transparent text-xs font-bold text-slate-700 outline-none p-0 border-none h-auto w-24 cursor-pointer"
+                                            />
+                                        </div>
+                                        <div className="flex items-center gap-1.5 bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 shadow-2xs">
+                                            <span className="text-[9px] font-bold text-slate-400 uppercase">Al:</span>
+                                            <input
+                                                type="date"
+                                                value={trendsEndDate}
+                                                onChange={(e) => setTrendsEndDate(e.target.value)}
+                                                className="bg-transparent text-xs font-bold text-slate-700 outline-none p-0 border-none h-auto w-24 cursor-pointer"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Group by: Dia, Semana, Mes */}
+                                <div className="flex items-center gap-2 border-t lg:border-t-0 pt-3 lg:pt-0 border-slate-200/80">
+                                    <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mr-1">Agrupar por:</span>
+                                    <div className="bg-white border border-slate-200 rounded-xl p-0.5 flex shadow-2xs">
+                                        {(['dia', 'semana', 'mes'] as const).map((g) => {
+                                            const labels = { dia: 'Día', semana: 'Semana', mes: 'Mes' };
+                                            const active = trendsGroupBy === g;
+                                            return (
+                                                <button
+                                                    key={g}
+                                                    onClick={() => setTrendsGroupBy(g)}
+                                                    className={cn(
+                                                        "px-3 py-1.5 text-xs font-bold rounded-lg transition-all duration-200",
+                                                        active
+                                                            ? "bg-slate-900 text-white shadow-xs"
+                                                            : "bg-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-50"
+                                                    )}
+                                                >
+                                                    {labels[g]}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Aggregate Metrics Row */}
+                            <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
+                                {/* Venta Total */}
+                                <div className="bg-gradient-to-br from-blue-500/[0.02] to-indigo-500/[0.02] border border-slate-200/60 rounded-2xl p-4 flex flex-col justify-between shadow-xs select-none">
+                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Venta Total ($)</span>
+                                    <span className="text-xl font-black text-blue-700 tracking-tight mt-1">{formatCurrency(aggregateTrends.totalSales)}</span>
+                                </div>
+                                {/* Unidades Vendidas */}
+                                <div className="bg-gradient-to-br from-amber-500/[0.02] to-orange-500/[0.02] border border-slate-200/60 rounded-2xl p-4 flex flex-col justify-between shadow-xs select-none">
+                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Unidades Vendidas</span>
+                                    <span className="text-xl font-black text-amber-700 tracking-tight mt-1">{Number(aggregateTrends.totalQuantity).toLocaleString()} un.</span>
+                                </div>
+                                {/* Tickets */}
+                                <div className="bg-gradient-to-br from-emerald-500/[0.02] to-teal-500/[0.02] border border-slate-200/60 rounded-2xl p-4 flex flex-col justify-between shadow-xs select-none">
+                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Tickets</span>
+                                    <span className="text-xl font-black text-emerald-700 tracking-tight mt-1">{Number(aggregateTrends.totalTickets).toLocaleString()} tkts.</span>
+                                </div>
+                                {/* Ticket Promedio */}
+                                <div className="bg-gradient-to-br from-purple-500/[0.02] to-fuchsia-500/[0.02] border border-slate-200/60 rounded-2xl p-4 flex flex-col justify-between shadow-xs select-none">
+                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Ticket Promedio</span>
+                                    <span className="text-xl font-black text-purple-700 tracking-tight mt-1">{formatCurrency(aggregateTrends.averageTicket)}</span>
+                                </div>
+                            </div>
+
+                            {/* Chart Area */}
+                            <div className="bg-white rounded-3xl border border-slate-200 p-5 min-h-[400px] flex flex-col justify-center relative overflow-hidden shadow-xs">
+                                {loadingTrends ? (
+                                    <div className="flex flex-col items-center justify-center space-y-3">
+                                        <Loader2 className="animate-spin text-blue-600" size={36} />
+                                        <p className="text-sm font-semibold text-slate-500">Cargando datos de tendencias...</p>
+                                    </div>
+                                ) : errorTrends ? (
+                                    <div className="rounded-2xl bg-red-50 border border-red-200 text-red-700 p-6 max-w-lg mx-auto text-center">
+                                        <p className="font-bold text-sm">Error al cargar datos</p>
+                                        <p className="text-xs text-red-600/90 mt-1">{errorTrends}</p>
+                                    </div>
+                                ) : trendsData.length === 0 ? (
+                                    <div className="text-center py-12 max-w-sm mx-auto space-y-2 select-none">
+                                        <div className="w-12 h-12 bg-slate-50 text-slate-400 border border-slate-200/60 rounded-2xl flex items-center justify-center mx-auto shadow-2xs">
+                                            <TrendingUp size={22} className="stroke-[1.5]" />
+                                        </div>
+                                        <h3 className="font-extrabold text-slate-800 text-sm tracking-tight">Sin datos para graficar</h3>
+                                        <p className="text-xs text-slate-400 font-semibold leading-relaxed">No se registraron ventas de este profesor en el periodo y sucursal seleccionados.</p>
+                                    </div>
+                                ) : (
+                                    <div className="w-full flex-1">
+                                        <ResponsiveContainer width="100%" height={350}>
+                                            <AreaChart data={trendsData} margin={{ top: 20, right: 10, left: 10, bottom: 5 }}>
+                                                <defs>
+                                                    <linearGradient id="colorTotalProfesor" x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="5%" stopColor="#2563eb" stopOpacity={0.2}/>
+                                                        <stop offset="95%" stopColor="#2563eb" stopOpacity={0.01}/>
+                                                    </linearGradient>
+                                                </defs>
+                                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                                <XAxis
+                                                    dataKey="Fecha"
+                                                    tickFormatter={(str) => formatDateTick(str, trendsGroupBy)}
+                                                    stroke="#94a3b8"
+                                                    fontSize={10}
+                                                    tickLine={false}
+                                                    axisLine={false}
+                                                    dy={10}
+                                                />
+                                                <YAxis
+                                                    yAxisId="left"
+                                                    stroke="#2563eb"
+                                                    fontSize={10}
+                                                    tickLine={false}
+                                                    axisLine={false}
+                                                    tickFormatter={(val) => formatCurrency(val)}
+                                                />
+                                                <YAxis
+                                                    yAxisId="right"
+                                                    orientation="right"
+                                                    stroke="#d97706"
+                                                    fontSize={10}
+                                                    tickLine={false}
+                                                    axisLine={false}
+                                                    tickFormatter={(val) => Number(val).toLocaleString()}
+                                                />
+                                                <Tooltip content={<CustomTooltip />} />
+                                                <Legend
+                                                    verticalAlign="top"
+                                                    height={36}
+                                                    iconType="circle"
+                                                    iconSize={8}
+                                                    formatter={(value) => <span className="text-xs font-bold text-slate-600 select-none">{value}</span>}
+                                                />
+                                                <Area
+                                                    yAxisId="left"
+                                                    type="monotone"
+                                                    dataKey="Total"
+                                                    name="Ventas ($)"
+                                                    stroke="#2563eb"
+                                                    strokeWidth={2}
+                                                    fillOpacity={1}
+                                                    fill="url(#colorTotalProfesor)"
+                                                />
+                                                <Line
+                                                    yAxisId="right"
+                                                    type="monotone"
+                                                    dataKey="Cantidad"
+                                                    name="Unidades Vendidas"
+                                                    stroke="#d97706"
+                                                    strokeWidth={2.5}
+                                                    dot={{ r: 3, strokeWidth: 1.5, fill: "#fff" }}
+                                                    activeDot={{ r: 5 }}
+                                                />
+                                            </AreaChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Footer */}
+                        <div className="flex items-center justify-end gap-3 border-t border-slate-200 px-6 py-4 bg-slate-50">
+                            <button
+                                onClick={() => {
+                                    setIsTrendsModalOpen(false);
+                                    setSelectedProfesorForTrends(null);
+                                    setTrendsData([]);
+                                }}
+                                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-sm transition-all border border-slate-200"
+                            >
+                                Cerrar Ventana
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {isArticleTrendsModalOpen && selectedArticleForTrends && (
+                <div className="fixed inset-0 z-[110] flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm">
+                    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-5xl max-h-[95vh] overflow-hidden flex flex-col animate-in scale-in duration-200">
+                        {/* Header */}
+                        <div className="flex items-center justify-between gap-4 border-b border-slate-200 px-6 py-4 bg-slate-50">
+                            <div>
+                                <h2 className="text-lg font-extrabold text-slate-900 tracking-tight uppercase flex items-center gap-2 select-none">
+                                    <TrendingUp size={20} className="text-blue-600" />
+                                    Tendencias de venta de artículo
+                                </h2>
+                                <p className="text-xs font-semibold text-slate-500">
+                                    {selectedArticleForTrends.Articulo} · <span className="font-bold text-slate-700">Prof. {selectedProfesor?.Cliente}</span> · <span className="font-bold text-blue-600">{selectedSucursal?.Nombre || 'Todas las sucursales'}</span>
+                                </p>
+                            </div>
+                            <button
+                                onClick={() => {
+                                    setIsArticleTrendsModalOpen(false);
+                                    setSelectedArticleForTrends(null);
+                                    setArticleTrendsData([]);
+                                }}
+                                className="p-2 hover:bg-slate-200/80 rounded-full transition-all text-slate-400 hover:text-slate-700"
+                                title="Cerrar modal"
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        {/* Content Scrollable */}
+                        <div className="flex-1 overflow-auto p-6 space-y-6">
+                            {/* Controls Row */}
+                            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200/60 shadow-xs">
+                                {/* Periodo selectors */}
+                                <div className="flex flex-wrap items-center gap-2">
+                                    <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mr-1">Periodo:</span>
+                                    {(['1m', '3m', '6m', '1y', 'custom'] as const).map((p) => {
+                                        const labels = { '1m': '1 Mes', '3m': '3 Meses', '6m': '6 Meses', '1y': '1 Año', 'custom': 'Personalizado' };
+                                        const active = articleTrendsPeriod === p;
+                                        return (
+                                            <button
+                                                key={p}
+                                                onClick={() => handleArticleTrendsPeriodChange(p)}
+                                                className={cn(
+                                                    "px-3 py-1.5 text-xs font-bold rounded-xl border transition-all duration-200",
+                                                    active
+                                                        ? "bg-blue-600 border-blue-600 text-white shadow-xs"
+                                                        : "bg-white border-slate-200 text-slate-650 hover:bg-slate-50"
+                                                )}
+                                            >
+                                                {labels[p]}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+
+                                {/* Date pickers for custom period */}
+                                {articleTrendsPeriod === 'custom' && (
+                                    <div className="flex flex-wrap items-center gap-2 animate-in fade-in slide-in-from-left-2 duration-200">
+                                        <div className="flex items-center gap-1.5 bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 shadow-2xs">
+                                            <span className="text-[9px] font-bold text-slate-400 uppercase">Del:</span>
+                                            <input
+                                                type="date"
+                                                value={articleTrendsStartDate}
+                                                onChange={(e) => setArticleTrendsStartDate(e.target.value)}
+                                                className="bg-transparent text-xs font-bold text-slate-700 outline-none p-0 border-none h-auto w-24 cursor-pointer"
+                                            />
+                                        </div>
+                                        <div className="flex items-center gap-1.5 bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 shadow-2xs">
+                                            <span className="text-[9px] font-bold text-slate-400 uppercase">Al:</span>
+                                            <input
+                                                type="date"
+                                                value={articleTrendsEndDate}
+                                                onChange={(e) => setArticleTrendsEndDate(e.target.value)}
+                                                className="bg-transparent text-xs font-bold text-slate-700 outline-none p-0 border-none h-auto w-24 cursor-pointer"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Group by: Dia, Semana, Mes */}
+                                <div className="flex items-center gap-2 border-t lg:border-t-0 pt-3 lg:pt-0 border-slate-200/80">
+                                    <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mr-1">Agrupar por:</span>
+                                    <div className="bg-white border border-slate-200 rounded-xl p-0.5 flex shadow-2xs">
+                                        {(['dia', 'semana', 'mes'] as const).map((g) => {
+                                            const labels = { dia: 'Día', semana: 'Semana', mes: 'Mes' };
+                                            const active = articleTrendsGroupBy === g;
+                                            return (
+                                                <button
+                                                    key={g}
+                                                    onClick={() => setArticleTrendsGroupBy(g)}
+                                                    className={cn(
+                                                        "px-3 py-1.5 text-xs font-bold rounded-lg transition-all duration-200",
+                                                        active
+                                                            ? "bg-slate-900 text-white shadow-xs"
+                                                            : "bg-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-50"
+                                                    )}
+                                                >
+                                                    {labels[g]}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Aggregate Metrics Row */}
+                            <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
+                                {/* Venta Total */}
+                                <div className="bg-gradient-to-br from-blue-500/[0.02] to-indigo-500/[0.02] border border-slate-200/60 rounded-2xl p-4 flex flex-col justify-between shadow-xs select-none">
+                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Venta Total ($)</span>
+                                    <span className="text-xl font-black text-blue-700 tracking-tight mt-1">{formatCurrency(aggregateArticleTrends.totalSales)}</span>
+                                </div>
+                                {/* Unidades Vendidas */}
+                                <div className="bg-gradient-to-br from-amber-500/[0.02] to-orange-500/[0.02] border border-slate-200/60 rounded-2xl p-4 flex flex-col justify-between shadow-xs select-none">
+                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Unidades Vendidas</span>
+                                    <span className="text-xl font-black text-amber-700 tracking-tight mt-1">{Number(aggregateArticleTrends.totalQuantity).toLocaleString()} un.</span>
+                                </div>
+                                {/* Tickets */}
+                                <div className="bg-gradient-to-br from-emerald-500/[0.02] to-teal-500/[0.02] border border-slate-200/60 rounded-2xl p-4 flex flex-col justify-between shadow-xs select-none">
+                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Tickets</span>
+                                    <span className="text-xl font-black text-emerald-700 tracking-tight mt-1">{Number(aggregateArticleTrends.totalTickets).toLocaleString()} tkts.</span>
+                                </div>
+                                {/* Ticket Promedio */}
+                                <div className="bg-gradient-to-br from-purple-500/[0.02] to-fuchsia-500/[0.02] border border-slate-200/60 rounded-2xl p-4 flex flex-col justify-between shadow-xs select-none">
+                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Ticket Promedio</span>
+                                    <span className="text-xl font-black text-purple-700 tracking-tight mt-1">{formatCurrency(aggregateArticleTrends.averageTicket)}</span>
+                                </div>
+                            </div>
+
+                            {/* Chart Area */}
+                            <div className="bg-white rounded-3xl border border-slate-200 p-5 min-h-[400px] flex flex-col justify-center relative overflow-hidden shadow-xs">
+                                {loadingArticleTrends ? (
+                                    <div className="flex flex-col items-center justify-center space-y-3">
+                                        <Loader2 className="animate-spin text-blue-600" size={36} />
+                                        <p className="text-sm font-semibold text-slate-500">Cargando datos de tendencias de artículo...</p>
+                                    </div>
+                                ) : errorArticleTrends ? (
+                                    <div className="rounded-2xl bg-red-50 border border-red-200 text-red-700 p-6 max-w-lg mx-auto text-center">
+                                        <p className="font-bold text-sm">Error al cargar datos</p>
+                                        <p className="text-xs text-red-600/90 mt-1">{errorArticleTrends}</p>
+                                    </div>
+                                ) : articleTrendsData.length === 0 ? (
+                                    <div className="text-center py-12 max-w-sm mx-auto space-y-2 select-none">
+                                        <div className="w-12 h-12 bg-slate-50 text-slate-400 border border-slate-200/60 rounded-2xl flex items-center justify-center mx-auto shadow-2xs">
+                                            <TrendingUp size={22} className="stroke-[1.5]" />
+                                        </div>
+                                        <h3 className="font-extrabold text-slate-800 text-sm tracking-tight">Sin datos para graficar</h3>
+                                        <p className="text-xs text-slate-400 font-semibold leading-relaxed">No se registraron ventas de este artículo para este profesor en el periodo y sucursal seleccionados.</p>
+                                    </div>
+                                ) : (
+                                    <div className="w-full flex-1">
+                                        <ResponsiveContainer width="100%" height={350}>
+                                            <AreaChart data={articleTrendsData} margin={{ top: 20, right: 10, left: 10, bottom: 5 }}>
+                                                <defs>
+                                                    <linearGradient id="colorTotalArticle" x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="5%" stopColor="#2563eb" stopOpacity={0.2}/>
+                                                        <stop offset="95%" stopColor="#2563eb" stopOpacity={0.01}/>
+                                                    </linearGradient>
+                                                </defs>
+                                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                                <XAxis
+                                                    dataKey="Fecha"
+                                                    tickFormatter={(str) => formatDateTick(str, articleTrendsGroupBy)}
+                                                    stroke="#94a3b8"
+                                                    fontSize={10}
+                                                    tickLine={false}
+                                                    axisLine={false}
+                                                    dy={10}
+                                                />
+                                                <YAxis
+                                                    yAxisId="left"
+                                                    stroke="#2563eb"
+                                                    fontSize={10}
+                                                    tickLine={false}
+                                                    axisLine={false}
+                                                    tickFormatter={(val) => formatCurrency(val)}
+                                                />
+                                                <YAxis
+                                                    yAxisId="right"
+                                                    orientation="right"
+                                                    stroke="#d97706"
+                                                    fontSize={10}
+                                                    tickLine={false}
+                                                    axisLine={false}
+                                                    tickFormatter={(val) => Number(val).toLocaleString()}
+                                                />
+                                                <Tooltip content={<CustomArticleTooltip />} />
+                                                <Legend
+                                                    verticalAlign="top"
+                                                    height={36}
+                                                    iconType="circle"
+                                                    iconSize={8}
+                                                    formatter={(value) => <span className="text-xs font-bold text-slate-600 select-none">{value}</span>}
+                                                />
+                                                <Area
+                                                    yAxisId="left"
+                                                    type="monotone"
+                                                    dataKey="Total"
+                                                    name="Ventas ($)"
+                                                    stroke="#2563eb"
+                                                    strokeWidth={2}
+                                                    fillOpacity={1}
+                                                    fill="url(#colorTotalArticle)"
+                                                />
+                                                <Line
+                                                    yAxisId="right"
+                                                    type="monotone"
+                                                    dataKey="Cantidad"
+                                                    name="Unidades Vendidas"
+                                                    stroke="#d97706"
+                                                    strokeWidth={2.5}
+                                                    dot={{ r: 3, strokeWidth: 1.5, fill: "#fff" }}
+                                                    activeDot={{ r: 5 }}
+                                                />
+                                            </AreaChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Footer */}
+                        <div className="flex items-center justify-end gap-3 border-t border-slate-200 px-6 py-4 bg-slate-50">
+                            <button
+                                onClick={() => {
+                                    setIsArticleTrendsModalOpen(false);
+                                    setSelectedArticleForTrends(null);
+                                    setArticleTrendsData([]);
+                                }}
+                                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-sm transition-all border border-slate-200"
+                            >
+                                Cerrar Ventana
+                            </button>
                         </div>
                     </div>
                 </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useMemo } from 'react';
-import { X, Download, FileSpreadsheet, Loader2, Store, FileText, ArrowUpDown } from 'lucide-react';
+import { X, Download, FileSpreadsheet, Loader2, Store, FileText, ArrowUpDown, ChevronRight, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
@@ -15,7 +15,9 @@ interface ProfesorVentasDetailModalProps {
     startDate: string;
     endDate: string;
     sucursalId: string;
+    sucursalName: string;
     onSaleClick: (sale: { id: number; folio: string; sucursalId: number }) => void;
+    onGoBackToBranches?: () => void;
 }
 
 export default function ProfesorVentasDetailModal({
@@ -26,12 +28,21 @@ export default function ProfesorVentasDetailModal({
     startDate,
     endDate,
     sucursalId,
-    onSaleClick
+    sucursalName,
+    onSaleClick,
+    onGoBackToBranches
 }: ProfesorVentasDetailModalProps) {
     const [data, setData] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [sortConfig, setSortConfig] = useState<{ key: string, direction: 'asc' | 'desc' } | null>({ key: 'Fecha', direction: 'desc' });
+    const [searchTerm, setSearchTerm] = useState('');
+
+    useEffect(() => {
+        if (isOpen) {
+            setSearchTerm('');
+        }
+    }, [isOpen, idSocio]);
 
     useEffect(() => {
         if (!isOpen || !idSocio) return;
@@ -72,16 +83,22 @@ export default function ProfesorVentasDetailModal({
         setSortConfig({ key, direction });
     };
 
+    const filteredData = useMemo(() => {
+        return data.filter(item => 
+            item.Folio.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }, [data, searchTerm]);
+
     const sortedData = useMemo(() => {
-        if (sortConfig === null) return data;
-        return [...data].sort((a, b) => {
+        if (sortConfig === null) return filteredData;
+        return [...filteredData].sort((a, b) => {
             const valA = a[sortConfig.key];
             const valB = b[sortConfig.key];
             if (valA === valB) return 0;
             if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
             return sortConfig.direction === 'asc' ? 1 : -1;
         });
-    }, [data, sortConfig]);
+    }, [filteredData, sortConfig]);
 
     if (!isOpen) return null;
 
@@ -92,8 +109,8 @@ export default function ProfesorVentasDetailModal({
     };
 
     const handleExportExcel = () => {
-        if (data.length === 0) return;
-        const exportData = data.map(({ IdVenta, ...rest }) => rest);
+        if (sortedData.length === 0) return;
+        const exportData = sortedData.map(({ IdVenta, ...rest }) => rest);
         const worksheet = XLSX.utils.json_to_sheet(exportData);
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "DetalleVentasSocio");
@@ -138,16 +155,54 @@ export default function ProfesorVentasDetailModal({
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-slate-100 bg-slate-50">
                     <div>
-                        <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+                        <div className="flex items-center gap-1 text-xs font-bold text-slate-400 select-none mb-1">
+                            <button
+                                onClick={onGoBackToBranches || onClose}
+                                className="hover:text-blue-600 hover:underline transition-colors duration-150"
+                            >
+                                Sucursales
+                            </button>
+                            <ChevronRight size={12} className="text-slate-300" />
+                            <button
+                                onClick={onClose}
+                                className="hover:text-blue-600 hover:underline transition-colors duration-150"
+                            >
+                                {sucursalName || 'Sucursal'}
+                            </button>
+                            <ChevronRight size={12} className="text-slate-300" />
+                            <span className="text-slate-850 font-extrabold">{socioName}</span>
+                        </div>
+                        <h2 className="text-xl font-black text-slate-800 tracking-tight uppercase flex items-center gap-2 select-none">
                             <Store className="text-blue-600" size={24} />
                             Ventas de {socioName}
                         </h2>
-                        <p className="text-sm text-slate-500 mt-1">Periodo: {startDate} al {endDate}</p>
+                        <p className="text-xs font-semibold text-slate-500 mt-1">Periodo: {startDate} al {endDate}</p>
                     </div>
                     <div className="flex items-center gap-2">
+                        {/* Search Input for Folio */}
+                        {!loading && !error && data.length > 0 && (
+                            <div className="relative flex items-center bg-white border border-slate-200 rounded-lg px-2.5 py-1 focus-within:ring-2 focus-within:ring-blue-500/10 focus-within:border-blue-500 transition-all w-40 sm:w-48 mr-2">
+                                <Search size={14} className="text-slate-400 mr-1.5 shrink-0" />
+                                <input
+                                    type="text"
+                                    placeholder="Buscar folio..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="bg-transparent text-xs font-semibold text-slate-700 outline-none p-0 border-none h-auto w-full"
+                                />
+                                {searchTerm && (
+                                    <button
+                                        onClick={() => setSearchTerm('')}
+                                        className="p-0.5 hover:bg-slate-100 rounded-full transition-colors text-slate-400 hover:text-slate-650"
+                                    >
+                                        <X size={10} />
+                                    </button>
+                                )}
+                            </div>
+                        )}
                         <button
                             onClick={handleExportExcel}
-                            disabled={loading || data.length === 0}
+                            disabled={loading || sortedData.length === 0}
                             className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors border border-slate-200"
                             title="Exportar Excel"
                         >
@@ -155,7 +210,7 @@ export default function ProfesorVentasDetailModal({
                         </button>
                         <button
                             onClick={handleExportPDF}
-                            disabled={loading || data.length === 0}
+                            disabled={loading || sortedData.length === 0}
                             className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors border border-slate-200"
                             title="Exportar PDF"
                         >
@@ -185,6 +240,10 @@ export default function ProfesorVentasDetailModal({
                     ) : data.length === 0 ? (
                         <div className="flex flex-col items-center justify-center h-64 text-slate-500 text-center px-6">
                             <p className="font-medium">No hay ventas registradas para este socio en el periodo seleccionado.</p>
+                        </div>
+                    ) : filteredData.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center h-64 text-slate-500 text-center px-6">
+                            <p className="font-medium">No se encontraron ventas que coincidan con su búsqueda de folio.</p>
                         </div>
                     ) : (
                         <table className="w-full text-left text-sm whitespace-nowrap border-collapse">

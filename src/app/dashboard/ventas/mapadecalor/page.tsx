@@ -1,15 +1,19 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
     Calendar,
     RefreshCcw,
     Store,
     Flame,
     LayoutGrid,
-    ChevronRight
+    ChevronRight,
+    FileText
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import html2canvas from 'html2canvas';
 
 const DAYS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 const HOURS = Array.from({ length: 24 }, (_, i) => `${i.toString().padStart(2, '0')}:00`);
@@ -36,6 +40,9 @@ const getStoreColor = (name: string, index: number) => {
 };
 
 export default function HeatmapPage() {
+    const heatmapRef = useRef<HTMLDivElement>(null);
+    const [exporting, setExporting] = useState(false);
+
     const getFormattedDate = (offset = 0) => {
         const d = new Date();
         d.setDate(d.getDate() + offset);
@@ -172,6 +179,103 @@ export default function HeatmapPage() {
         return new Intl.NumberFormat('es-MX').format(val);
     };
 
+    const handleExportPDF = async () => {
+        setExporting(true);
+        try {
+            const doc = new jsPDF('l', 'mm', 'a4'); // Landscape A4 for wide heatmap grid!
+            
+            // Header
+            doc.setFontSize(18);
+            doc.setTextColor(30, 41, 59); // Slate 800
+            doc.text('Reporte de Mapa de Calor', 14, 18);
+            
+            doc.setFontSize(10);
+            doc.setTextColor(100, 116, 139); // Slate 500
+            doc.text(`Periodo: ${fechaInicio} al ${fechaFin}`, 14, 25);
+            doc.text(`Sucursal: ${selectedStoreId === 'all' ? 'Todas las sucursales' : stores.find(s => s.IdSucursal.toString() === selectedStoreId)?.Tienda || ''}`, 14, 30);
+            doc.text(`Métrica: ${selectedMetric === 'ventas' ? 'Venta' : selectedMetric === 'operaciones' ? 'Operaciones' : 'Ticket Promedio'}`, 14, 35);
+            doc.text(`Generado el: ${new Date().toLocaleString()}`, 14, 40);
+            
+            // Capture visual heatmap grid
+            let heatmapImgData = null;
+            let pdfWidth = 269; // A4 landscape width is 297mm, margin is 14mm on each side (297 - 28 = 269)
+            let pdfHeight = 135;
+            
+            if (heatmapRef.current) {
+                try {
+                    const canvas = await html2canvas(heatmapRef.current, {
+                        scale: 2,
+                        useCORS: true,
+                        backgroundColor: '#ffffff',
+                        logging: false
+                    });
+                    heatmapImgData = canvas.toDataURL('image/png');
+                    const imgProps = doc.getImageProperties(heatmapImgData);
+                    pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+                } catch (error) {
+                    console.error("Error capturing heatmap with html2canvas:", error);
+                }
+            }
+            
+            let yPos = 48;
+            if (heatmapImgData) {
+                doc.addImage(heatmapImgData, 'PNG', 14, yPos, pdfWidth, pdfHeight);
+                yPos += pdfHeight + 12;
+            }
+            
+            // If the table doesn't fit, add page
+            if (yPos > 175) {
+                doc.addPage();
+                yPos = 20;
+            }
+            
+            doc.setFontSize(14);
+            doc.setTextColor(30, 41, 59);
+            doc.text('Resumen Agregado por Día de la Semana', 14, yPos);
+            
+            // Aggregate values by day of the week
+            const summaryRows = DAYS.map((day, dIdx) => {
+                const diaId = ((dIdx + 1) % 7) + 1;
+                let daySales = 0;
+                let dayOps = 0;
+                
+                // Sum across 24 hours
+                for (let h = 0; h < 24; h++) {
+                    daySales += matrix[`${diaId}-${h}-sales`] || 0;
+                    dayOps += matrix[`${diaId}-${h}-tickets`] || 0;
+                }
+                
+                const avgTicket = dayOps > 0 ? daySales / dayOps : 0;
+                return [
+                    day,
+                    new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(daySales),
+                    new Intl.NumberFormat('es-MX').format(dayOps),
+                    new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(avgTicket)
+                ];
+            });
+            
+            autoTable(doc, {
+                head: [["Día de la Semana", "Monto Total de Venta", "Total Operaciones (Tickets)", "Ticket Promedio"]],
+                body: summaryRows,
+                startY: yPos + 4,
+                theme: 'grid',
+                headStyles: { fillColor: [30, 41, 59] },
+                styles: { fontSize: 9, cellPadding: 4 },
+                columnStyles: {
+                    1: { halign: 'right' },
+                    2: { halign: 'right' },
+                    3: { halign: 'right' }
+                }
+            });
+            
+            doc.save(`Mapa_de_Calor_${fechaInicio}_a_${fechaFin}.pdf`);
+        } catch (err) {
+            console.error("Error exporting PDF:", err);
+        } finally {
+            setExporting(false);
+        }
+    };
+
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {/* Header with Filters & Periods */}
@@ -229,6 +333,15 @@ export default function HeatmapPage() {
                                 className="bg-transparent text-xs font-bold text-slate-700 outline-none p-0 border-none h-auto w-28"
                             />
                         </div>
+                        <button
+                            onClick={handleExportPDF}
+                            disabled={exporting}
+                            className="flex items-center gap-2 px-4 py-2.5 bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-100 hover:border-rose-300 transition-all rounded-xl shadow-sm text-xs font-bold disabled:opacity-50"
+                            title="Exportar Reporte a PDF"
+                        >
+                            <FileText size={16} className={cn(exporting && "animate-pulse")} />
+                            <span className="hidden sm:inline">{exporting ? 'Exportando...' : 'Exportar PDF'}</span>
+                        </button>
                         <button
                             onClick={fetchData}
                             className="p-2.5 bg-slate-50 border border-slate-200 text-blue-600 hover:bg-slate-100 hover:border-slate-300 transition-all rounded-xl shadow-sm"
@@ -316,7 +429,7 @@ export default function HeatmapPage() {
 
                 {/* Heatmap Grid Area */}
                 <div className="flex-1 min-w-0">
-                    <div className="bg-white border border-slate-100 shadow-sm relative p-5 h-[580px] rounded-2xl flex flex-col">
+                    <div ref={heatmapRef} className="bg-white border border-slate-100 shadow-sm relative p-5 h-[580px] rounded-2xl flex flex-col">
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 pb-4 border-b border-slate-100">
                             <div className="flex items-center gap-2">
                                 <span className={cn(

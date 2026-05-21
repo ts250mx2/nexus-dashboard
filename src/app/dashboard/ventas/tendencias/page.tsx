@@ -1,16 +1,19 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { 
     TrendingUp, TrendingDown, Calendar, Store, ArrowUpRight, 
     ArrowDownRight, RefreshCcw, LayoutGrid, 
     ShoppingCart, Ticket, DollarSign, Clock, CalendarDays, CalendarRange,
-    CheckSquare, Square, Package, Layers, Info, X
+    CheckSquare, Square, Package, Layers, Info, X, FileText
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SalesTrendsChart } from '@/components/dashboard/sales-trends-chart';
 import { SalesTrendsDetails } from '@/components/dashboard/sales-trends-details';
 import MultiSelect from '@/components/MultiSelect';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import html2canvas from 'html2canvas';
 
 const DEFAULT_COLORS = [
     '#3B82F6', // Blue
@@ -66,6 +69,9 @@ export default function SalesTrendsPage() {
     const [selectedDeptos, setSelectedDeptos] = useState<string[]>([]);
     const [selectedArticulos, setSelectedArticulos] = useState<string[]>([]);
 
+    const chartRef = useRef<HTMLDivElement>(null);
+    const [exporting, setExporting] = useState(false);
+
     // Fetch filters list on mount
     useEffect(() => {
         fetch('/api/dashboard/trends/filters')
@@ -114,6 +120,188 @@ export default function SalesTrendsPage() {
     useEffect(() => {
         fetchData();
     }, [fetchData]);
+
+    const handleExportPDF = async () => {
+        if (!data) return;
+        
+        setExporting(true);
+        try {
+            const doc = new jsPDF();
+            
+            // Title & Header Info
+            doc.setFontSize(20);
+            doc.setTextColor(30, 41, 59); // Slate 800
+            doc.text('Reporte de Tendencias de Ventas', 14, 20);
+            
+            doc.setFontSize(10);
+            doc.setTextColor(100, 116, 139); // Slate 500
+            doc.text(`Periodo: ${fechaInicio} al ${fechaFin}`, 14, 28);
+            doc.text(`Sucursales: ${currentStoreTitle}`, 14, 33);
+            
+            let filterDetails = '';
+            if (selectedDeptos.length > 0) {
+                filterDetails += `Deptos: ${selectedDeptos.join(', ')}  `;
+            }
+            if (selectedArticulos.length > 0) {
+                filterDetails += `Articulos: ${selectedArticulos.length} seleccionados`;
+            }
+            if (filterDetails) {
+                doc.text(`Filtros aplicados: ${filterDetails}`, 14, 38);
+            }
+            doc.text(`Generado el: ${new Date().toLocaleString()}`, 14, filterDetails ? 43 : 38);
+            
+            // Add KPI Summaries
+            doc.setFontSize(14);
+            doc.setTextColor(30, 41, 59);
+            const yStartKPI = filterDetails ? 53 : 48;
+            doc.text('Resumen de Rendimiento', 14, yStartKPI);
+            
+            const kpiHeaders = [["Metrica", "Valor Acumulado", "Metrica de Soporte", "Valor Soporte"]];
+            const kpiRows = [
+                ["Venta Total", formatCurrency(totalSales), "Ticket Promedio", formatCurrency(ticketPromedio)],
+                ["Operaciones Totales", new Intl.NumberFormat('es-MX').format(totalOps), "Variacion del Periodo", `${globalTrend >= 0 ? '+' : ''}${globalTrend.toFixed(1)}%`]
+            ];
+            
+            autoTable(doc, {
+                head: kpiHeaders,
+                body: kpiRows,
+                startY: yStartKPI + 4,
+                theme: 'grid',
+                headStyles: { fillColor: [30, 41, 59] },
+                styles: { fontSize: 9, cellPadding: 4 }
+            });
+
+            // Try capturing the chart using html2canvas
+            let chartImgData = null;
+            let pdfWidth = 182;
+            let pdfHeight = 85;
+            
+            if (chartRef.current) {
+                try {
+                    const canvas = await html2canvas(chartRef.current, {
+                        scale: 2, // High-quality display resolution
+                        useCORS: true,
+                        backgroundColor: '#ffffff',
+                        logging: false
+                    });
+                    chartImgData = canvas.toDataURL('image/png');
+                    const imgProps = doc.getImageProperties(chartImgData);
+                    pdfWidth = doc.internal.pageSize.getWidth() - 28; // 14 margin on each side
+                    pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+                } catch (error) {
+                    console.error("Error capturing chart with html2canvas:", error);
+                }
+            }
+
+            // Table 1: Branch Performance Table OR Chart first!
+            let yStartBranch = (doc as any).lastAutoTable.finalY + 12;
+            
+            if (chartImgData) {
+                // If it goes off page 1, add page
+                if (yStartBranch > 180) {
+                    doc.addPage();
+                    yStartBranch = 20;
+                }
+                
+                doc.setFontSize(14);
+                doc.setTextColor(30, 41, 59);
+                doc.text('Gráfica de Tendencia de Ventas', 14, yStartBranch);
+                
+                doc.addImage(chartImgData, 'PNG', 14, yStartBranch + 4, pdfWidth, pdfHeight);
+                yStartBranch = yStartBranch + 4 + pdfHeight + 12;
+            }
+            
+            // If the branch table goes too low, add page
+            if (yStartBranch > 220) {
+                doc.addPage();
+                yStartBranch = 20;
+            }
+            
+            doc.setFontSize(14);
+            doc.setTextColor(30, 41, 59);
+            doc.text('Desglose de Ventas y Tendencia por Sucursal', 14, yStartBranch);
+            
+            const branchHeaders = [["Sucursal", "Total Periodo Actual", "Total Periodo Anterior", "Variacion (%)"]];
+            const branchRows = (data.branchTrends || []).map((item: any) => [
+                item.Tienda || 'Desconocida',
+                formatCurrency(item.CurrentTotal),
+                formatCurrency(item.PrevTotal),
+                `${item.TrendPercentage >= 0 ? '+' : ''}${item.TrendPercentage.toFixed(1)}%`
+            ]);
+            
+            autoTable(doc, {
+                head: branchHeaders,
+                body: branchRows,
+                startY: yStartBranch + 4,
+                theme: 'grid',
+                headStyles: { fillColor: [37, 99, 235] },
+                styles: { fontSize: 9, cellPadding: 4 },
+                columnStyles: {
+                    1: { halign: 'right' },
+                    2: { halign: 'right' },
+                    3: { halign: 'right' }
+                }
+            });
+            
+            // Table 2: Time Series Table
+            const yStartTimeSeries = (doc as any).lastAutoTable.finalY + 12;
+            
+            // If we run out of vertical space on the current page, add a new page
+            let finalYPosition = yStartTimeSeries;
+            if (finalYPosition > 200) {
+                doc.addPage();
+                finalYPosition = 20;
+            }
+            
+            doc.setFontSize(14);
+            doc.setTextColor(30, 41, 59);
+            doc.text(`Historico Detallado de Ventas (Agrupado por ${groupBy === 'dia' ? 'Dia' : groupBy === 'semana' ? 'Semana' : 'Mes'})`, 14, finalYPosition);
+            
+            const timeSeriesHeaders = groupBy === 'dia' 
+                ? [["Fecha", "Venta Total", "Tickets (Ops)", "Ticket Promedio"]]
+                : [["Periodo (Inicio)", "Venta Total", "Tickets (Ops)", "Ticket Promedio"]];
+                
+            // Aggregate by date to show a clean summary in the PDF table
+            const aggregatedSeriesMap = new Map<string, { date: string, total: number, ops: number }>();
+            (data.timeSeries || []).forEach((item: any) => {
+                const dateStr = new Date(item.Fecha).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' });
+                if (!aggregatedSeriesMap.has(dateStr)) {
+                    aggregatedSeriesMap.set(dateStr, { date: dateStr, total: 0, ops: 0 });
+                }
+                const entry = aggregatedSeriesMap.get(dateStr)!;
+                entry.total += item.Total;
+                entry.ops += item.Operaciones;
+            });
+            
+            const timeSeriesRows = Array.from(aggregatedSeriesMap.values()).map(row => [
+                row.date,
+                formatCurrency(row.total),
+                new Intl.NumberFormat('es-MX').format(row.ops),
+                formatCurrency(row.ops > 0 ? row.total / row.ops : 0)
+            ]);
+            
+            autoTable(doc, {
+                head: timeSeriesHeaders,
+                body: timeSeriesRows,
+                startY: finalYPosition + 4,
+                theme: 'striped',
+                headStyles: { fillColor: [79, 70, 229] },
+                styles: { fontSize: 9, cellPadding: 3.5 },
+                columnStyles: {
+                    1: { halign: 'right' },
+                    2: { halign: 'right' },
+                    3: { halign: 'right' }
+                }
+            });
+            
+            // Save PDF file
+            doc.save(`Reporte_Tendencias_${fechaInicio}_a_${fechaFin}.pdf`);
+        } catch (err) {
+            console.error("Error exporting PDF:", err);
+        } finally {
+            setExporting(false);
+        }
+    };
 
     const handleStoreToggle = (id: string) => {
         setSelectedStoreIds(prev => {
@@ -229,8 +417,21 @@ export default function SalesTrendsPage() {
                         />
                     </div>
                     <button
+                        onClick={handleExportPDF}
+                        className="flex items-center gap-2 px-3 py-2.5 bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-100 hover:border-rose-300 transition-all rounded-xl shadow-sm text-xs font-bold cursor-pointer disabled:opacity-50"
+                        disabled={loading || !data || exporting}
+                        title="Exportar Reporte a PDF"
+                    >
+                        {exporting ? (
+                            <RefreshCcw size={16} className="animate-spin" />
+                        ) : (
+                            <FileText size={16} />
+                        )}
+                        <span className="hidden sm:inline">{exporting ? 'Exportando...' : 'Exportar PDF'}</span>
+                    </button>
+                    <button
                         onClick={fetchData}
-                        className="p-2.5 bg-slate-50 border border-slate-200 text-blue-600 hover:bg-slate-100 hover:border-slate-300 transition-all rounded-xl shadow-sm"
+                        className="p-2.5 bg-slate-50 border border-slate-200 text-blue-600 hover:bg-slate-100 hover:border-slate-300 transition-all rounded-xl shadow-sm cursor-pointer"
                         disabled={loading}
                     >
                         <RefreshCcw size={16} className={cn(loading && "animate-spin")} />
@@ -555,7 +756,7 @@ export default function SalesTrendsPage() {
                         </div>
 
                         {/* Rendering Recharts SalesTrendsChart */}
-                        <div className="flex-1 pt-2 relative">
+                        <div ref={chartRef} className="flex-1 pt-2 relative bg-white rounded-xl">
                             {loading ? (
                                 <div className="absolute inset-0 flex items-center justify-center bg-white/70 backdrop-blur-[1px] z-10">
                                     <div className="flex flex-col items-center gap-3">

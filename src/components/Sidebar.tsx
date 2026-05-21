@@ -17,7 +17,8 @@ import {
     LayoutGrid,
     Flame,
     Users,
-    Layers
+    Layers,
+    Package
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
@@ -41,9 +42,11 @@ const sidebarItems: SidebarItem[] = [
         subItems: [
             { name: 'Tendencias de Venta', href: '/dashboard/ventas/tendencias', icon: TrendingUp, color: 'text-blue-900' },
             { name: 'Mapa de Calor', href: '/dashboard/ventas/mapadecalor', icon: Flame, color: 'text-blue-900' },
+            { name: 'Categorías Global', href: '/dashboard/ventas/categorias-global', icon: LayoutGrid, color: 'text-blue-900' },
             { name: 'Operaciones', href: '/dashboard/ventas/operaciones', icon: LayoutGrid, color: 'text-blue-900' },
             { name: 'Reporte Ventas', href: '/dashboard/reportes/ventas', icon: FileText, color: 'text-blue-900' },
             { name: 'Profesores Global', href: '/dashboard/ventas/profesores-global', icon: Users, color: 'text-blue-900' },
+            { name: 'Productos Global', href: '/dashboard/ventas/productos-global', icon: Package, color: 'text-blue-900' },
             { name: 'Profesores', href: '/dashboard/reportes/profesores', icon: FileText, color: 'text-blue-900' },
             { name: 'Margen & Rentabilidad', href: '/dashboard/reportes/margen', icon: DollarSign, color: 'text-blue-900' },
             { name: 'Retiros', href: '/dashboard/ventas/retiros', icon: DollarSign, color: 'text-blue-900' }
