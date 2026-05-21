@@ -27,6 +27,8 @@ import {
     Legend,
     Line
 } from 'recharts';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import DatePresetsProfesores from '@/components/DatePresetsProfesores';
 import VentasItemDetailModal from '@/components/VentasItemDetailModal';
 import { cn } from '@/lib/utils';
@@ -199,6 +201,7 @@ export default function ProfesoresGlobalPage() {
     const [initialSucursalId, setInitialSucursalId] = useState<string | null>(null);
     const [initialProfesorId, setInitialProfesorId] = useState<string | null>(null);
 
+    const [exporting, setExporting] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
 
     const filteredBranches = useMemo(() => {
@@ -733,6 +736,143 @@ export default function ProfesoresGlobalPage() {
         updateQueryParams({ articuloId: null });
     };
 
+    const handleExportPDF = async () => {
+        setExporting(true);
+        try {
+            const doc = new jsPDF();
+            
+            // Header title and metadata
+            doc.setFontSize(18);
+            doc.setTextColor(30, 41, 59); // Slate 800
+            
+            const hasSucursal = !!selectedSucursal;
+            const hasProfesor = !!selectedProfesor;
+            
+            let title = 'Reporte Global de Profesores / Socios';
+            if (hasSucursal && !hasProfesor) {
+                title = `Reporte de Profesores / Socios - ${selectedSucursal.Nombre}`;
+            } else if (hasProfesor) {
+                title = `Reporte de Artículos - Prof. ${selectedProfesor.Cliente}`;
+            }
+            
+            doc.text(title, 14, 20);
+            
+            doc.setFontSize(10);
+            doc.setTextColor(100, 116, 139); // Slate 500
+            doc.text(`Periodo: ${startDate} al ${endDate}`, 14, 28);
+            if (hasSucursal) {
+                doc.text(`Sucursal Seleccionada: ${selectedSucursal.Nombre}`, 14, 33);
+            }
+            if (hasProfesor) {
+                doc.text(`Profesor / Socio Seleccionado: ${selectedProfesor.Cliente}`, 14, hasSucursal ? 38 : 33);
+            }
+            
+            const dateY = hasProfesor ? (hasSucursal ? 43 : 38) : (hasSucursal ? 38 : 33);
+            doc.text(`Generado el: ${new Date().toLocaleString()}`, 14, dateY);
+            
+            const startY = dateY + 8;
+            
+            if (!hasSucursal) {
+                // Tier 1: Global branches summary
+                const headers = [["Sucursal", "Venta Total", "Clientes Activos"]];
+                const rows = [];
+                
+                if (allBranchesTotal) {
+                    rows.push([
+                        allBranchesTotal.Nombre,
+                        formatCurrency(allBranchesTotal.TotalVenta),
+                        allBranchesTotal.TotalClientes.toString()
+                    ]);
+                }
+                
+                filteredBranches.forEach((branch) => {
+                    rows.push([
+                        branch.Nombre,
+                        formatCurrency(branch.TotalVenta),
+                        branch.TotalClientes.toString()
+                    ]);
+                });
+                
+                autoTable(doc, {
+                    head: headers,
+                    body: rows,
+                    startY: startY,
+                    theme: 'striped',
+                    headStyles: { fillColor: [30, 41, 59] },
+                    styles: { fontSize: 9.5, cellPadding: 4 },
+                    columnStyles: {
+                        1: { halign: 'right' },
+                        2: { halign: 'right' }
+                    }
+                });
+            } else if (!hasProfesor) {
+                // Tier 2: Teachers of Selected Branch
+                const headers = [["Profesor / Socio", "Sucursal", "Tickets (Ops)", "Venta Total", "Ticket Promedio"]];
+                const rows = filteredProfesores.map((prof) => [
+                    prof.Cliente,
+                    prof.Sucursal || selectedSucursal.Nombre,
+                    prof.TotalVentas.toString(),
+                    formatCurrency(prof.ImporteTotal),
+                    formatCurrency(prof.TicketPromedio)
+                ]);
+                
+                autoTable(doc, {
+                    head: headers,
+                    body: rows,
+                    startY: startY,
+                    theme: 'striped',
+                    headStyles: { fillColor: [30, 41, 59] },
+                    styles: { fontSize: 8.5, cellPadding: 3.5 },
+                    columnStyles: {
+                        2: { halign: 'right' },
+                        3: { halign: 'right' },
+                        4: { halign: 'right' }
+                    }
+                });
+            } else {
+                // Tier 3: Sold Articles by Selected Teacher
+                const headers = [["Artículo", "Código", "Cantidad", "Total de Venta", "Tickets (Ops)", "Ticket Promedio"]];
+                const rows = filteredArticulos.map((art) => [
+                    art.Articulo,
+                    art.Codigo || art.IdArticulo.toString(),
+                    art.Cantidad.toString(),
+                    formatCurrency(art.Total),
+                    art.NumeroTickets.toString(),
+                    formatCurrency(art.TicketPromedio)
+                ]);
+                
+                autoTable(doc, {
+                    head: headers,
+                    body: rows,
+                    startY: startY,
+                    theme: 'striped',
+                    headStyles: { fillColor: [30, 41, 59] },
+                    styles: { fontSize: 8.5, cellPadding: 3.5 },
+                    columnStyles: {
+                        1: { halign: 'left' },
+                        2: { halign: 'right' },
+                        3: { halign: 'right' },
+                        4: { halign: 'right' },
+                        5: { halign: 'right' }
+                    }
+                });
+            }
+            
+            let filename = `Reporte_Global_Profesores_${startDate}_a_${endDate}.pdf`;
+            if (hasSucursal && !hasProfesor) {
+                filename = `Reporte_Profesores_${selectedSucursal.Nombre.replace(/\s+/g, '_')}_${startDate}_a_${endDate}.pdf`;
+            } else if (hasProfesor) {
+                filename = `Reporte_Articulos_Prof_${selectedProfesor.Cliente.replace(/\s+/g, '_')}_${startDate}_a_${endDate}.pdf`;
+            }
+                
+            doc.save(filename);
+        } catch (err) {
+            console.error("Error exporting PDF:", err);
+        } finally {
+            setExporting(false);
+        }
+    };
+
     const allBranchesTotal = useMemo(() => {
         if (branches.length === 0) return null;
         return {
@@ -787,6 +927,15 @@ export default function ProfesoresGlobalPage() {
                         title="Actualizar Datos"
                     >
                         <RefreshCcw size={16} className={cn((loadingBranches || loadingProfesores || loadingArticulos) && "animate-spin")} />
+                    </button>
+                    <button
+                        onClick={handleExportPDF}
+                        disabled={exporting}
+                        className="flex items-center gap-2 px-4 py-2.5 bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-100 hover:border-rose-300 transition-all rounded-xl shadow-sm text-xs font-bold disabled:opacity-50"
+                        title="Exportar Reporte a PDF"
+                    >
+                        <FileText size={16} className={cn(exporting && "animate-pulse")} />
+                        <span className="hidden sm:inline">{exporting ? 'Exportando...' : 'Exportar PDF'}</span>
                     </button>
                 </div>
             </div>

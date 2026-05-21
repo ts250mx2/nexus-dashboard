@@ -111,6 +111,7 @@ function ReportContent() {
     const [sucursalesSummary, setSucursalesSummary] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [exporting, setExporting] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
 
     const filteredBranches = useMemo(() => {
@@ -205,6 +206,65 @@ function ReportContent() {
         };
     }, [sucursalesSummary]);
 
+    const handleExportPDF = async () => {
+        setExporting(true);
+        try {
+            const doc = new jsPDF();
+            
+            // Header title and metadata
+            doc.setFontSize(18);
+            doc.setTextColor(30, 41, 59); // Slate 800
+            
+            doc.text('Reporte de Profesores por Sucursal', 14, 20);
+            
+            doc.setFontSize(10);
+            doc.setTextColor(100, 116, 139); // Slate 500
+            doc.text(`Periodo: ${startDate} al ${endDate}`, 14, 28);
+            doc.text(`Generado el: ${new Date().toLocaleString()}`, 14, 33);
+            
+            const startY = 41;
+            
+            // Table: Branches Summary
+            const headers = [["Sucursal", "Venta Total", "Socios Activos"]];
+            const rows = [];
+            
+            if (allBranchesSummary) {
+                rows.push([
+                    allBranchesSummary.Nombre,
+                    formatCurrency(allBranchesSummary.TotalVenta),
+                    allBranchesSummary.TotalClientes.toString()
+                ]);
+            }
+            
+            filteredBranches.forEach((branch) => {
+                rows.push([
+                    branch.Nombre,
+                    formatCurrency(branch.TotalVenta),
+                    branch.TotalClientes.toString()
+                ]);
+            });
+            
+            autoTable(doc, {
+                head: headers,
+                body: rows,
+                startY: startY,
+                theme: 'striped',
+                headStyles: { fillColor: [30, 41, 59] },
+                styles: { fontSize: 9.5, cellPadding: 4 },
+                columnStyles: {
+                    1: { halign: 'right' },
+                    2: { halign: 'right' }
+                }
+            });
+            
+            doc.save(`Reporte_Profesores_Sucursales_${startDate}_a_${endDate}.pdf`);
+        } catch (err) {
+            console.error("Error exporting PDF:", err);
+        } finally {
+            setExporting(false);
+        }
+    };
+
     return (
         <div className="space-y-6">
             {/* Header with Filters & Periods */}
@@ -249,6 +309,15 @@ function ReportContent() {
                         title="Actualizar Datos"
                     >
                         <RefreshCcw size={16} className={cn(loading && "animate-spin")} />
+                    </button>
+                    <button
+                        onClick={handleExportPDF}
+                        disabled={exporting}
+                        className="flex items-center gap-2 px-4 py-2.5 bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-100 hover:border-rose-300 transition-all rounded-xl shadow-sm text-xs font-bold disabled:opacity-50"
+                        title="Exportar Reporte a PDF"
+                    >
+                        <FileText size={16} className={cn(exporting && "animate-pulse")} />
+                        <span className="hidden sm:inline">{exporting ? 'Exportando...' : 'Exportar PDF'}</span>
                     </button>
                 </div>
             </div>

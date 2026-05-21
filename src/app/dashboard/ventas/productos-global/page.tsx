@@ -691,6 +691,15 @@ export default function ProductosGlobalPage() {
                     >
                         <RefreshCcw size={16} className={cn((loadingBranches || loadingArticulos) && "animate-spin")} />
                     </button>
+                    <button
+                        onClick={handleExportPDF}
+                        disabled={exporting}
+                        className="flex items-center gap-2 px-4 py-2.5 bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-100 hover:border-rose-300 transition-all rounded-xl shadow-sm text-xs font-bold disabled:opacity-50"
+                        title="Exportar Reporte a PDF"
+                    >
+                        <FileText size={16} className={cn(exporting && "animate-pulse")} />
+                        <span className="hidden sm:inline">{exporting ? 'Exportando...' : 'Exportar PDF'}</span>
+                    </button>
                 </div>
             </div>
 
