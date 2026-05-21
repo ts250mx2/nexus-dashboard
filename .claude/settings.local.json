@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir \"c:\\\\Users\\\\Ruben\\\\Documents\\\\Antigravity Projects\\\\nexus-dashboard\" /B)",
+      "Bash(ls \"c:/Users/Ruben/Documents/Antigravity Projects/kyk-dashboard/src\" 2>&1 | head -50)",
+      "Read(//c/Users/Ruben/Documents/Antigravity Projects/kyk-dashboard/src/**)",
+      "Bash(ls \"c:/Users/Ruben/Documents/Antigravity Projects/kyk-dashboard/src/lib\" 2>&1 *)",
+      "Read(//c/Users/Ruben/Documents/Antigravity Projects/kyk-dashboard/**)",
+      "Bash(npm install *)",
+      "Bash(node inspect-tables.mjs)",
+      "Bash(npx tsc *)",
+      "Bash(echo \"EXIT=$?\")",
+      "Bash(ls \"C:\\\\Users\\\\Ruben\\\\.claude\\\\projects\\\\c--Users-Ruben-Documents-Antigravity-Projects-nexus-dashboard\\\\memory\\\\\" 2>&1)",
+      "Read(//c/Users/Ruben/.claude/projects/c--Users-Ruben-Documents-Antigravity-Projects-nexus-dashboard/**)",
+      "PowerShell(npx tsc --noEmit --pretty false 2>&1)",
+      "PowerShell(npx tsc --noEmit 2>&1; \"exit: $LASTEXITCODE\")"
+    ]
+  }
+}

@@ -2,10 +2,27 @@ import { NextResponse } from 'next/server';
 import { openai } from '@/lib/ai';
 import { anthropic, DEFAULT_MODEL } from '@/lib/anthropic';
 import { query } from '@/lib/db';
-import { reportsCatalogForPrompt, AVAILABLE_REPORTS } from '@/lib/available-reports';
+import { reportsCatalogForPrompt, AVAILABLE_REPORTS, findRelevantReports } from '@/lib/available-reports';
 import { assertReadOnly } from '@/lib/sql-sandbox';
 import { createSseStream, SSE_HEADERS } from '@/lib/sse';
-import { proposeFollowUp } from '@/lib/investigator';
+import { proposeFollowUp, FollowUpProposal } from '@/lib/investigator';
+import {
+    detectCausalIntent,
+    generateHypotheses,
+    executeHypotheses,
+    generateDeepDive,
+    formatHypothesesForPrompt,
+    CausalHypothesisResult
+} from '@/lib/causal-reasoner';
+import {
+    detectForecastIntent,
+    rowsToSeries,
+    forecastSeries,
+    formatForecastForPrompt,
+    ForecastResult
+} from '@/lib/forecasting';
+import { saveMemory } from '@/lib/semantic-memory';
+import { findRelevantPlaybookSteps } from '@/lib/playbooks';
 import { queryLimiter } from '@/lib/rate-limit';
 import { getUserId } from '@/lib/conversations';
 import { recordMetric } from '@/lib/metrics';
@@ -20,6 +37,7 @@ const SECRET_KEY = new TextEncoder().encode(
 );
 
 const MAX_HISTORY_TURNS = 8;
+const META_MARKER = '---NEXUS_META---';
 
 const ANTHROPIC_TOOLS: any[] = [
     {
@@ -39,7 +57,7 @@ const ANTHROPIC_TOOLS: any[] = [
         input_schema: {
             type: 'object',
             properties: {
-                main_insight: { type: 'string', description: 'Hallazgo principal que motiva las recomendaciones' },
+                main_insight: { type: 'string' },
                 recommended_reports: {
                     type: 'array',
                     items: {
@@ -150,9 +168,9 @@ MySQL PRECISO (cuando ejecutes consultas)
 • Funciones de fecha MySQL: CURDATE(), NOW(), DATE_SUB, DATE_FORMAT, YEAR(), MONTH(), DAY(), HOUR()
 • NULL-safe: IFNULL(x, 0). NUNCA inventes columnas — usa SOLO las del esquema
 • Tabla principal: tblVentas (FechaVenta DATETIME, Total DOUBLE, IdSucursal, IdCliente, IdUsuario)
-• CLIENTES Y PROVEEDORES: Ambos están consolidados en \`tblSocios\` (el nombre del socio/cliente/proveedor está en la columna \`Socio\`).
-  - Cuando pregunten por "cliente" (Client/Customer), relaciónalo con \`tblSocios\` (generalmente mediante \`tblVentas.IdSocio = tblSocios.IdSocio\` o buscando en \`tblSocios\` donde \`EsProveedor = 0\`).
-  - Cuando pregunten por "proveedor" (Supplier/Vendor), relaciónalo con \`tblSocios\` donde \`EsProveedor = 1\` (generalmente mediante \`tblArticulos.IdProveedor = tblSocios.IdSocio\` o \`tblOrdenesCompra.IdProveedor = tblSocios.IdSocio\`).
+• CLIENTES Y PROVEEDORES: Ambos están consolidados en \`tblSocios\` (Socio es el nombre).
+  - "cliente" → \`tblSocios\` (típicamente \`tblVentas.IdSocio = tblSocios.IdSocio\` o \`EsProveedor = 0\`)
+  - "proveedor" → \`tblSocios\` donde \`EsProveedor = 1\`
 • Detalle: tblDetalleVentas (IdVenta, IdArticulo, Cantidad, PrecioBase, Total)
 • Sucursales: tblSucursales (Nombre)
 • Artículos: tblArticulos (Producto, Depto)
@@ -173,11 +191,6 @@ FORMATO: Métricas inline en prosa, en **negritas**. Sin tablas obligatorias.
 CORRECTO:
 "Las ventas de hoy van en **$1.4M**, 8% arriba de ayer. Centro tira del carro
 con **$420K**, seguido por Norte (**$310K**)."
-
-INCORRECTO:
-"Aquí los datos:
-• Total: $1.4M
-• Centro: $420K"
 
 NO HACER:
 ✗ Bullets de datos numéricos simples
@@ -232,8 +245,191 @@ async function logQuestion(prompt: string, response: any, sql: string | null): P
             [prompt, JSON.stringify(response).slice(0, 16000), userId, sql]
         );
     } catch (e) {
-        // Silencioso
+        // silencioso
     }
+}
+
+function inferVisualization(prompt: string, results: any[]): string {
+    if (!results || results.length === 0) return 'table';
+    const cols = Object.keys(results[0]);
+    const lowerPrompt = prompt.toLowerCase();
+    if (/tendencia|evoluci[oó]n|histor|por d[ií]a|por mes|por hora/i.test(lowerPrompt)) return 'line';
+    if (/comparativa|comparar|vs|ranking|top \d+|por sucursal/i.test(lowerPrompt)) return 'bar';
+    if (/distribuci[oó]n|porcentaje|participaci[oó]n|share/i.test(lowerPrompt)) return 'pie';
+    if (results.length === 1 && cols.length === 1) return 'kpi';
+    return 'table';
+}
+
+function buildSuggestedFollowups(_prompt: string, results: any[]): string[] {
+    const base = [
+        'Compara contra el mismo período del año pasado',
+        'Desglose por sucursal',
+        'Ver evolución diaria de los últimos 30 días'
+    ];
+    if (results && results.length > 0) {
+        const cols = Object.keys(results[0]);
+        if (cols.includes('Sucursal') || cols.includes('IdSucursal')) {
+            base[1] = 'Compara contra el promedio de las demás sucursales';
+        }
+    }
+    return base;
+}
+
+interface FollowUpContext {
+    question: string;
+    sql: string | null;
+    results: any[];
+}
+
+function buildMetaPrompt(
+    prompt: string,
+    sql: string | null,
+    results: any[],
+    followUp?: FollowUpContext | null,
+    causalResults?: CausalHypothesisResult[] | null,
+    forecastResult?: ForecastResult | null
+): string {
+    const forecastSection = forecastResult ? formatForecastForPrompt(forecastResult) : '';
+
+    const followUpSection = followUp && followUp.results.length > 0 ? `
+
+INVESTIGACIÓN AUTOMÁTICA EJECUTADA:
+Detectaste algo anómalo en la primera consulta y ejecutaste una segunda para
+profundizar. Integra AMBAS en tu análisis — no las trates como separadas.
+Tu respuesta debe contar la historia completa: el dato inicial + lo que
+descubriste al investigar.
+
+Pregunta de la investigación: ${followUp.question}
+SQL de la investigación: ${followUp.sql}
+Resultados (primeros 10): ${JSON.stringify(followUp.results.slice(0, 10))}
+` : '';
+
+    const subCount = (causalResults || []).filter(r => r.label.startsWith('↳')).length;
+    const baseCount = (causalResults?.length || 0) - subCount;
+    const causalSection = causalResults && causalResults.length > 0 ? `
+
+RAZONAMIENTO CAUSAL MULTI-HIPÓTESIS:
+La pregunta es de tipo "¿por qué pasó X?". Ejecutaste ${baseCount} hipótesis
+principales en paralelo${subCount > 0 ? ` y ${subCount} sub-hipótesis de profundización` : ''}
+para investigar la causa raíz. Cada hipótesis viene con un VEREDICTO PRELIMINAR
+calculado heurísticamente (concentración y varianza de los datos).
+
+Tu trabajo:
+1. CONFÍA en el veredicto preliminar pero VERIFÍCALO mirando los datos crudos.
+   Hipótesis ordenadas: primero "EVIDENCIA FUERTE", luego "PARCIAL", luego "SIN EVIDENCIA".
+2. CONCLUYE con la causa raíz más probable, fundamentada en las hipótesis con
+   evidencia fuerte/parcial.${subCount > 0 ? `
+3. Las sub-hipótesis ("↳") profundizan en la dimensión concentrada. Úsalas para
+   dar especificidad ("la causa es X, y dentro de X específicamente Y").` : ''}
+
+INSTRUCCIONES PARA EL TEXTO DE LA PARTE 1:
+- Permitido extenderse a 5-7 oraciones (es un análisis de causa raíz)
+- Estructura: dato principal → causa identificada con evidencia → 1-2 hipótesis
+  descartadas brevemente → 1 acción accionable
+- Sé contundente con "EVIDENCIA FUERTE": "la causa es X" no "podría ser X".
+
+INSTRUCCIONES PARA "key_insights":
+- Lista las 3 HIPÓTESIS MÁS RELEVANTES con su veredicto: "Confirmada", "Parcial"
+  o "Descartada", acompañada del dato concreto que lo prueba.
+
+HIPÓTESIS EJECUTADAS (ordenadas por fuerza de evidencia):
+${formatHypothesesForPrompt(causalResults)}
+` : '';
+
+    const isCausal = !!(causalResults && causalResults.length > 0);
+    const sentenceRange = isCausal ? '5-7 oraciones (análisis de causa raíz)'
+        : followUp ? '4-6 oraciones (con investigación)'
+            : '2-4 oraciones';
+
+    const reportsList = Object.values(AVAILABLE_REPORTS)
+        .flatMap(c => c.reports)
+        .map(r => `- ${r.name} (${r.path}) — ${r.description}`)
+        .join('\n');
+
+    return `Eres Nexus IA, consultor senior conversacional. Acabas de ejecutar una consulta
+y tienes los resultados. Vas a responder en DOS partes separadas por un marcador.
+
+PARTE 1 — Texto en prosa fluida (lo primero que verá el usuario):
+• ${sentenceRange} máximo
+• Cifras INLINE con **negritas Markdown** (ej: "**$1.4M**", "**+12%**")
+• Tono: consultor amigable, no robótico
+• NO bullets, NO encabezados, NO repitas la pregunta
+• NO digas "¿quieres profundizar?" — los botones ya aparecen en la UI
+${followUp ? '• Menciona el hallazgo principal Y lo que reveló la investigación, como una sola narrativa fluida' : ''}
+${isCausal ? '• Concluye con la causa raíz más probable y 1 acción accionable' : ''}
+
+DESPUÉS DEL TEXTO, en una nueva línea, escribe EXACTAMENTE este marcador:
+${META_MARKER}
+
+PARTE 2 — Debajo del marcador, un JSON válido (y nada más):
+{
+  "key_insights": ["3 hallazgos cortos con dato concreto"],
+  "recommendations": ["2-3 acciones priorizadas"],
+  "visualization": "table|bar|line|pie|area|kpi",
+  "suggested_questions": ["3 preguntas de seguimiento naturales"],
+  "suggested_reports": [
+    { "report_name": "Nombre exacto del reporte", "reason": "por qué ayuda", "path": "/dashboard/..." }
+  ]
+}
+
+REPORTES DISPONIBLES (para suggested_reports — copia name/path TAL CUAL):
+${reportsList}
+
+REGLAS DE VISUALIZACIÓN:
+• line/area → series temporales
+• bar → comparativas entre categorías
+• pie → distribuciones porcentuales
+• table → datos multi-columna de detalle
+• kpi → una sola métrica clave
+
+──────────────────────────────────────────────
+Pregunta del usuario: ${prompt}
+SQL ejecutado: ${sql}
+Resultados (primeros 10): ${JSON.stringify(results.slice(0, 10))}${followUpSection}${causalSection}${forecastSection}
+──────────────────────────────────────────────
+
+Empieza la respuesta directamente, sin preámbulos.`;
+}
+
+function parseMetaBlock(raw: string): any {
+    const start = raw.indexOf('{');
+    const end = raw.lastIndexOf('}');
+    if (start < 0 || end <= start) return {};
+    try {
+        return JSON.parse(raw.substring(start, end + 1));
+    } catch {
+        return {};
+    }
+}
+
+function resolveReportPath(name: string): string | undefined {
+    if (!name) return undefined;
+    const lower = name.toLowerCase();
+    for (const cat of Object.values(AVAILABLE_REPORTS)) {
+        for (const r of cat.reports) {
+            if (r.name.toLowerCase() === lower) return r.path;
+        }
+    }
+    return undefined;
+}
+
+function normalizeSuggestedReports(meta: any, prompt: string): any[] {
+    if (Array.isArray(meta.suggested_reports) && meta.suggested_reports.length > 0) {
+        return meta.suggested_reports.slice(0, 4).map((r: any) => ({
+            report_name: String(r.report_name || '').slice(0, 100),
+            reason: String(r.reason || '').slice(0, 200),
+            expected_action: r.expected_action ? String(r.expected_action).slice(0, 200) : undefined,
+            path: r.path ? String(r.path).slice(0, 200) : resolveReportPath(r.report_name)
+        }));
+    }
+    const relevant = findRelevantReports(prompt);
+    if (relevant.length === 0) return [];
+    return relevant.slice(0, 3).map(item => ({
+        report_name: item.report.name,
+        reason: item.report.description,
+        expected_action: item.report.useCases[0],
+        path: item.report.path
+    }));
 }
 
 export async function POST(req: Request) {
@@ -245,7 +441,6 @@ export async function POST(req: Request) {
     const log = logger.child({ requestId });
 
     try {
-        // Rate limit
         const userIdForLimit = await getUserId().catch(() => 'anonymous');
         const limit = queryLimiter.check(`query:${userIdForLimit}`);
         if (!limit.allowed) {
@@ -295,8 +490,7 @@ export async function POST(req: Request) {
 
         const schemaPath = path.join(process.cwd(), 'database-schema-ia.md');
         const schemaString = fs.readFileSync(schemaPath, 'utf-8');
-        
-        // Read custom query designer schemas and prompt injection
+
         let customSchemasString = '';
         try {
             const customSchemasPath = path.join(process.cwd(), 'src', 'data', 'custom-query-schemas.json');
@@ -319,7 +513,6 @@ export async function POST(req: Request) {
                                         .join(' AND ');
                                     customSchemasString += `  - Join ${rel.joinType || 'INNER JOIN'}: ON ${joinConditions}\n`;
                                 } else {
-                                    // Fallback for single-field schema structure
                                     customSchemasString += `  - Join ${rel.joinType || 'INNER JOIN'}: ON ${rel.tableA}.${rel.fieldA} = ${rel.tableB}.${rel.fieldB}\n`;
                                 }
                             });
@@ -336,16 +529,16 @@ export async function POST(req: Request) {
                 }
             }
         } catch (err) {
-            console.error('Error loading custom schemas for AI Agent:', err);
+            console.error('Error loading custom schemas:', err);
         }
 
         const formattedRules = await fetchAiRules(prompt);
         const currentDateTime = new Date().toLocaleString('es-MX', { timeZone: 'America/Mexico_City' });
-        const systemPrompt = buildSystemPrompt({ 
-            schemaString, 
-            customSchemasString, 
-            formattedRules, 
-            currentDateTime 
+        const systemPrompt = buildSystemPrompt({
+            schemaString,
+            customSchemasString,
+            formattedRules,
+            currentDateTime
         });
 
         const url = new URL(req.url);
@@ -354,6 +547,9 @@ export async function POST(req: Request) {
 
         // ───────────────────────────── STREAMING ─────────────────────────────
         if (wantsStreaming && isAnthropic) {
+            let streamOutcome: 'ok' | 'error' = 'ok';
+            let streamError: string | undefined;
+
             const stream = createSseStream(async (emit) => {
                 try {
                     emit({ event: 'status', data: { phase: 'thinking' } });
@@ -371,6 +567,7 @@ export async function POST(req: Request) {
                     const initialText = textBlock?.text || '';
                     const toolUses = decision.content.filter((c: any) => c.type === 'tool_use') as any[];
 
+                    // CASO A: sin tool — respuesta conversacional
                     if (toolUses.length === 0) {
                         const text = initialText.trim() ||
                             'Estoy aquí. Cuéntame qué necesitas — puedo darte el pulso del negocio o ayudarte con cualquier otra pregunta.';
@@ -384,6 +581,7 @@ export async function POST(req: Request) {
                     const toolCall = toolUses[0];
                     const args = toolCall.input;
 
+                    // CASO B: request_clarification
                     if (toolCall.name === 'request_clarification') {
                         emit({
                             event: 'clarification',
@@ -398,6 +596,7 @@ export async function POST(req: Request) {
                         return;
                     }
 
+                    // CASO C: suggest_reports
                     if (toolCall.name === 'suggest_reports') {
                         const msg = `${args.main_insight}\n\nReportes que pueden ayudarte:`;
                         emit({ event: 'text-delta', data: { text: msg } });
@@ -414,6 +613,7 @@ export async function POST(req: Request) {
                         return;
                     }
 
+                    // CASO D: query_database
                     if (toolCall.name === 'query_database') {
                         let safeSql: string;
                         try {
@@ -437,58 +637,262 @@ export async function POST(req: Request) {
                         try {
                             results = await query(safeSql);
                         } catch (sqlErr: any) {
-                            emit({
-                                event: 'error',
-                                data: { message: 'Error ejecutando la consulta', details: sqlErr.message }
-                            });
-                            emit({ event: 'done', data: {} });
-                            return;
+                            emit({ event: 'status', data: { phase: 'correcting-sql' } });
+                            try {
+                                const correction = await anthropic.messages.create({
+                                    model: selectedModel,
+                                    max_tokens: 1024,
+                                    messages: [{
+                                        role: 'user',
+                                        content: `Error MySQL: ${sqlErr.message}. Corrige el SQL. Solo devuelve el SQL corregido sin markdown.\n\nSQL Original: ${safeSql}`
+                                    }]
+                                });
+                                const corrected = (correction.content[0] as any).text.replace(/```sql|```/g, '').trim();
+                                const safeCorrected = assertReadOnly(corrected);
+                                lastSql = safeCorrected;
+                                results = await query(safeCorrected);
+                            } catch (e) {
+                                emit({
+                                    event: 'error',
+                                    data: { message: 'Error ejecutando la consulta', details: sqlErr.message }
+                                });
+                                emit({ event: 'done', data: {} });
+                                return;
+                            }
                         }
 
+                        // BRANCH: causal vs investigador
+                        const isCausal = detectCausalIntent(prompt);
+
+                        // FORECASTING (independiente de causal)
+                        let forecastResult: ForecastResult | null = null;
+                        const forecastIntent = detectForecastIntent(prompt);
+                        if (forecastIntent.wants && results.length >= 7) {
+                            try {
+                                const series = rowsToSeries(results);
+                                if (series.length >= 7) {
+                                    emit({
+                                        event: 'status',
+                                        data: {
+                                            phase: 'analyzing',
+                                            detail: `Proyectando ${forecastIntent.daysAhead} días…`
+                                        }
+                                    });
+                                    forecastResult = forecastSeries(series, forecastIntent.daysAhead);
+                                }
+                            } catch (fe) {
+                                console.error('Forecast failed:', fe);
+                            }
+                        }
+
+                        let followUp: FollowUpProposal | null = null;
+                        let followUpResults: any[] = [];
+                        let followUpSql: string | null = null;
+                        let causalResults: CausalHypothesisResult[] = [];
+
+                        if (isCausal && results.length > 0) {
+                            // MODO CAUSAL: 4-6 hipótesis en paralelo
+                            emit({
+                                event: 'status',
+                                data: { phase: 'reasoning-causal', detail: 'Diseñando hipótesis…' }
+                            });
+                            try {
+                                const playbookHints = await findRelevantPlaybookSteps(
+                                    String(userIdForLimit),
+                                    prompt
+                                ).catch(() => [] as string[]);
+                                const hypotheses = await generateHypotheses({
+                                    userPrompt: prompt,
+                                    schemaContext: schemaString,
+                                    firstSql: lastSql,
+                                    firstResults: results,
+                                    playbookHints
+                                });
+                                if (hypotheses.length > 0) {
+                                    emit({
+                                        event: 'status',
+                                        data: {
+                                            phase: 'reasoning-causal',
+                                            detail: `Probando ${hypotheses.length} hipótesis en paralelo…`,
+                                            hypothesesCount: hypotheses.length
+                                        }
+                                    });
+                                    causalResults = await executeHypotheses(hypotheses);
+
+                                    // SEGUNDA RONDA: solo la primera 'strong'
+                                    const strongParent = causalResults.find(
+                                        r => r.success && r.evidence?.verdict === 'strong'
+                                    );
+                                    if (strongParent) {
+                                        emit({
+                                            event: 'status',
+                                            data: {
+                                                phase: 'reasoning-causal',
+                                                detail: `Profundizando en "${strongParent.evidence?.topDimension?.value || strongParent.label}"…`
+                                            }
+                                        });
+                                        try {
+                                            const subHypotheses = await generateDeepDive({
+                                                userPrompt: prompt,
+                                                parent: strongParent,
+                                                schemaContext: schemaString
+                                            });
+                                            if (subHypotheses.length > 0) {
+                                                const subResults = await executeHypotheses(subHypotheses);
+                                                causalResults = [...causalResults, ...subResults];
+                                            }
+                                        } catch (e) {
+                                            console.error('Deep dive failed:', e);
+                                        }
+                                    }
+                                }
+                            } catch (e) {
+                                console.error('Causal reasoning failed:', e);
+                            }
+                        } else if (results.length > 0) {
+                            // MODO INVESTIGADOR clásico
+                            try {
+                                followUp = await proposeFollowUp({
+                                    userPrompt: prompt,
+                                    firstSql: lastSql || '',
+                                    firstResults: results,
+                                    schemaContext: schemaString,
+                                    model: selectedModel
+                                });
+                            } catch (e) {
+                                console.error('Investigator failed:', e);
+                            }
+
+                            if (followUp) {
+                                emit({
+                                    event: 'status',
+                                    data: {
+                                        phase: 'investigating',
+                                        detail: followUp.question,
+                                        rationale: followUp.rationale
+                                    }
+                                });
+                                try {
+                                    const safeFollowUpSql = assertReadOnly(followUp.sql);
+                                    followUpSql = safeFollowUpSql;
+                                    followUpResults = await query(safeFollowUpSql);
+                                } catch (e) {
+                                    console.error('Follow-up query failed:', e);
+                                    followUp = null;
+                                    followUpSql = null;
+                                    followUpResults = [];
+                                }
+                            }
+                        }
+
+                        // Stream del análisis con META_MARKER protocol
                         emit({ event: 'status', data: { phase: 'analyzing' } });
 
-                        const analysisPayload = await runStructuredAnalysis({
-                            model: selectedModel,
+                        const metaPrompt = buildMetaPrompt(
                             prompt,
-                            sql: safeSql,
-                            results
+                            lastSql,
+                            results,
+                            followUp && followUpResults.length > 0
+                                ? { question: followUp.question, sql: followUpSql, results: followUpResults }
+                                : null,
+                            causalResults.length > 0 ? causalResults : null,
+                            forecastResult
+                        );
+
+                        const streamResp = anthropic.messages.stream({
+                            model: selectedModel,
+                            max_tokens: 2500,
+                            messages: [{ role: 'user', content: metaPrompt }]
                         });
 
-                        emit({ event: 'text-delta', data: { text: analysisPayload.text } });
+                        let fullText = '';
+                        let inMetadata = false;
+                        let metadataBuffer = '';
 
-                        // Modo investigador (opcional, una sola query extra)
-                        let followUp = null;
-                        try {
-                            followUp = await proposeFollowUp({
-                                userPrompt: prompt,
-                                firstSql: safeSql,
-                                firstResults: results,
-                                schemaContext: schemaString,
-                                model: selectedModel
-                            });
-                        } catch { }
+                        for await (const event of streamResp) {
+                            if (event.type === 'content_block_delta' &&
+                                (event.delta as any).type === 'text_delta') {
+                                const chunk = (event.delta as any).text as string;
+                                fullText += chunk;
 
-                        const visualization = analysisPayload.visualization || inferVisualization(prompt, results);
+                                if (!inMetadata) {
+                                    const markerIdx = fullText.indexOf(META_MARKER);
+                                    if (markerIdx >= 0) {
+                                        const preMarker = fullText.substring(0, markerIdx);
+                                        const alreadyEmittedLen = fullText.length - chunk.length;
+                                        if (markerIdx > alreadyEmittedLen) {
+                                            const remainingPre = preMarker.substring(alreadyEmittedLen);
+                                            if (remainingPre) {
+                                                emit({ event: 'text-delta', data: { text: remainingPre } });
+                                            }
+                                        }
+                                        inMetadata = true;
+                                        metadataBuffer = fullText.substring(markerIdx + META_MARKER.length);
+                                    } else {
+                                        emit({ event: 'text-delta', data: { text: chunk } });
+                                    }
+                                } else {
+                                    metadataBuffer += chunk;
+                                }
+                            }
+                        }
+
+                        const meta = parseMetaBlock(metadataBuffer);
+
+                        const fullSummary = inMetadata
+                            ? fullText.substring(0, fullText.indexOf(META_MARKER)).trim()
+                            : fullText.trim();
+
+                        const visualization = ['table', 'bar', 'line', 'pie', 'area', 'kpi'].includes(meta.visualization)
+                            ? meta.visualization
+                            : inferVisualization(prompt, results);
 
                         emit({
                             event: 'metadata',
                             data: {
                                 ai_model: selectedModel,
-                                sql: safeSql,
+                                sql: lastSql,
                                 data: results,
                                 visualization,
-                                follow_up: followUp,
-                                key_insights: analysisPayload.key_insights,
-                                recommendations: analysisPayload.recommendations,
-                                suggested_reports: analysisPayload.suggested_reports,
-                                suggested_questions: analysisPayload.suggested_questions?.length
-                                    ? analysisPayload.suggested_questions
+                                follow_up: followUp ? {
+                                    question: followUp.question,
+                                    rationale: followUp.rationale,
+                                    sql: followUpSql
+                                } : null,
+                                causal: causalResults.length > 0 ? {
+                                    hypotheses_count: causalResults.length,
+                                    strong_count: causalResults.filter(r => r.evidence?.verdict === 'strong').length
+                                } : null,
+                                forecast: forecastResult,
+                                key_insights: Array.isArray(meta.key_insights) ? meta.key_insights.slice(0, 6) : [],
+                                recommendations: Array.isArray(meta.recommendations) ? meta.recommendations.slice(0, 6) : [],
+                                suggested_reports: normalizeSuggestedReports(meta, prompt),
+                                suggested_questions: Array.isArray(meta.suggested_questions) && meta.suggested_questions.length > 0
+                                    ? meta.suggested_questions.slice(0, 4)
                                     : buildSuggestedFollowups(prompt, results)
                             }
                         });
                         emit({ event: 'done', data: {} });
 
-                        await logQuestion(prompt, { message: analysisPayload.text, sql: safeSql, rows: results.length }, safeSql);
+                        await logQuestion(prompt, {
+                            message: fullSummary,
+                            sql: lastSql,
+                            rows: results.length,
+                            causal: causalResults.length > 0,
+                            forecast: !!forecastResult
+                        }, lastSql);
+
+                        // Memoria semántica (best-effort)
+                        if (lastSql) {
+                            void saveMemory({
+                                userId: String(userIdForLimit),
+                                prompt,
+                                response: fullSummary,
+                                sql: lastSql,
+                                aiModel: selectedModel
+                            });
+                        }
+
                         void recordMetric({
                             userId: userIdForLimit,
                             endpoint: '/api/query',
@@ -498,13 +902,15 @@ export async function POST(req: Request) {
                             latencyMs: Date.now() - startTime,
                             tokensInput: decision.usage?.input_tokens,
                             tokensOutput: decision.usage?.output_tokens,
-                            extra: { requestId, rows: results.length }
+                            extra: { requestId, rows: results.length, causal: causalResults.length > 0, forecast: !!forecastResult }
                         });
                         return;
                     }
                 } catch (err: any) {
-                    log.error('streaming error', { msg: err?.message });
-                    emit({ event: 'error', data: { message: err?.message || 'Error interno' } });
+                    streamOutcome = 'error';
+                    streamError = err?.message || String(err);
+                    log.error('streaming error', { msg: streamError });
+                    emit({ event: 'error', data: { message: streamError } });
                     emit({ event: 'done', data: {} });
                     void recordMetric({
                         userId: userIdForLimit,
@@ -513,7 +919,7 @@ export async function POST(req: Request) {
                         streaming: true,
                         status: 'error',
                         latencyMs: Date.now() - startTime,
-                        errorMsg: err?.message,
+                        errorMsg: streamError,
                         extra: { requestId }
                     });
                 }
@@ -590,6 +996,8 @@ export async function POST(req: Request) {
                 data: [],
                 message: message.text?.trim() || 'Estoy aquí. ¿En qué te apoyo?',
                 visualization: 'table',
+                conversational: true,
+                ai_model: selectedModel,
                 suggested_questions: ['Ventas de hoy', 'Top 5 productos del mes', 'Comparativa por sucursal']
             };
         } else {
@@ -602,6 +1010,7 @@ export async function POST(req: Request) {
                     sql: null,
                     message: args.message,
                     visualization: 'table',
+                    ai_model: selectedModel,
                     suggested_questions: args.suggested_questions
                 };
             } else if (toolCall.name === 'suggest_reports') {
@@ -610,6 +1019,7 @@ export async function POST(req: Request) {
                     sql: null,
                     message: args.main_insight,
                     visualization: 'table',
+                    ai_model: selectedModel,
                     suggested_reports: args.recommended_reports,
                     suggested_questions: args.recommended_reports.map((r: any) => r.report_name)
                 };
@@ -638,7 +1048,6 @@ export async function POST(req: Request) {
                 try {
                     results = await query(safeSql);
                 } catch (sqlErr: any) {
-                    // Auto-corrección rápida con el mismo modelo
                     try {
                         const correction = await openai.chat.completions.create({
                             model: 'gpt-4o',
@@ -656,25 +1065,52 @@ export async function POST(req: Request) {
                     }
                 }
 
-                const analysisPayload = await runStructuredAnalysis({
-                    model: selectedModel.includes('claude') ? selectedModel : DEFAULT_MODEL,
-                    prompt,
-                    sql: lastSql || safeSql,
-                    results
-                });
+                // Non-streaming: simpler, no causal/forecast (keep latency reasonable)
+                const metaPrompt = buildMetaPrompt(prompt, lastSql, results);
+                let metaContent = '';
+                if (selectedModel.includes('claude')) {
+                    const metaResp = await anthropic.messages.create({
+                        model: selectedModel,
+                        max_tokens: 2500,
+                        messages: [{ role: 'user', content: metaPrompt }]
+                    });
+                    metaContent = (metaResp.content[0] as any).text || '';
+                } else {
+                    const metaResp = await openai.chat.completions.create({
+                        model: 'gpt-4o',
+                        messages: [{ role: 'user', content: metaPrompt }]
+                    });
+                    metaContent = metaResp.choices[0].message.content || '';
+                }
+
+                const markerIdx = metaContent.indexOf(META_MARKER);
+                const summary = markerIdx >= 0 ? metaContent.substring(0, markerIdx).trim() : metaContent.trim();
+                const meta = markerIdx >= 0 ? parseMetaBlock(metaContent.substring(markerIdx + META_MARKER.length)) : {};
+
                 finalResponse = {
                     data: results,
                     sql: lastSql,
-                    message: analysisPayload.text,
-                    visualization: analysisPayload.visualization || inferVisualization(prompt, results),
-                    key_insights: analysisPayload.key_insights,
-                    recommendations: analysisPayload.recommendations,
-                    suggested_reports: analysisPayload.suggested_reports,
-                    suggested_questions: analysisPayload.suggested_questions?.length
-                        ? analysisPayload.suggested_questions
+                    message: summary || 'Análisis completado.',
+                    visualization: ['table', 'bar', 'line', 'pie', 'area', 'kpi'].includes(meta.visualization)
+                        ? meta.visualization
+                        : inferVisualization(prompt, results),
+                    key_insights: Array.isArray(meta.key_insights) ? meta.key_insights.slice(0, 6) : [],
+                    recommendations: Array.isArray(meta.recommendations) ? meta.recommendations.slice(0, 6) : [],
+                    suggested_reports: normalizeSuggestedReports(meta, prompt),
+                    suggested_questions: Array.isArray(meta.suggested_questions) && meta.suggested_questions.length > 0
+                        ? meta.suggested_questions.slice(0, 4)
                         : buildSuggestedFollowups(prompt, results),
                     ai_model: selectedModel
                 };
+
+                // Memoria semántica best-effort
+                void saveMemory({
+                    userId: String(userIdForLimit),
+                    prompt,
+                    response: summary,
+                    sql: lastSql,
+                    aiModel: selectedModel
+                });
             }
         }
 
@@ -708,153 +1144,4 @@ export async function POST(req: Request) {
             sql: lastSql
         }, { status: 500 });
     }
-}
-
-function inferVisualization(prompt: string, results: any[]): string {
-    if (!results || results.length === 0) return 'table';
-    const cols = Object.keys(results[0]);
-    const lowerPrompt = prompt.toLowerCase();
-    if (/tendencia|evoluci[oó]n|histor|por d[ií]a|por mes|por hora/i.test(lowerPrompt)) return 'line';
-    if (/comparativa|comparar|vs|ranking|top \d+|por sucursal/i.test(lowerPrompt)) return 'bar';
-    if (/distribuci[oó]n|porcentaje|participaci[oó]n|share/i.test(lowerPrompt)) return 'pie';
-    if (results.length === 1 && cols.length === 1) return 'kpi';
-    return 'table';
-}
-
-function buildSuggestedFollowups(_prompt: string, results: any[]): string[] {
-    const base = [
-        'Compara contra el mismo período del año pasado',
-        'Desglose por sucursal',
-        'Ver evolución diaria de los últimos 30 días'
-    ];
-    if (results && results.length > 0) {
-        const cols = Object.keys(results[0]);
-        if (cols.includes('Sucursal') || cols.includes('IdSucursal')) {
-            base[1] = 'Compara contra el promedio de las demás sucursales';
-        }
-    }
-    return base;
-}
-
-interface StructuredAnalysis {
-    text: string;
-    key_insights?: string[];
-    recommendations?: string[];
-    suggested_reports?: Array<{ report_name: string; reason: string; expected_action?: string; path?: string }>;
-    suggested_questions?: string[];
-    visualization?: 'table' | 'bar' | 'line' | 'pie' | 'area' | 'kpi';
-}
-
-/**
- * Pide a Claude (o OpenAI fallback) una respuesta estructurada con prosa breve
- * + hallazgos + acciones + reportes sugeridos. Una sola llamada que devuelve
- * JSON. Si el modelo falla, regresa al menos el texto crudo.
- */
-async function runStructuredAnalysis(opts: {
-    model: string;
-    prompt: string;
-    sql: string;
-    results: any[];
-}): Promise<StructuredAnalysis> {
-    const { model, prompt, sql, results } = opts;
-
-    const reportsList = Object.values(AVAILABLE_REPORTS)
-        .flatMap(c => c.reports)
-        .map(r => `- ${r.name} (${r.path}) — ${r.description}`)
-        .join('\n');
-
-    const instr = `Eres Nexus IA, consultor senior. Acabas de ejecutar una consulta y tienes los resultados.
-
-Genera una respuesta ESTRUCTURADA EN JSON con estos campos:
-
-{
-  "text": "Prosa breve (2-4 oraciones) con métricas inline en **negritas**. Tono consultor senior. Sin encabezados, sin bullets, sin 'Aquí tienes:'",
-  "key_insights": ["3-5 hallazgos cortos", "cada uno una oración con datos en **negritas**", "lo que llama la atención"],
-  "recommendations": ["2-4 acciones concretas y verbo-en-infinitivo", "ej: 'Revisar inventario de X en sucursal Y'", "directas, accionables"],
-  "suggested_reports": [
-    { "report_name": "Nombre exacto del reporte", "reason": "por qué ayuda aquí", "path": "/dashboard/..." }
-  ],
-  "suggested_questions": ["Pregunta de seguimiento 1", "Pregunta 2", "Pregunta 3"],
-  "visualization": "table|bar|line|pie|area|kpi"
-}
-
-REPORTES DISPONIBLES (para suggested_reports, copia name y path TAL CUAL):
-${reportsList}
-
-REGLAS:
-- "text" es la respuesta principal — debe sonar natural, no robótica
-- "key_insights" SOLO cosas notables/llamativas (no obvias). Si nada destaca, devuelve []
-- "recommendations" SOLO si los datos sugieren acción clara. Si no, []
-- "suggested_reports" SOLO si hay un reporte que el usuario podría visitar. Si no aplica, []
-- "visualization" sugiere el mejor formato según los datos (1 fila numérica → "kpi"; serie temporal → "line"; ranking categorías → "bar"; distribución → "pie"; lista larga → "table")
-
-DEVUELVE SOLO EL JSON, sin markdown.
-
-PREGUNTA: ${prompt}
-SQL: ${sql}
-RESULTADOS (muestra de hasta 20 filas, total ${results.length}): ${JSON.stringify(results.slice(0, 20))}`;
-
-    try {
-        if (model.includes('claude')) {
-            const resp = await anthropic.messages.create({
-                model,
-                max_tokens: 2500,
-                messages: [{ role: 'user', content: instr }]
-            });
-            const text = (resp.content[0] as any)?.text || '';
-            return parseStructuredAnalysis(text);
-        } else {
-            const resp = await openai.chat.completions.create({
-                model: 'gpt-4o',
-                messages: [{ role: 'user', content: instr }],
-                response_format: { type: 'json_object' }
-            });
-            const text = resp.choices[0].message.content || '';
-            return parseStructuredAnalysis(text);
-        }
-    } catch (e) {
-        console.error('runStructuredAnalysis failed:', e);
-        return { text: 'Aquí tienes los datos solicitados.' };
-    }
-}
-
-function parseStructuredAnalysis(raw: string): StructuredAnalysis {
-    const start = raw.indexOf('{');
-    const end = raw.lastIndexOf('}');
-    if (start < 0 || end <= start) {
-        return { text: raw.trim() || 'Aquí tienes los datos.' };
-    }
-    try {
-        const parsed = JSON.parse(raw.substring(start, end + 1));
-        return {
-            text: String(parsed.text || 'Aquí tienes los datos.').slice(0, 4000),
-            key_insights: Array.isArray(parsed.key_insights) ? parsed.key_insights.slice(0, 6).map((x: any) => String(x).slice(0, 300)) : [],
-            recommendations: Array.isArray(parsed.recommendations) ? parsed.recommendations.slice(0, 6).map((x: any) => String(x).slice(0, 300)) : [],
-            suggested_reports: Array.isArray(parsed.suggested_reports)
-                ? parsed.suggested_reports.slice(0, 4).map((r: any) => ({
-                    report_name: String(r.report_name || '').slice(0, 100),
-                    reason: String(r.reason || '').slice(0, 200),
-                    expected_action: r.expected_action ? String(r.expected_action).slice(0, 200) : undefined,
-                    path: r.path ? String(r.path).slice(0, 200) : resolveReportPath(r.report_name)
-                }))
-                : [],
-            suggested_questions: Array.isArray(parsed.suggested_questions)
-                ? parsed.suggested_questions.slice(0, 4).map((x: any) => String(x).slice(0, 200))
-                : [],
-            visualization: ['table', 'bar', 'line', 'pie', 'area', 'kpi'].includes(parsed.visualization) ? parsed.visualization : undefined
-        };
-    } catch {
-        return { text: raw.trim().slice(0, 4000) };
-    }
-}
-
-function resolveReportPath(name: string): string | undefined {
-    if (!name) return undefined;
-    const lower = name.toLowerCase();
-    for (const cat of Object.values(AVAILABLE_REPORTS)) {
-        for (const r of cat.reports) {
-            if (r.name.toLowerCase() === lower) return r.path;
-        }
-    }
-    return undefined;
 }

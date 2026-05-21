@@ -17,7 +17,8 @@ import {
     TrendingUp,
     User,
     Layers,
-    AlertCircle
+    AlertCircle,
+    RefreshCcw
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import * as XLSX from 'xlsx';
@@ -227,20 +228,48 @@ function RetirosContent() {
 
     return (
         <div className="space-y-6 relative min-h-[calc(100vh-140px)] animate-in fade-in duration-300">
-            {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Retiros de Efectivo</h1>
-                    <p className="text-slate-500 mt-1">Monitoreo y auditoría de salidas de caja y retiros de efectivo</p>
+            {/* Header with Filters & Periods */}
+            <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white py-4 px-6 rounded-2xl shadow-sm border border-slate-100 animate-in fade-in duration-500">
+                <div className="flex flex-col md:flex-row md:items-center gap-6">
+                    <h1 className="text-2xl font-black text-slate-800 tracking-tight uppercase flex items-center gap-3 select-none">
+                        <DollarSign className="text-blue-600" />
+                        Retiros de Efectivo
+                    </h1>
+
+                    <DatePresets />
                 </div>
-                <div className="flex items-center gap-3">
+
+                <div className="flex flex-wrap items-center gap-3">
+                    <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
+                        <Calendar size={16} className="text-blue-500" />
+                        <span className="text-[10px] font-bold text-slate-400 uppercase">Del</span>
+                        <input
+                            type="date"
+                            value={startDate}
+                            onChange={(e) => handleParamChange('startDate', e.target.value)}
+                            className="bg-transparent text-xs font-bold text-slate-700 outline-none p-0 border-none h-auto w-28 cursor-pointer"
+                        />
+                    </div>
+                    <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
+                        <Calendar size={16} className="text-blue-500" />
+                        <span className="text-[10px] font-bold text-slate-400 uppercase">Al</span>
+                        <input
+                            type="date"
+                            value={endDate}
+                            onChange={(e) => handleParamChange('endDate', e.target.value)}
+                            className="bg-transparent text-xs font-bold text-slate-700 outline-none p-0 border-none h-auto w-28 cursor-pointer"
+                        />
+                    </div>
                     <button
-                        onClick={handleExportExcel}
-                        disabled={loading || data.length === 0}
-                        className="flex items-center gap-2 px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm active:scale-95 text-sm"
+                        onClick={() => {
+                            // Trigger refresh by pushing same state
+                            handleParamChange('startDate', startDate);
+                        }}
+                        className="p-2.5 bg-slate-50 border border-slate-200 text-blue-600 hover:bg-slate-100 hover:border-slate-300 transition-all rounded-xl shadow-sm cursor-pointer"
+                        disabled={loading}
+                        title="Actualizar Datos"
                     >
-                        <FileSpreadsheet size={16} />
-                        <span>Exportar Excel</span>
+                        <RefreshCcw size={16} className={cn(loading && "animate-spin")} />
                     </button>
                 </div>
             </div>
@@ -291,62 +320,36 @@ function RetirosContent() {
                 </div>
             </div>
 
-            {/* Filter Panel */}
-            <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-wrap items-center justify-between gap-6">
-                <div className="flex flex-wrap items-center gap-6">
-                    {/* Sucursal Filter */}
-                    <div className="flex flex-col gap-1.5 min-w-[200px]">
-                        <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-wider">
-                            <Store size={14} className="text-amber-500" />
-                            Sucursal
-                        </div>
-                        <div className="relative">
-                            <select
-                                value={idTienda}
-                                onChange={(e) => handleParamChange('idTienda', e.target.value)}
-                                className="w-full pl-3 pr-10 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all appearance-none cursor-pointer"
-                            >
-                                <option value="all">Todas las Sucursales</option>
-                                {sucursales.map(s => (
-                                    <option key={s.id} value={s.id}>{s.name}</option>
-                                ))}
-                            </select>
-                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={14} />
-                        </div>
+            {/* Action Row - Sucursal & Export */}
+            <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                    <span className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5 select-none">
+                        <Store size={14} className="text-amber-500" />
+                        Sucursal:
+                    </span>
+                    <div className="relative">
+                        <select
+                            value={idTienda}
+                            onChange={(e) => handleParamChange('idTienda', e.target.value)}
+                            className="w-[220px] pl-3 pr-10 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all appearance-none cursor-pointer"
+                        >
+                            <option value="all">Todas las Sucursales</option>
+                            {sucursales.map(s => (
+                                <option key={s.id} value={s.id}>{s.name}</option>
+                            ))}
+                        </select>
+                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={14} />
                     </div>
-
-                    {/* Periodo de Tiempo */}
-                    <div className="flex flex-col gap-1.5 min-w-[300px]">
-                        <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-wider">
-                            <Calendar size={14} className="text-indigo-500" />
-                            Periodo de Tiempo
-                        </div>
-                        <div className="flex flex-wrap items-center gap-3">
-                            <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase">Del</span>
-                                    <input
-                                        type="date"
-                                        value={startDate}
-                                        onChange={(e) => handleParamChange('startDate', e.target.value)}
-                                        className="bg-transparent text-xs font-semibold text-slate-700 focus:outline-none cursor-pointer"
-                                    />
-                                </div>
-                                <div className="h-4 w-px bg-slate-300"></div>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase">Al</span>
-                                    <input
-                                        type="date"
-                                        value={endDate}
-                                        onChange={(e) => handleParamChange('endDate', e.target.value)}
-                                        className="bg-transparent text-xs font-semibold text-slate-700 focus:outline-none cursor-pointer"
-                                    />
-                                </div>
-                            </div>
-                            <div className="hidden sm:block w-px h-6 bg-slate-200"></div>
-                            <DatePresets />
-                        </div>
-                    </div>
+                </div>
+                <div className="ml-auto">
+                    <button
+                        onClick={handleExportExcel}
+                        disabled={loading || data.length === 0}
+                        className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-sm transition-all cursor-pointer active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                        <FileSpreadsheet size={14} />
+                        <span>Exportar Excel</span>
+                    </button>
                 </div>
             </div>
 

@@ -1,7 +1,7 @@
 import mysql from 'mysql2/promise';
 
 const poolConfig = {
-    host: process.env.DB_SERVER || 'nexusmty.ddns.net',
+    host: process.env.DB_SERVER || '100.65.202.81',
     port: parseInt(process.env.DB_PORT || '3306'),
     user: process.env.DB_USER || 'kyk',
     password: process.env.DB_PASSWORD || 'merkurio',

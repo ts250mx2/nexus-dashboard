@@ -20,11 +20,17 @@ import {
     TrendingUp,
     Sparkles,
     RefreshCw,
-    BarChart3
+    BarChart3,
+    ThumbsUp,
+    ThumbsDown,
+    Brain,
+    LineChart,
+    Zap
 } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 
 interface Message {
+    id?: string;
     role: 'user' | 'assistant';
     content: string;
     sql?: string;
@@ -43,9 +49,18 @@ interface Message {
         expected_action?: string;
         path?: string;
     }>;
+    follow_up?: { question: string; rationale?: string; sql?: string | null } | null;
+    causal?: { hypotheses_count: number; strong_count: number } | null;
+    forecast?: {
+        forecast: Array<{ date: string; pointEstimate: number; lowerBound: number; upperBound: number }>;
+        confidence: 'high' | 'medium' | 'low';
+        r2: number;
+        summary: string;
+    } | null;
     streaming?: boolean;
-    streamPhase?: 'thinking' | 'querying' | 'correcting-sql' | 'investigating' | 'analyzing' | 'finalizing';
+    streamPhase?: 'thinking' | 'querying' | 'correcting-sql' | 'investigating' | 'reasoning-causal' | 'analyzing' | 'finalizing';
     streamPhaseDetail?: string;
+    feedback?: 'up' | 'down' | null;
 }
 
 const STREAM_PHASE_LABELS: Record<NonNullable<Message['streamPhase']>, string> = {
@@ -53,9 +68,18 @@ const STREAM_PHASE_LABELS: Record<NonNullable<Message['streamPhase']>, string> =
     'querying': 'Consultando datos...',
     'correcting-sql': 'Ajustando consulta...',
     'investigating': 'Investigando causa...',
+    'reasoning-causal': 'Razonando causalmente...',
     'analyzing': 'Analizando resultados...',
     'finalizing': 'Preparando análisis...'
 };
+
+interface ProactivePrompt {
+    id: string;
+    message: string;
+    context: string | null;
+    suggestedAction: string;
+    severity: 'critical' | 'opportunity' | 'info';
+}
 
 interface DailyInsight {
     id: string;
@@ -131,6 +155,8 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
     const [expandedData, setExpandedData] = useState<Record<number, boolean>>({});
     const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
     const [conversationsRefreshKey, setConversationsRefreshKey] = useState(0);
+    const [proactivePrompts, setProactivePrompts] = useState<ProactivePrompt[]>([]);
+    const [expandedForecast, setExpandedForecast] = useState<Record<number, boolean>>({});
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const streamControllerRef = useRef<AbortController | null>(null);
     const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -243,6 +269,70 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
         }
     }, []);
 
+    const generateMessageId = (): string => {
+        return 'msg_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
+    };
+
+    const fetchProactivePrompts = useCallback(async () => {
+        try {
+            const r = await fetch('/api/agent/proactive-prompts');
+            if (!r.ok) return;
+            const data = await r.json();
+            if (Array.isArray(data.prompts)) {
+                setProactivePrompts(data.prompts);
+            }
+        } catch (e) {
+            console.error('Error cargando prompts proactivos:', e);
+        }
+    }, []);
+
+    const resolveProactivePrompt = useCallback(async (id: string, status: 'accepted' | 'dismissed') => {
+        setProactivePrompts(prev => prev.filter(p => p.id !== id));
+        try {
+            await fetch('/api/agent/proactive-prompts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'resolve', id, status })
+            });
+        } catch (e) {
+            console.error('Error resolviendo prompt proactivo:', e);
+        }
+    }, []);
+
+    const sendFeedback = useCallback(async (msgIndex: number, rating: 'up' | 'down') => {
+        setMessages(prev => {
+            if (msgIndex < 0 || msgIndex >= prev.length) return prev;
+            const copy = [...prev];
+            copy[msgIndex] = { ...copy[msgIndex], feedback: rating };
+            return copy;
+        });
+        try {
+            const msg = messages[msgIndex];
+            if (!msg) return;
+            const messageId = msg.id || `msg_${msg.timestamp || Date.now()}`;
+            const userMsg = msgIndex > 0 ? messages[msgIndex - 1] : null;
+            await fetch('/api/agent/feedback', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    messageId,
+                    conversationId: activeConversationId,
+                    rating,
+                    prompt: userMsg?.role === 'user' ? userMsg.content : null,
+                    response: msg.content || null,
+                    sql: msg.sql || null,
+                    aiModel: msg.ai_model || null
+                })
+            });
+        } catch (e) {
+            console.error('Error enviando feedback:', e);
+        }
+    }, [messages, activeConversationId]);
+
+    const toggleForecast = (index: number) => {
+        setExpandedForecast(prev => ({ ...prev, [index]: !prev[index] }));
+    };
+
     const toggleData = (index: number) => {
         setExpandedData(prev => ({ ...prev, [index]: !prev[index] }));
     };
@@ -278,6 +368,12 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
             fetchDailyInsights(false);
         }
     }, [isOpen, dailyInsights.length, loadingInsights, fetchDailyInsights]);
+
+    useEffect(() => {
+        if (isOpen) {
+            fetchProactivePrompts();
+        }
+    }, [isOpen, fetchProactivePrompts]);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -349,6 +445,7 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
         setMessages((prev) => {
             assistantIndex = prev.length;
             return [...prev, {
+                id: generateMessageId(),
                 role: 'assistant',
                 content: '',
                 timestamp: assistantTimestamp,
@@ -434,6 +531,9 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
                                 key_insights: evt.data?.key_insights || [],
                                 recommendations: evt.data?.recommendations || [],
                                 suggested_reports: evt.data?.suggested_reports,
+                                follow_up: evt.data?.follow_up || null,
+                                causal: evt.data?.causal || null,
+                                forecast: evt.data?.forecast || null,
                                 conversational: evt.data?.conversational === true,
                                 ai_model: evt.data?.ai_model
                             });
@@ -468,6 +568,9 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
                     key_insights: data.key_insights,
                     recommendations: data.recommendations,
                     suggested_reports: data.suggested_reports,
+                    follow_up: data.follow_up || null,
+                    causal: data.causal || null,
+                    forecast: data.forecast || null,
                     streaming: false,
                     streamPhase: undefined
                 });
@@ -567,6 +670,54 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
 
                     {/* Messages Area */}
                     <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-8 scroll-smooth" id="chat-messages">
+                        {/* Prompts proactivos (siempre visibles cuando hay) */}
+                        {proactivePrompts.length > 0 && messages.length === 0 && (
+                            <div className="space-y-2 mb-2 animate-in fade-in slide-in-from-top-4 duration-500">
+                                <div className="flex items-center gap-2 px-2">
+                                    <Zap className="w-3.5 h-3.5 text-amber-500" />
+                                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-700">
+                                        El agente detectó algo
+                                    </span>
+                                </div>
+                                {proactivePrompts.slice(0, 3).map((pp) => {
+                                    const sevBar = pp.severity === 'critical' ? 'bg-rose-500'
+                                        : pp.severity === 'opportunity' ? 'bg-emerald-500'
+                                            : 'bg-amber-400';
+                                    return (
+                                        <div
+                                            key={pp.id}
+                                            className="relative bg-gradient-to-br from-amber-50 to-white border border-amber-200 rounded-2xl p-4 shadow-sm"
+                                        >
+                                            <div className={cn('absolute left-0 top-3 bottom-3 w-1 rounded-full', sevBar)} />
+                                            <div className="pl-2 space-y-2">
+                                                <p className="text-sm font-bold text-slate-800 leading-snug">{pp.message}</p>
+                                                {pp.context && (
+                                                    <p className="text-[11px] text-slate-600 leading-snug">{pp.context}</p>
+                                                )}
+                                                <div className="flex gap-2 pt-1">
+                                                    <button
+                                                        onClick={() => {
+                                                            resolveProactivePrompt(pp.id, 'accepted');
+                                                            handleSend(pp.suggestedAction);
+                                                        }}
+                                                        className="flex-1 px-3 py-1.5 bg-slate-900 hover:bg-blue-600 text-white rounded-full text-[11px] font-bold transition-colors active:scale-95"
+                                                    >
+                                                        Investigar
+                                                    </button>
+                                                    <button
+                                                        onClick={() => resolveProactivePrompt(pp.id, 'dismissed')}
+                                                        className="px-3 py-1.5 bg-white hover:bg-slate-100 border border-slate-200 text-slate-500 rounded-full text-[11px] font-bold transition-colors active:scale-95"
+                                                    >
+                                                        Descartar
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+
                         {messages.length === 0 && (
                             <div className="flex flex-col h-full animate-in fade-in slide-in-from-bottom-4 duration-700">
                                 {/* Briefing */}
@@ -705,20 +856,28 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
                                                             <div className="flex space-x-1">
                                                                 <div className={cn(
                                                                     'w-1.5 h-1.5 rounded-full animate-bounce [animation-delay:-0.3s]',
-                                                                    message.streamPhase === 'investigating' ? 'bg-amber-500' : 'bg-blue-500'
+                                                                    message.streamPhase === 'investigating' ? 'bg-amber-500'
+                                                                        : message.streamPhase === 'reasoning-causal' ? 'bg-purple-500'
+                                                                        : 'bg-blue-500'
                                                                 )} />
                                                                 <div className={cn(
                                                                     'w-1.5 h-1.5 rounded-full animate-bounce [animation-delay:-0.15s]',
-                                                                    message.streamPhase === 'investigating' ? 'bg-amber-500' : 'bg-blue-500'
+                                                                    message.streamPhase === 'investigating' ? 'bg-amber-500'
+                                                                        : message.streamPhase === 'reasoning-causal' ? 'bg-purple-500'
+                                                                        : 'bg-blue-500'
                                                                 )} />
                                                                 <div className={cn(
                                                                     'w-1.5 h-1.5 rounded-full animate-bounce',
-                                                                    message.streamPhase === 'investigating' ? 'bg-amber-500' : 'bg-blue-500'
+                                                                    message.streamPhase === 'investigating' ? 'bg-amber-500'
+                                                                        : message.streamPhase === 'reasoning-causal' ? 'bg-purple-500'
+                                                                        : 'bg-blue-500'
                                                                 )} />
                                                             </div>
                                                             <span className={cn(
                                                                 'text-[11px] font-bold uppercase tracking-[0.15em]',
-                                                                message.streamPhase === 'investigating' ? 'text-amber-600' : 'text-slate-400'
+                                                                message.streamPhase === 'investigating' ? 'text-amber-600'
+                                                                    : message.streamPhase === 'reasoning-causal' ? 'text-purple-600'
+                                                                    : 'text-slate-400'
                                                             )}>
                                                                 {STREAM_PHASE_LABELS[message.streamPhase]}
                                                             </span>
@@ -765,11 +924,37 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
                                                     </div>
                                                 )}
 
-                                                {/* Chips: Ver datos / Hallazgos / Acciones */}
+                                                {/* Badges: causal / forecast */}
+                                                {!message.conversational && (message.causal || message.forecast) && (
+                                                    <div className="mt-3 flex flex-wrap gap-1.5">
+                                                        {message.causal && message.causal.hypotheses_count > 0 && (
+                                                            <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold rounded-md bg-purple-50 text-purple-700 border border-purple-200">
+                                                                <Brain className="w-3 h-3" />
+                                                                {message.causal.hypotheses_count} hipótesis
+                                                                {message.causal.strong_count > 0 && ` · ${message.causal.strong_count} fuertes`}
+                                                            </span>
+                                                        )}
+                                                        {message.follow_up && (
+                                                            <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold rounded-md bg-amber-50 text-amber-700 border border-amber-200" title={message.follow_up.rationale || ''}>
+                                                                <AlertCircle className="w-3 h-3" />
+                                                                Investigación: {message.follow_up.question.slice(0, 50)}
+                                                            </span>
+                                                        )}
+                                                        {message.forecast && (
+                                                            <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold rounded-md bg-blue-50 text-blue-700 border border-blue-200">
+                                                                <LineChart className="w-3 h-3" />
+                                                                Proyección {message.forecast.forecast.length}d · {message.forecast.confidence}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                )}
+
+                                                {/* Chips: Ver datos / Hallazgos / Acciones / Proyección */}
                                                 {!message.conversational && (
                                                     ((message.results && message.results.length > 0) ||
                                                         (message.key_insights && message.key_insights.length > 0) ||
-                                                        (message.recommendations && message.recommendations.length > 0)) && (
+                                                        (message.recommendations && message.recommendations.length > 0) ||
+                                                        message.forecast) && (
                                                         <div className="mt-5 flex flex-wrap gap-2">
                                                             {message.results && message.results.length > 0 && !(message.results.length === 1 && Object.keys(message.results[0]).length === 1) && (
                                                                 <button
@@ -779,6 +964,16 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
                                                                     <BarChart3 className="w-3.5 h-3.5 text-slate-500" />
                                                                     <span>{expandedData[index] ? 'Ocultar datos' : 'Ver datos'}</span>
                                                                     {expandedData[index] ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                                                                </button>
+                                                            )}
+                                                            {message.forecast && (
+                                                                <button
+                                                                    onClick={() => toggleForecast(index)}
+                                                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold rounded-full transition-all border bg-white border-blue-200 text-blue-700 hover:bg-blue-50 active:scale-95"
+                                                                >
+                                                                    <LineChart className="w-3.5 h-3.5" />
+                                                                    <span>Proyección</span>
+                                                                    {expandedForecast[index] ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
                                                                 </button>
                                                             )}
                                                             {message.key_insights && message.key_insights.length > 0 && (
@@ -852,6 +1047,79 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
                                                                 </li>
                                                             ))}
                                                         </ul>
+                                                    </div>
+                                                )}
+
+                                                {/* Proyección / Forecast */}
+                                                {expandedForecast[index] && message.forecast && (
+                                                    <div className="mt-4 relative bg-blue-50/50 border border-blue-100 p-4 rounded-2xl animate-in fade-in slide-in-from-top-2 duration-300">
+                                                        <div className="absolute left-0 top-3 bottom-3 w-1 bg-blue-500 rounded-full" />
+                                                        <div className="pl-2 space-y-2">
+                                                            <div className="flex items-center gap-2">
+                                                                <LineChart className="w-3.5 h-3.5 text-blue-600" />
+                                                                <span className="text-[10px] font-black uppercase tracking-wider text-blue-700">
+                                                                    Proyección · Confianza {message.forecast.confidence} · R²={message.forecast.r2.toFixed(2)}
+                                                                </span>
+                                                            </div>
+                                                            <p className="text-[12px] text-slate-600 leading-snug">{message.forecast.summary}</p>
+                                                            <div className="overflow-x-auto">
+                                                                <table className="text-[11px] w-full">
+                                                                    <thead>
+                                                                        <tr className="text-slate-400 border-b border-blue-100">
+                                                                            <th className="text-left py-1 font-bold">Fecha</th>
+                                                                            <th className="text-right py-1 font-bold">Estimado</th>
+                                                                            <th className="text-right py-1 font-bold">Rango</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        {message.forecast.forecast.slice(0, 14).map((p, i) => (
+                                                                            <tr key={i} className="border-b border-blue-50 last:border-0">
+                                                                                <td className="py-1 text-slate-600">{p.date}</td>
+                                                                                <td className="py-1 text-right font-bold text-slate-900">{p.pointEstimate.toLocaleString('es-MX')}</td>
+                                                                                <td className="py-1 text-right text-slate-500">{p.lowerBound.toLocaleString('es-MX')}–{p.upperBound.toLocaleString('es-MX')}</td>
+                                                                            </tr>
+                                                                        ))}
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Feedback 👍/👎 */}
+                                                {!message.streaming && message.content && !message.conversational && (
+                                                    <div className="mt-3 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <button
+                                                            onClick={() => sendFeedback(index, 'up')}
+                                                            disabled={message.feedback === 'up'}
+                                                            className={cn(
+                                                                'p-1.5 rounded-full transition-colors',
+                                                                message.feedback === 'up'
+                                                                    ? 'bg-emerald-100 text-emerald-700'
+                                                                    : 'text-slate-400 hover:bg-slate-100 hover:text-emerald-600'
+                                                            )}
+                                                            title="Buena respuesta"
+                                                        >
+                                                            <ThumbsUp className="w-3.5 h-3.5" />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => sendFeedback(index, 'down')}
+                                                            disabled={message.feedback === 'down'}
+                                                            className={cn(
+                                                                'p-1.5 rounded-full transition-colors',
+                                                                message.feedback === 'down'
+                                                                    ? 'bg-rose-100 text-rose-700'
+                                                                    : 'text-slate-400 hover:bg-slate-100 hover:text-rose-600'
+                                                            )}
+                                                            title="Necesita mejorar"
+                                                        >
+                                                            <ThumbsDown className="w-3.5 h-3.5" />
+                                                        </button>
+                                                        {message.feedback && (
+                                                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider ml-1">
+                                                                Gracias
+                                                            </span>
+                                                        )}
                                                     </div>
                                                 )}
                                             </div>

@@ -59,19 +59,75 @@ export default function DatePresets() {
         router.push(`?${params.toString()}`, { scroll: false });
     };
 
+    const getPresetDates = (preset: DatePreset) => {
+        const now = new Date();
+        let start = new Date();
+        let end = new Date();
+
+        switch (preset) {
+            case 'Hoy':
+                break;
+            case 'Ayer':
+                start.setDate(now.getDate() - 1);
+                end.setDate(now.getDate() - 1);
+                break;
+            case 'Semana':
+                const day = now.getDay();
+                const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+                start.setDate(diff);
+                break;
+            case '7 Dias':
+                start.setDate(now.getDate() - 6);
+                break;
+            case 'Mes':
+                start.setDate(1);
+                break;
+            case 'Mes Pasado':
+                start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+                end = new Date(now.getFullYear(), now.getMonth(), 0);
+                break;
+        }
+        return {
+            start: formatDate(start),
+            end: formatDate(end)
+        };
+    };
+
+    const activeStartDate = searchParams.get('startDate');
+    const activeEndDate = searchParams.get('endDate');
+
+    // If dates are not set in the URL, default is 'Hoy'
+    const isPresetActive = (preset: DatePreset) => {
+        const presetDates = getPresetDates(preset);
+        
+        if (!activeStartDate && !activeEndDate) {
+            return preset === 'Hoy';
+        }
+        
+        return activeStartDate === presetDates.start && activeEndDate === presetDates.end;
+    };
+
     const presets: DatePreset[] = ['Hoy', 'Ayer', 'Semana', '7 Dias', 'Mes', 'Mes Pasado'];
 
     return (
-        <div className="flex flex-wrap items-center gap-2">
-            {presets.map((preset) => (
-                <button
-                    key={preset}
-                    onClick={() => handlePresetClick(preset)}
-                    className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-50 text-slate-600 border border-slate-200 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all active:scale-95"
-                >
-                    {preset}
-                </button>
-            ))}
+        <div className="flex flex-wrap items-center gap-1 sm:gap-1.5">
+            {presets.map((preset) => {
+                const active = isPresetActive(preset);
+                return (
+                    <button
+                        key={preset}
+                        onClick={() => handlePresetClick(preset)}
+                        className={cn(
+                            "px-3 py-1.5 text-xs font-semibold rounded-lg transition-all active:scale-95 cursor-pointer",
+                            active
+                                ? "bg-slate-900 text-white border border-slate-900 shadow-sm"
+                                : "bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 border border-slate-200 shadow-xs"
+                        )}
+                    >
+                        {preset}
+                    </button>
+                );
+            })}
         </div>
     );
 }

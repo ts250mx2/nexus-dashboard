@@ -140,23 +140,64 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ st
     }).format(ticketPromedio);
 
     const stats = [
-        { name: 'Ventas del día', value: formattedVentas, change: 'Hoy', icon: DollarSign, trend: 'stable', color: 'emerald' },
-        { name: 'Operaciones del día', value: totalOperaciones.toString(), change: 'Hoy', icon: ShoppingBag, trend: 'stable', color: 'amber' },
-        { name: 'Aperturas Activas', value: totalAperturas.toString(), change: 'En curso', icon: Store, trend: 'stable', color: 'blue' },
-        { name: 'Ticket Promedio', value: formattedTicket, change: 'Hoy', icon: Receipt, trend: 'stable', color: 'purple' },
+        { 
+            name: 'Ventas del día', 
+            value: formattedVentas, 
+            change: 'Hoy', 
+            icon: DollarSign, 
+            trend: 'stable', 
+            color: 'emerald',
+            iconBg: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
+            glowColor: 'from-emerald-500/5 to-transparent',
+            valueColor: 'text-emerald-600'
+        },
+        { 
+            name: 'Operaciones del día', 
+            value: totalOperaciones.toString(), 
+            change: 'Hoy', 
+            icon: ShoppingBag, 
+            trend: 'stable', 
+            color: 'amber',
+            iconBg: 'bg-amber-500/10 text-amber-500 border-amber-500/20',
+            glowColor: 'from-amber-500/5 to-transparent',
+            valueColor: 'text-amber-600'
+        },
+        { 
+            name: 'Aperturas Activas', 
+            value: totalAperturas.toString(), 
+            change: 'En curso', 
+            icon: Store, 
+            trend: 'stable', 
+            color: 'blue',
+            iconBg: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
+            glowColor: 'from-blue-500/5 to-transparent',
+            valueColor: 'text-blue-600'
+        },
+        { 
+            name: 'Ticket Promedio', 
+            value: formattedTicket, 
+            change: 'Hoy', 
+            icon: Receipt, 
+            trend: 'stable', 
+            color: 'purple',
+            iconBg: 'bg-purple-500/10 text-purple-500 border-purple-500/20',
+            glowColor: 'from-purple-500/5 to-transparent',
+            valueColor: 'text-purple-600'
+        },
     ];
 
     return (
         <div className="space-y-8">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Panel Principal</h1>
+                    <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-900 bg-clip-text text-transparent">Panel Principal</h1>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mt-1">Resumen de Ventas y Rendimiento</p>
                 </div>
-                <div className="flex flex-wrap items-center gap-3 bg-white px-4 py-2 rounded-xl shadow-sm border border-slate-100">
+                <div className="bg-white border border-slate-200/60 px-4 py-2 rounded-xl flex flex-wrap items-center gap-4 shadow-xs">
                     <DatePresets />
-                    <div className="w-px h-6 bg-slate-100 mx-1 hidden sm:block"></div>
+                    <div className="w-px h-6 bg-slate-200/80 mx-1 hidden md:block"></div>
                     <div className="flex items-center gap-3">
-                        <CalendarDays size={18} className="text-slate-400" />
+                        <CalendarDays size={18} className="text-slate-400 shrink-0" />
                         <DateSelector defaultStartDate={startDate} defaultEndDate={endDate} />
                     </div>
                 </div>
@@ -164,21 +205,31 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ st
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {stats.map((stat) => (
-                    <div key={stat.name} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 transition-all duration-200 hover:shadow-md hover:border-blue-100 group">
-                        <div className="flex items-start justify-between">
+                    <div 
+                        key={stat.name} 
+                        className={cn(
+                            "bg-white border border-slate-200/60 border-l-4 p-5 rounded-xl relative overflow-hidden group hover-premium cursor-pointer transition-all duration-300 shadow-xs",
+                            stat.color === 'emerald' ? 'border-l-emerald-500' :
+                            stat.color === 'amber' ? 'border-l-amber-500' :
+                            stat.color === 'blue' ? 'border-l-blue-500' :
+                            'border-l-purple-500'
+                        )}
+                    >
+                        <div className="flex items-start justify-between relative z-10">
+                            <div>
+                                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">{stat.name}</p>
+                                <p className={cn("text-3xl font-extrabold tracking-tight mt-2", stat.valueColor)}>{stat.value}</p>
+                            </div>
                             <div className={cn(
-                                "flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-110",
-                                stat.color === 'emerald' && "text-emerald-500",
-                                stat.color === 'amber' && "text-amber-500",
-                                stat.color === 'blue' && "text-blue-500",
-                                stat.color === 'purple' && "text-purple-500"
+                                "flex items-center justify-center shrink-0 w-10 h-10 rounded-lg border transition-all duration-300 group-hover:scale-105",
+                                stat.iconBg
                             )}>
-                                <stat.icon size={32} strokeWidth={2.5} />
+                                <stat.icon size={18} strokeWidth={2} />
                             </div>
                         </div>
-                        <div className="mt-4">
-                            <p className="text-sm font-medium text-slate-500">{stat.name}</p>
-                            <p className="text-3xl font-extrabold text-blue-600 mt-1">{stat.value}</p>
+                        <div className="mt-4 flex items-center gap-1.5 relative z-10">
+                            <span className="w-1.5 h-1.5 rounded-full bg-slate-300 group-hover:bg-indigo-500 transition-colors animate-pulse" />
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{stat.change}</span>
                         </div>
                     </div>
                 ))}
@@ -191,7 +242,7 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ st
 
                 <VentasTable data={ventasSucursal} startDate={startDate} endDate={endDate} />
             </div>
-        </div >
+        </div>
     );
 }
 

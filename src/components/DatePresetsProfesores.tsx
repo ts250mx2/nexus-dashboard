@@ -1,14 +1,12 @@
 'use client';
 
 import React from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { cn } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
 
 type DatePreset = '1 Mes' | '3 Meses' | '6 Meses' | '1 Año' | '2 Años';
 
 export default function DatePresetsProfesores() {
     const router = useRouter();
-    const searchParams = useSearchParams();
 
     const formatDate = (date: Date) => {
         const d = new Date(date);
@@ -50,7 +48,7 @@ export default function DatePresetsProfesores() {
                 break;
         }
 
-        const params = new URLSearchParams(searchParams.toString());
+        const params = new URLSearchParams(window.location.search);
         params.set('startDate', formatDate(start));
         params.set('endDate', formatDate(end));
         router.push(`?${params.toString()}`, { scroll: false });

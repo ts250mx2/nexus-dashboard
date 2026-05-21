@@ -1,25 +1,23 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import {
     LayoutDashboard,
     FileText,
     Settings,
-    LogOut,
-    Menu,
-    X,
     ChevronRight,
     ChevronDown,
-    CircleUser,
     Bot,
     Brain,
     History,
     ShoppingBag,
     TrendingUp,
     DollarSign,
-    LayoutGrid
+    LayoutGrid,
+    Flame,
+    Users,
+    Layers
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
@@ -34,93 +32,94 @@ type SidebarItem = {
 };
 
 const sidebarItems: SidebarItem[] = [
-    { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, color: 'text-indigo-500' },
-    { name: 'Agente IA', href: '/dashboard/reports/ai-agent', icon: Bot, color: 'text-violet-500' },
+    { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, color: 'text-blue-900' },
+    { name: 'Agente IA', href: '/dashboard/reports/ai-agent', icon: Bot, color: 'text-blue-900' },
     {
         name: 'Ventas',
         icon: ShoppingBag,
-        color: 'text-emerald-500',
+        color: 'text-blue-900',
         subItems: [
-            { name: 'Tendencias de Venta', href: '/dashboard/ventas/tendencias', icon: TrendingUp, color: 'text-emerald-500' },
-            { name: 'Operaciones', href: '/dashboard/ventas/operaciones', icon: LayoutGrid, color: 'text-indigo-500' },
-            { name: 'Reporte Ventas', href: '/dashboard/reportes/ventas', icon: FileText, color: 'text-emerald-500' },
-            { name: 'Profesores', href: '/dashboard/reportes/profesores', icon: FileText, color: 'text-blue-500' },
-            { name: 'Margen & Rentabilidad', href: '/dashboard/reportes/margen', icon: DollarSign, color: 'text-emerald-500' },
-            { name: 'Retiros', href: '/dashboard/ventas/retiros', icon: DollarSign, color: 'text-amber-500' }
+            { name: 'Tendencias de Venta', href: '/dashboard/ventas/tendencias', icon: TrendingUp, color: 'text-blue-900' },
+            { name: 'Mapa de Calor', href: '/dashboard/ventas/mapadecalor', icon: Flame, color: 'text-blue-900' },
+            { name: 'Operaciones', href: '/dashboard/ventas/operaciones', icon: LayoutGrid, color: 'text-blue-900' },
+            { name: 'Reporte Ventas', href: '/dashboard/reportes/ventas', icon: FileText, color: 'text-blue-900' },
+            { name: 'Profesores Global', href: '/dashboard/ventas/profesores-global', icon: Users, color: 'text-blue-900' },
+            { name: 'Profesores', href: '/dashboard/reportes/profesores', icon: FileText, color: 'text-blue-900' },
+            { name: 'Margen & Rentabilidad', href: '/dashboard/reportes/margen', icon: DollarSign, color: 'text-blue-900' },
+            { name: 'Retiros', href: '/dashboard/ventas/retiros', icon: DollarSign, color: 'text-blue-900' }
         ]
     },
     {
         name: 'Compras',
         icon: ShoppingBag,
-        color: 'text-blue-500',
+        color: 'text-blue-900',
         subItems: [
-            { name: 'Órdenes de Compra', href: '/dashboard/compras/ordenes', icon: FileText, color: 'text-blue-500' }
+            { name: 'Órdenes de Compra', href: '/dashboard/compras/ordenes', icon: FileText, color: 'text-blue-900' }
+        ]
+    },
+    {
+        name: 'Inventarios',
+        icon: Layers,
+        color: 'text-blue-900',
+        subItems: [
+            { name: 'Costo de Inventario', href: '/dashboard/inventarios/costo', icon: DollarSign, color: 'text-blue-900' }
         ]
     },
     {
         name: 'Configuración',
         icon: Settings,
-        color: 'text-pink-500',
+        color: 'text-blue-900',
         subItems: [
-            { name: 'Diseñador de Consultas', href: '/dashboard/settings/query-designer', icon: LayoutGrid, color: 'text-pink-500' },
-            { name: 'Aprendizaje IA', href: '/dashboard/settings/ai-learning', icon: Brain, color: 'text-cyan-500' },
-            { name: 'Historial de Preguntas', href: '/dashboard/settings/ai-history', icon: History, color: 'text-slate-400' }
+            { name: 'Diseñador de Consultas', href: '/dashboard/settings/query-designer', icon: LayoutGrid, color: 'text-blue-900' },
+            { name: 'Aprendizaje IA', href: '/dashboard/settings/ai-learning', icon: Brain, color: 'text-blue-900' },
+            { name: 'Historial de Preguntas', href: '/dashboard/settings/ai-history', icon: History, color: 'text-blue-900' }
         ]
     },
 ];
 
-export default function Sidebar() {
+interface SidebarProps {
+    isCollapsed: boolean;
+    setIsCollapsed: (collapsed: boolean) => void;
+    isMobileOpen: boolean;
+    setIsMobileOpen: (open: boolean) => void;
+}
+
+export default function Sidebar({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen }: SidebarProps) {
     const pathname = usePathname();
-    const [isOpen, setIsOpen] = useState(true);
     const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>({
         'Ventas': pathname.includes('/ventas') || pathname.includes('/reportes'),
         'Compras': pathname.includes('/compras'),
+        'Inventarios': pathname.includes('/inventarios'),
         'Configuración': pathname.includes('/settings'),
     });
 
     const toggleExpanded = (name: string) => {
-        if (!isOpen) setIsOpen(true);
+        if (isCollapsed) setIsCollapsed(false);
         setExpandedMenus(prev => ({ ...prev, [name]: !prev[name] }));
     };
 
     useEffect(() => {
-        if (!isOpen) {
+        if (isCollapsed) {
             setExpandedMenus({});
         } else {
             setExpandedMenus({
                 'Ventas': pathname.includes('/ventas') || pathname.includes('/reportes'),
                 'Compras': pathname.includes('/compras'),
+                'Inventarios': pathname.includes('/inventarios'),
                 'Configuración': pathname.includes('/settings'),
             });
         }
-    }, [isOpen, pathname]);
+    }, [isCollapsed, pathname]);
 
     return (
         <>
-            <button
-                className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-blue-600 text-white rounded-md"
-                onClick={() => setIsOpen(!isOpen)}
-            >
-                {isOpen ? <X size={20} /> : <Menu size={20} />}
-            </button>
-
             <aside className={cn(
-                "fixed left-0 top-0 h-full bg-slate-900 text-white transition-all duration-300 z-40 flex flex-col border-r border-slate-800",
-                isOpen ? "w-64" : "w-20",
-                !isOpen && "hidden lg:flex"
+                "fixed left-0 top-16 h-[calc(100vh-4rem)] bg-[#F1F5F9] text-slate-800 transition-all duration-300 z-20 flex flex-col border-r border-slate-200/60 shadow-xs",
+                isCollapsed ? "w-20" : "w-64",
+                isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
             )}>
-                <div className="p-6 flex items-center gap-3 border-b border-slate-800 h-28">
-                    <div className="flex bg-white rounded p-2 items-center justify-center shrink-0 w-full h-full">
-                        <img
-                            src="/logo.webp"
-                            alt="Nexus Logo"
-                            className="object-contain transition-all duration-300 w-auto h-full max-h-[70px]"
-                            style={{ maxWidth: isOpen ? '280px' : '60px' }}
-                        />
-                    </div>
-                </div>
-
-                <nav className="flex-1 py-6 px-3 space-y-2 overflow-y-auto overflow-x-hidden">
+                {/* Navigation Menu */}
+                <nav className="flex-1 py-4 px-3 space-y-1.5 overflow-y-auto overflow-x-hidden">
                     {sidebarItems.map((item) => {
                         const hasSubItems = item.subItems && item.subItems.length > 0;
                         const isExpanded = expandedMenus[item.name];
@@ -133,37 +132,37 @@ export default function Sidebar() {
                                     <button
                                         onClick={() => toggleExpanded(item.name)}
                                         className={cn(
-                                            "flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 group w-full text-left",
+                                            "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-150 group w-full text-left cursor-pointer",
                                             hasActiveChild
-                                                ? "bg-slate-800 text-blue-400"
-                                                : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                                                ? "bg-white text-blue-900 font-bold border-l-2 border-blue-900 shadow-xs"
+                                                : "text-slate-600 font-semibold hover:bg-slate-200/50 hover:text-slate-900"
                                         )}
                                     >
-                                        <item.icon size={22} className={cn(hasActiveChild ? item.color : "text-slate-500 group-hover:" + item.color, "shrink-0 transition-all duration-300 group-hover:scale-110")} />
-                                        {isOpen && <span className="font-semibold flex-1 truncate">{item.name}</span>}
-                                        {isOpen && (
-                                            isExpanded ? <ChevronDown size={16} className="shrink-0" /> : <ChevronRight size={16} className="shrink-0" />
+                                        <item.icon size={18} className={cn(hasActiveChild ? "text-blue-900" : "text-slate-400 group-hover:text-slate-600", "shrink-0 transition-transform duration-200 group-hover:scale-105")} />
+                                        {!isCollapsed && <span className="text-sm flex-1 truncate">{item.name}</span>}
+                                        {!isCollapsed && (
+                                            isExpanded ? <ChevronDown size={14} className="shrink-0 text-slate-400" /> : <ChevronRight size={14} className="shrink-0 text-slate-400" />
                                         )}
                                     </button>
                                 ) : (
                                     <Link
                                         href={item.href!}
                                         className={cn(
-                                            "flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 group",
+                                            "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-150 group",
                                             isActive
-                                                ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30"
-                                                : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                                                ? "bg-white text-blue-900 font-bold border-l-2 border-blue-900 shadow-xs"
+                                                : "text-slate-600 font-semibold hover:bg-slate-200/50 hover:text-slate-900"
                                         )}
-                                        title={!isOpen ? item.name : undefined}
+                                        title={isCollapsed ? item.name : undefined}
                                     >
-                                        <item.icon size={22} className={cn(isActive ? "text-white" : "text-slate-500 group-hover:" + item.color, "shrink-0 transition-all duration-300 group-hover:scale-110")} />
-                                        {isOpen && <span className="font-semibold truncate">{item.name}</span>}
+                                        <item.icon size={18} className={cn(isActive ? "text-blue-900" : "text-slate-400 group-hover:text-slate-600", "shrink-0 transition-transform duration-200 group-hover:scale-105")} />
+                                        {!isCollapsed && <span className="text-sm truncate">{item.name}</span>}
                                     </Link>
                                 )}
 
-                                {/* Render SubItems if expanded */}
-                                {hasSubItems && isOpen && isExpanded && (
-                                    <div className="ml-9 mt-1 flex flex-col gap-1 border-l border-slate-700 pl-2">
+                                {/* SubItems Section */}
+                                {hasSubItems && !isCollapsed && isExpanded && (
+                                    <div className="ml-5 mt-1.5 flex flex-col gap-1 border-l border-slate-200/60 pl-3.5">
                                         {item.subItems!.map((sub) => {
                                             const isSubActive = pathname === sub.href;
                                             return (
@@ -171,14 +170,14 @@ export default function Sidebar() {
                                                     key={sub.name}
                                                     href={sub.href}
                                                     className={cn(
-                                                        "flex items-center gap-3 px-3 py-2 rounded-md transition-all duration-200 text-sm group",
+                                                        "flex items-center gap-2.5 px-3 py-2 rounded-lg transition-all duration-150 text-xs group",
                                                         isSubActive
-                                                            ? "bg-blue-600 text-white shadow-sm"
-                                                            : "text-slate-400 hover:text-white hover:bg-slate-800"
+                                                            ? "bg-white text-blue-900 font-bold border-l-2 border-blue-900 shadow-xs"
+                                                            : "text-slate-600 font-medium hover:text-slate-900 hover:bg-slate-200/40"
                                                     )}
                                                 >
-                                                    <sub.icon size={18} className={cn(isSubActive ? "text-blue-400" : "text-slate-500 group-hover:" + sub.color, "shrink-0 transition-all duration-300 group-hover:scale-110")} />
-                                                    <span className="truncate font-medium">{sub.name}</span>
+                                                    <sub.icon size={14} className={cn(isSubActive ? "text-blue-900" : "text-slate-400 group-hover:text-slate-600", "shrink-0")} />
+                                                    <span className="truncate">{sub.name}</span>
                                                 </Link>
                                             )
                                         })}
@@ -189,28 +188,20 @@ export default function Sidebar() {
                     })}
                 </nav>
 
-                <div className="p-4 border-t border-slate-800">
-                    <div className={cn(
-                        "flex items-center gap-3 p-2 rounded-xl bg-slate-800/50 mb-4",
-                        isOpen ? "px-3" : "justify-center"
-                    )}>
-                        <div className="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center shrink-0">
-                            <CircleUser size={20} />
-                        </div>
-                        {isOpen && (
-                            <div className="overflow-hidden">
-                                <p className="text-sm font-medium truncate">Admin User</p>
-                                <p className="text-xs text-slate-500 truncate">admin@nexusmty.com</p>
-                            </div>
+                {/* Footer Collapse Toggle at the Bottom */}
+                <div className="p-3 border-t border-slate-200 bg-slate-200/20">
+                    <button
+                        onClick={() => setIsCollapsed(!isCollapsed)}
+                        className={cn(
+                            "flex items-center gap-3 w-full px-3 py-2.5 text-slate-450 hover:text-blue-900 hover:bg-slate-200/50 rounded-lg transition-all duration-150 cursor-pointer text-xs font-bold uppercase tracking-wider",
+                            isCollapsed ? "justify-center" : "justify-between"
                         )}
-                    </div>
-
-                    <button className={cn(
-                        "flex items-center gap-3 w-full px-3 py-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all",
-                        !isOpen && "justify-center"
-                    )}>
-                        <LogOut size={20} />
-                        {isOpen && <span className="font-medium">Cerrar Sesión</span>}
+                        title={isCollapsed ? "Expandir menú" : "Contraer menú"}
+                    >
+                        <div className="flex items-center gap-3">
+                            <ChevronRight size={16} className={cn("transition-transform duration-200", !isCollapsed && "rotate-180")} />
+                            {!isCollapsed && <span>Ocultar menú</span>}
+                        </div>
                     </button>
                 </div>
             </aside>

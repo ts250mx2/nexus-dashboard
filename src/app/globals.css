@@ -102,4 +102,70 @@
 body {
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
+  overflow-x: hidden;
 }
+
+/* Premium Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.2);
+  border-radius: 999px;
+  transition: all 0.2s ease;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.4);
+}
+
+/* Minimalist Premium Card Utilities (Stripe/Linear Style) */
+.glass-panel {
+  background: #ffffff;
+  border: 1px solid rgba(226, 232, 240, 0.7); /* border-slate-200/70 */
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 
+              0 1px 2px -1px rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
+}
+
+.dark .glass-panel {
+  background: #0f172a; /* bg-slate-900 */
+  border: 1px solid rgba(51, 65, 85, 0.5); /* border-slate-700/50 */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+}
+
+.glass-panel-dark {
+  background: #0f172a;
+  border: 1px solid rgba(51, 65, 85, 0.5);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+}
+
+/* Empty utilities maintained for backwards compatibility but rendered inactive */
+.aurora-glow-indigo,
+.aurora-glow-pink,
+.aurora-glow-blue {
+  display: none;
+}
+
+/* Crisp interactive micro-animations */
+.hover-premium {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hover-premium:hover {
+  transform: translateY(-1.5px);
+  box-shadow: 0 8px 16px -6px rgba(0, 0, 0, 0.06),
+              0 0 0 1px rgba(99, 102, 241, 0.1);
+  border-color: rgba(99, 102, 241, 0.25) !important;
+}
+
+.text-neon-blue,
+.text-neon-red {
+  text-shadow: none;
+}
+
+

@@ -10,7 +10,9 @@ import {
     Loader2,
     Download,
     ArrowUpDown,
-    Filter
+    Filter,
+    Calendar,
+    RefreshCcw
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import * as XLSX from 'xlsx';
@@ -137,86 +139,120 @@ export default function MargenPage() {
     };
 
     return (
-        <div className="p-6 md:p-8 max-w-[1600px] mx-auto">
-            <div className="mb-6">
-                <h1 className="text-3xl font-black tracking-tight text-slate-900">Margen y Rentabilidad</h1>
-                <p className="text-slate-500 mt-1">
-                    Cruza ventas reales con costo de inventario por sucursal. Identifica dónde se hace dinero y dónde se fuga el margen.
-                </p>
-            </div>
+        <div className="p-6 md:p-8 max-w-[1600px] mx-auto space-y-6">
+            {/* Header with Filters & Periods */}
+            <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white py-4 px-6 rounded-2xl shadow-sm border border-slate-100 animate-in fade-in duration-500">
+                <div className="flex flex-col md:flex-row md:items-center gap-6">
+                    <h1 className="text-2xl font-black text-slate-800 tracking-tight uppercase flex items-center gap-3 select-none">
+                        <TrendingUp className="text-blue-600" />
+                        Margen y Rentabilidad
+                    </h1>
 
-            {/* Filtros */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 mb-6 shadow-sm">
-                <div className="flex flex-wrap items-end gap-4">
-                    <div>
-                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Desde</label>
-                        <input
-                            type="date"
-                            value={startDate}
-                            onChange={e => setStartDate(e.target.value)}
-                            className="border border-slate-300 rounded-lg px-3 py-2 text-sm font-medium"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Hasta</label>
-                        <input
-                            type="date"
-                            value={endDate}
-                            onChange={e => setEndDate(e.target.value)}
-                            className="border border-slate-300 rounded-lg px-3 py-2 text-sm font-medium"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Atajos</label>
-                        <div className="flex gap-1.5">
-                            {[
-                                { label: 'Hoy', fn: () => { const t = getToday(); setStartDate(t); setEndDate(t); } },
-                                { label: '7d', fn: () => { const d = new Date(); d.setDate(d.getDate() - 6); setStartDate(d.toISOString().slice(0, 10)); setEndDate(getToday()); } },
-                                { label: 'Mes', fn: () => { setStartDate(getFirstOfMonth()); setEndDate(getToday()); } },
-                                { label: 'Mes anterior', fn: () => { const d = new Date(); const first = new Date(d.getFullYear(), d.getMonth() - 1, 1); const last = new Date(d.getFullYear(), d.getMonth(), 0); setStartDate(first.toISOString().slice(0, 10)); setEndDate(last.toISOString().slice(0, 10)); } },
-                                { label: 'Año', fn: () => { setStartDate(`${new Date().getFullYear()}-01-01`); setEndDate(getToday()); } }
-                            ].map(p => (
+                    <div className="flex items-center gap-1 bg-slate-100 border border-slate-200 rounded-xl p-1 overflow-x-auto no-scrollbar">
+                        {[
+                            { label: 'Hoy', fn: () => { const t = getToday(); setStartDate(t); setEndDate(t); } },
+                            { label: '7d', fn: () => { const d = new Date(); d.setDate(d.getDate() - 6); setStartDate(d.toISOString().slice(0, 10)); setEndDate(getToday()); } },
+                            { label: 'Mes', fn: () => { setStartDate(getFirstOfMonth()); setEndDate(getToday()); } },
+                            { label: 'Mes anterior', fn: () => { const d = new Date(); const first = new Date(d.getFullYear(), d.getMonth() - 1, 1); const last = new Date(d.getFullYear(), d.getMonth(), 0); setStartDate(first.toISOString().slice(0, 10)); setEndDate(last.toISOString().slice(0, 10)); } },
+                            { label: 'Año', fn: () => { setStartDate(`${new Date().getFullYear()}-01-01`); setEndDate(getToday()); } }
+                        ].map(p => {
+                            let isActive = false;
+                            if (p.label === 'Hoy') isActive = startDate === getToday() && endDate === getToday();
+                            else if (p.label === 'Mes') isActive = startDate === getFirstOfMonth() && endDate === getToday();
+                            else if (p.label === 'Año') isActive = startDate === `${new Date().getFullYear()}-01-01` && endDate === getToday();
+                            else if (p.label === '7d') {
+                                const d = new Date(); d.setDate(d.getDate() - 6);
+                                isActive = startDate === d.toISOString().slice(0, 10) && endDate === getToday();
+                            } else if (p.label === 'Mes anterior') {
+                                const d = new Date(); const first = new Date(d.getFullYear(), d.getMonth() - 1, 1); const last = new Date(d.getFullYear(), d.getMonth(), 0);
+                                isActive = startDate === first.toISOString().slice(0, 10) && endDate === last.toISOString().slice(0, 10);
+                            }
+
+                            return (
                                 <button
                                     key={p.label}
                                     onClick={p.fn}
-                                    className="px-3 py-2 text-xs font-bold bg-slate-100 hover:bg-blue-100 hover:text-blue-700 text-slate-600 rounded-lg transition-colors"
+                                    className={cn(
+                                        "px-3 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer whitespace-nowrap",
+                                        isActive 
+                                            ? "bg-slate-900 text-white shadow-sm" 
+                                            : "text-slate-500 hover:text-slate-900 hover:bg-slate-200/50"
+                                    )}
                                 >
                                     {p.label}
                                 </button>
-                            ))}
-                        </div>
+                            );
+                        })}
                     </div>
-                    <div>
-                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">
-                            <Filter className="inline w-3 h-3 mr-1" />
-                            Agrupar por
-                        </label>
-                        <div className="flex flex-wrap gap-2">
-                            {GROUPS.map(g => (
-                                <button
-                                    key={g.key}
-                                    onClick={() => setGroupBy(g.key)}
-                                    className={cn(
-                                        'px-3 py-2 rounded-lg text-sm font-bold border transition-all',
-                                        groupBy === g.key
-                                            ? 'bg-blue-600 text-white border-blue-600 shadow'
-                                            : 'bg-white text-slate-600 border-slate-200 hover:border-blue-300'
-                                    )}
-                                >
-                                    {g.label}
-                                </button>
-                            ))}
-                        </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3">
+                    <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
+                        <Calendar size={16} className="text-blue-500" />
+                        <span className="text-[10px] font-bold text-slate-400 uppercase">Del</span>
+                        <input
+                            type="date"
+                            value={startDate}
+                            onChange={(e) => setStartDate(e.target.value)}
+                            className="bg-transparent text-xs font-bold text-slate-700 outline-none p-0 border-none h-auto w-28 cursor-pointer"
+                        />
                     </div>
-                    <div className="ml-auto">
-                        <button
-                            onClick={exportXls}
-                            disabled={loading || rows.length === 0}
-                            className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-lg text-sm font-bold shadow"
-                        >
-                            <Download className="w-4 h-4" /> Exportar XLSX
-                        </button>
+                    <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
+                        <Calendar size={16} className="text-blue-500" />
+                        <span className="text-[10px] font-bold text-slate-400 uppercase">Al</span>
+                        <input
+                            type="date"
+                            value={endDate}
+                            onChange={(e) => setEndDate(e.target.value)}
+                            className="bg-transparent text-xs font-bold text-slate-700 outline-none p-0 border-none h-auto w-28 cursor-pointer"
+                        />
                     </div>
+                    <button
+                        onClick={() => {
+                            // Trigger refresh by pushing the same state
+                            setStartDate(startDate);
+                        }}
+                        className="p-2.5 bg-slate-50 border border-slate-200 text-blue-600 hover:bg-slate-100 hover:border-slate-300 transition-all rounded-xl shadow-sm cursor-pointer"
+                        disabled={loading}
+                        title="Actualizar Datos"
+                    >
+                        <RefreshCcw size={16} className={cn(loading && "animate-spin")} />
+                    </button>
+                </div>
+            </div>
+
+            {/* Filtros de Agrupación y Exportación */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-wrap items-center justify-between gap-4">
+                <div className="flex flex-wrap items-center gap-3">
+                    <span className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5 select-none">
+                        <Filter size={14} className="text-blue-500" />
+                        Agrupar por:
+                    </span>
+                    <div className="flex flex-wrap gap-1.5">
+                        {GROUPS.map(g => (
+                            <button
+                                key={g.key}
+                                onClick={() => setGroupBy(g.key)}
+                                className={cn(
+                                    'px-3 py-1.5 rounded-xl text-xs font-bold border transition-all cursor-pointer',
+                                    groupBy === g.key
+                                        ? 'bg-blue-50 text-blue-700 border-blue-200 shadow-xs'
+                                        : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
+                                )}
+                            >
+                                {g.label}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+                <div className="ml-auto">
+                    <button
+                        onClick={exportXls}
+                        disabled={loading || rows.length === 0}
+                        className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-xl text-xs font-bold shadow-sm transition-all cursor-pointer active:scale-95"
+                    >
+                        <Download size={14} /> Exportar XLSX
+                    </button>
                 </div>
             </div>
 
