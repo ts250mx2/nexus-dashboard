@@ -32,10 +32,11 @@ export async function GET(request: NextRequest) {
                 Pago2 AS "Pago 2", 
                 D.TipoPago AS "Tipo Pago 2", 
                 E.Banco AS "Banco 2",
-                Pago3 AS "Pago 3", 
-                F.TipoPago AS "Tipo Pago 3", 
-                G.Banco AS "Banco 3", 
-                I.Sucursal
+                Pago3 AS "Pago 3",
+                F.TipoPago AS "Tipo Pago 3",
+                G.Banco AS "Banco 3",
+                I.Sucursal,
+                U.Usuario AS Cajero
             FROM tblVentas A
             LEFT JOIN tblTiposPago B ON A.IdTipoPago = B.IdTipoPago
             LEFT JOIN tblBancos C ON A.IdBanco = C.IdBanco
@@ -45,26 +46,28 @@ export async function GET(request: NextRequest) {
             LEFT JOIN tblBancos G ON A.IdBanco3 = G.IdBanco
             INNER JOIN tblDetalleVentas H ON A.IdVenta = H.IdVenta AND A.IdSucursal = H.IdSucursal
             INNER JOIN tblSucursales I ON A.IdSucursal = I.IdSucursal
-            WHERE DATE(FechaVenta) >= ? 
-              AND DATE(FechaVenta) <= ? 
+            LEFT JOIN tblUsuarios U ON A.IdUsuarioVenta = U.IdUsuario
+            WHERE DATE(FechaVenta) >= ?
+              AND DATE(FechaVenta) <= ?
               AND A.IdSucursal = ?
-            GROUP BY 
+            GROUP BY
                 A.IdVenta,
                 A.IdSucursal,
-                A.FolioVenta, 
-                A.FechaVenta, 
-                A.Cliente, 
-                A.Total, 
-                Pago, 
-                B.TipoPago, 
-                C.Banco, 
-                Pago2, 
-                D.TipoPago, 
-                E.Banco, 
-                Pago3, 
-                F.TipoPago, 
-                G.Banco, 
-                I.Sucursal
+                A.FolioVenta,
+                A.FechaVenta,
+                A.Cliente,
+                A.Total,
+                Pago,
+                B.TipoPago,
+                C.Banco,
+                Pago2,
+                D.TipoPago,
+                E.Banco,
+                Pago3,
+                F.TipoPago,
+                G.Banco,
+                I.Sucursal,
+                U.Usuario
             ORDER BY A.FechaVenta DESC, A.FolioVenta DESC;
         `;
 

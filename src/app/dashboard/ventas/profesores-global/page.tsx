@@ -47,6 +47,7 @@ interface Profesor {
     TotalVentas: number;
     ImporteTotal: number;
     TicketPromedio: number;
+    UltimaVenta: string | null;
 }
 
 interface Articulo {
@@ -709,6 +710,15 @@ export default function ProfesoresGlobalPage() {
         return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(num);
     };
 
+    const formatShortDate = (val: any) => {
+        if (!val) return '—';
+        try {
+            return new Date(val).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' });
+        } catch {
+            return String(val);
+        }
+    };
+
     const clearSucursalSelection = () => {
         setSearchTerm('');
         setSelectedSucursal(null);
@@ -807,15 +817,16 @@ export default function ProfesoresGlobalPage() {
                 });
             } else if (!hasProfesor) {
                 // Tier 2: Teachers of Selected Branch
-                const headers = [["Profesor / Socio", "Sucursal", "Tickets (Ops)", "Venta Total", "Ticket Promedio"]];
+                const headers = [["Profesor / Socio", "Sucursal", "Tickets (Ops)", "Venta Total", "Ticket Promedio", "Última Venta"]];
                 const rows = filteredProfesores.map((prof) => [
                     prof.Cliente,
                     prof.Sucursal || selectedSucursal.Nombre,
                     prof.TotalVentas.toString(),
                     formatCurrency(prof.ImporteTotal),
-                    formatCurrency(prof.TicketPromedio)
+                    formatCurrency(prof.TicketPromedio),
+                    formatShortDate(prof.UltimaVenta)
                 ]);
-                
+
                 autoTable(doc, {
                     head: headers,
                     body: rows,
@@ -826,7 +837,8 @@ export default function ProfesoresGlobalPage() {
                     columnStyles: {
                         2: { halign: 'right' },
                         3: { halign: 'right' },
-                        4: { halign: 'right' }
+                        4: { halign: 'right' },
+                        5: { halign: 'center' }
                     }
                 });
             } else {
@@ -1196,6 +1208,10 @@ export default function ProfesoresGlobalPage() {
                                                     <span className="text-slate-400 font-semibold">T. Prom</span>
                                                     <span className="font-bold text-slate-700 truncate max-w-[50px]">{formatCurrency(prof.TicketPromedio)}</span>
                                                 </div>
+                                            </div>
+                                            <div className="flex items-center justify-between text-[10px] pt-0.5">
+                                                <span className="text-slate-400 font-semibold uppercase tracking-wider">Última venta</span>
+                                                <span className="font-bold text-slate-700 tabular-nums">{formatShortDate(prof.UltimaVenta)}</span>
                                             </div>
                                         </div>
                                     </div>

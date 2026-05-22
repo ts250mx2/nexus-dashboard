@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useEffect, useState, useMemo } from 'react';
-import { X, Download, FileSpreadsheet, Loader2, Store, FileText, ArrowUpDown, ChevronRight, Search } from 'lucide-react';
+import { X, FileSpreadsheet, Loader2, Store, FileText, ArrowUpDown, ChevronRight, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { buildFormattedSheet, downloadXLSX, safeFileName } from '@/lib/excel-helpers';
 
 interface ProfesorVentasDetailModalProps {
     isOpen: boolean;
@@ -100,6 +100,11 @@ export default function ProfesorVentasDetailModal({
         });
     }, [filteredData, sortConfig]);
 
+    const totalVentas = useMemo(
+        () => sortedData.reduce((acc, r) => acc + (Number(r.Total) || 0), 0),
+        [sortedData]
+    );
+
     if (!isOpen) return null;
 
     const formatCurrency = (val: any) => {
@@ -108,13 +113,39 @@ export default function ProfesorVentasDetailModal({
         return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(num);
     };
 
+    /** Excel formateado: tabla con encabezado + total. */
     const handleExportExcel = () => {
         if (sortedData.length === 0) return;
-        const exportData = sortedData.map(({ IdVenta, ...rest }) => rest);
-        const worksheet = XLSX.utils.json_to_sheet(exportData);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "DetalleVentasSocio");
-        XLSX.writeFile(workbook, `Ventas_${socioName.replace(/ /g, '_')}_${startDate}_al_${endDate}.xlsx`);
+        const ws = buildFormattedSheet({
+            title: `Ventas de ${socioName}`,
+            meta: [
+                { label: 'Profesor:', value: socioName },
+                { label: 'Sucursal:', value: sucursalName || 'Todas las Sucursales' },
+                { label: 'Periodo:', value: `${startDate} al ${endDate}` }
+            ],
+            columns: [
+                { header: 'Folio', key: 'Folio', width: 18 },
+                { header: 'Fecha', key: 'Fecha', width: 18 },
+                { header: 'Sucursal', key: 'Sucursal', width: 28 },
+                { header: 'Cajero', key: 'Cajero', width: 22 },
+                { header: 'Total', key: 'Total', width: 16, isCurrency: true, align: 'right' }
+            ],
+            rows: sortedData.map(r => ({
+                Folio: r.Folio,
+                Fecha: r.Fecha,
+                Sucursal: r.Sucursal,
+                Cajero: r.Cajero || '—',
+                Total: r.Total
+            })),
+            totalRow: {
+                label: 'TOTAL',
+                values: { Total: totalVentas }
+            }
+        });
+        downloadXLSX(
+            `Ventas_${safeFileName(socioName)}_${startDate}_al_${endDate}.xlsx`,
+            [{ name: 'Ventas', ws }]
+        );
     };
 
     const handleExportPDF = () => {
@@ -127,11 +158,12 @@ export default function ProfesorVentasDetailModal({
         doc.text(`Periodo: ${startDate} al ${endDate}`, 14, 28);
         doc.text(`Generado el: ${new Date().toLocaleString()}`, 14, 33);
 
-        const tableColumn = ["Folio", "Fecha", "Sucursal", "Total"];
+        const tableColumn = ["Folio", "Fecha", "Sucursal", "Cajero", "Total"];
         const tableRows = sortedData.map(row => [
             row.Folio,
             row.Fecha,
             row.Sucursal,
+            row.Cajero || '—',
             formatCurrency(row.Total)
         ]);
 
@@ -142,7 +174,7 @@ export default function ProfesorVentasDetailModal({
             theme: 'grid',
             headStyles: { fillColor: [37, 99, 235] },
             columnStyles: {
-                3: { halign: 'right' }
+                4: { halign: 'right' }
             }
         });
 
@@ -203,7 +235,7 @@ export default function ProfesorVentasDetailModal({
                         <button
                             onClick={handleExportExcel}
                             disabled={loading || sortedData.length === 0}
-                            className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors border border-slate-200"
+                            className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors border border-slate-200 disabled:opacity-40"
                             title="Exportar Excel"
                         >
                             <FileSpreadsheet size={20} />
@@ -211,7 +243,7 @@ export default function ProfesorVentasDetailModal({
                         <button
                             onClick={handleExportPDF}
                             disabled={loading || sortedData.length === 0}
-                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors border border-slate-200"
+                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors border border-slate-200 disabled:opacity-40"
                             title="Exportar PDF"
                         >
                             <FileText size={20} />
@@ -267,6 +299,12 @@ export default function ProfesorVentasDetailModal({
                                             <ArrowUpDown size={14} className={cn("text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig?.key === 'Sucursal' && "opacity-100 text-blue-500")} />
                                         </div>
                                     </th>
+                                    <th className="px-6 py-3 font-semibold text-slate-600 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors select-none group" onClick={() => handleSort('Cajero')}>
+                                        <div className="flex items-center gap-1 justify-between">
+                                            Cajero
+                                            <ArrowUpDown size={14} className={cn("text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig?.key === 'Cajero' && "opacity-100 text-blue-500")} />
+                                        </div>
+                                    </th>
                                     <th className="px-6 py-3 font-semibold text-slate-600 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors select-none group text-right" onClick={() => handleSort('Total')}>
                                         <div className="flex items-center gap-1 justify-end">
                                             Total
@@ -285,6 +323,7 @@ export default function ProfesorVentasDetailModal({
                                         <td className="px-6 py-3 font-mono text-blue-600 group-hover:underline">{row.Folio}</td>
                                         <td className="px-6 py-3 text-slate-600">{row.Fecha}</td>
                                         <td className="px-6 py-3 text-slate-600">{row.Sucursal}</td>
+                                        <td className="px-6 py-3 text-slate-600">{row.Cajero || '—'}</td>
                                         <td className="px-6 py-3 text-right font-bold text-slate-800">{formatCurrency(row.Total)}</td>
                                     </tr>
                                 ))}

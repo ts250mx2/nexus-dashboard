@@ -22,6 +22,8 @@ const segmentMap: Record<string, string> = {
     'tendencias': 'Tendencias de Venta',
     'retiros': 'Retiros',
     'ordenes': 'Órdenes de Compra',
+    'traspasos': 'Traspasos',
+    'kanban': 'Kanban',
     'query-designer': 'Diseñador de Consultas',
     'ai-learning': 'Aprendizaje IA',
     'ai-history': 'Historial de Preguntas',
@@ -44,6 +46,8 @@ const searchItems = [
     { name: 'Margen & Rentabilidad', href: '/dashboard/reportes/margen', category: 'Reportes' },
     { name: 'Retiros de Caja', href: '/dashboard/ventas/retiros', category: 'Ventas' },
     { name: 'Órdenes de Compra', href: '/dashboard/compras/ordenes', category: 'Compras' },
+    { name: 'Traspasos entre Sucursales', href: '/dashboard/compras/traspasos', category: 'Compras' },
+    { name: 'Kanban de Traspasos', href: '/dashboard/compras/traspasos/kanban', category: 'Compras' },
     { name: 'Diseñador de Consultas', href: '/dashboard/settings/query-designer', category: 'Configuración' },
     { name: 'Aprendizaje IA', href: '/dashboard/settings/ai-learning', category: 'Configuración' },
     { name: 'Historial de Preguntas IA', href: '/dashboard/settings/ai-history', category: 'Configuración' }

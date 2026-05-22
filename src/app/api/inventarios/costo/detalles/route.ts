@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
         const search = searchParams.get('search');
         const status = searchParams.get('status'); // 'todos' | 'existencias' | 'cero' | 'negativos' | 'alerta'
 
-        let whereClause = '1=1';
+        let whereClause = "LOWER(B.Sucursal) NOT LIKE '%fiscal%' AND LOWER(B.Sucursal) NOT LIKE '%prueba%'";
         let params: any[] = [];
 
         if (idSucursal && idSucursal !== 'all') {

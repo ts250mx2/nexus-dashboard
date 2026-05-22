@@ -20,6 +20,7 @@ export async function GET(req: Request) {
                 V.FolioVenta as Folio,
                 DATE_FORMAT(V.FechaVenta, '%Y-%m-%d %H:%i') as Fecha,
                 S.Sucursal,
+                U.Usuario as Cajero,
                 V.Total as TotalVenta,
                 SUM(DV.Cantidad) as CantidadArticulo,
                 SUM(DV.PrecioVenta * DV.Cantidad) as TotalArticulo
@@ -27,6 +28,7 @@ export async function GET(req: Request) {
             INNER JOIN tblDetalleVentas DV ON DV.IdVenta = V.IdVenta AND DV.IdSucursal = V.IdSucursal
             INNER JOIN tblArticulos A ON DV.IdArticulo = A.IdArticulo
             INNER JOIN tblSucursales S ON V.IdSucursal = S.IdSucursal
+            LEFT JOIN tblUsuarios U ON V.IdUsuarioVenta = U.IdUsuario
             WHERE A.IdArticulo = ?
               AND V.FechaVenta BETWEEN ? AND ?
               AND V.Status = 0
@@ -39,7 +41,7 @@ export async function GET(req: Request) {
             params.push(sucursalId);
         }
 
-        sql += ` GROUP BY V.IdVenta, V.IdSucursal, V.FolioVenta, V.FechaVenta, S.Sucursal, V.Total ORDER BY V.FechaVenta DESC`;
+        sql += ` GROUP BY V.IdVenta, V.IdSucursal, V.FolioVenta, V.FechaVenta, S.Sucursal, U.Usuario, V.Total ORDER BY V.FechaVenta DESC`;
 
         const rows = await query(sql, params);
         return NextResponse.json({ success: true, data: rows });

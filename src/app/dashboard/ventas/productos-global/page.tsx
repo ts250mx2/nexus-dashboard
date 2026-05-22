@@ -56,6 +56,7 @@ interface VentaDetalle {
     Folio: string;
     Fecha: string;
     Sucursal: string;
+    Cajero: string | null;
     CantidadArticulo: number;
     TotalArticulo: number;
     TotalVenta: number;
@@ -983,6 +984,7 @@ export default function ProductosGlobalPage() {
                                                 <th className="px-5 py-4">Folio</th>
                                                 <th className="px-5 py-4">Fecha</th>
                                                 <th className="px-5 py-4">Sucursal</th>
+                                                <th className="px-5 py-4">Cajero</th>
                                                 <th className="px-5 py-4 text-right">Cantidad</th>
                                                 <th className="px-5 py-4 text-right">Total Art.</th>
                                                 <th className="px-5 py-4 text-right">Total Venta</th>
@@ -1000,6 +1002,7 @@ export default function ProductosGlobalPage() {
                                                     <td className="px-5 py-4 font-medium text-slate-900">{venta.Folio}</td>
                                                     <td className="px-5 py-4 text-slate-650">{venta.Fecha}</td>
                                                     <td className="px-5 py-4 text-slate-650">{venta.Sucursal}</td>
+                                                    <td className="px-5 py-4 text-slate-650">{venta.Cajero || '—'}</td>
                                                     <td className="px-5 py-4 text-right text-slate-900 font-semibold">{venta.CantidadArticulo}</td>
                                                     <td className="px-5 py-4 text-right text-slate-900 font-semibold">{formatCurrency(venta.TotalArticulo)}</td>
                                                     <td className="px-5 py-4 text-right text-slate-900 font-semibold">{formatCurrency(venta.TotalVenta)}</td>

@@ -62,6 +62,58 @@ export const AVAILABLE_REPORTS: Record<string, ReportCategory> = {
             }
         ]
     },
+    purchasing: {
+        category: 'COMPRAS Y TRASPASOS',
+        reports: [
+            {
+                id: 'compras-global',
+                name: 'Compras Global',
+                path: '/dashboard/compras/global',
+                description: 'Vista global por sucursal de compras (recibidas/pendientes) y traspasos (recibidos/pendientes) en un periodo. Drill-down a artículos abastecidos y al detalle de cada compra/traspaso por artículo.',
+                keywords: ['compras global', 'abastecimiento', 'recepción', 'compras por sucursal', 'traspasos por sucursal', 'pendientes', 'recibidas', 'panorama compras'],
+                useCases: [
+                    'Detectar sucursales con muchas compras pendientes',
+                    'Comparar abasto por compra vs traspaso',
+                    'Identificar artículos con más entrada de mercancía',
+                    'Auditar el cruce de pendientes vs recibidos'
+                ]
+            },
+            {
+                id: 'ordenes-compra',
+                name: 'Órdenes de Compra',
+                path: '/dashboard/compras/ordenes',
+                description: 'Listado de órdenes de compra con drill-down a artículos por orden, filtros por sucursal y estatus (pendiente/recibida).',
+                keywords: ['orden compra', 'oc', 'proveedor', 'compras', 'abasto', 'recepción', 'pedido proveedor'],
+                useCases: ['Seguimiento de órdenes', 'Recepción pendiente', 'Compras por proveedor']
+            },
+            {
+                id: 'traspasos',
+                name: 'Traspasos',
+                path: '/dashboard/compras/traspasos',
+                description: 'Traspasos de mercancía entre sucursales con estatus (pendiente, recibida, pagada, cancelada), origen, destino, usuario, orden de compra ligada y drill-down por artículos.',
+                keywords: ['traspaso', 'traspasos', 'envío entre sucursales', 'movimiento de inventario', 'transferencia', 'envío mercancía'],
+                useCases: [
+                    'Auditar movimientos entre sucursales',
+                    'Detectar traspasos sin recibir',
+                    'Cruzar traspasos con orden de compra origen',
+                    'Identificar traspasos cancelados y responsable'
+                ]
+            },
+            {
+                id: 'traspasos-kanban',
+                name: 'Kanban de Traspasos',
+                path: '/dashboard/compras/traspasos/kanban',
+                description: 'Tablero kanban con el flujo del traspaso en 4 etapas: Orden Creada → Orden Recibida → Traspaso Enviado → Traspaso Recibido. Útil para ver cuellos de botella en el ciclo de abasto entre sucursales.',
+                keywords: ['kanban', 'pipeline', 'flujo', 'tablero', 'estado traspaso', 'avance', 'cuello de botella', 'embudo'],
+                useCases: [
+                    'Detectar traspasos atorados en una etapa',
+                    'Ver flujo visual desde la orden hasta la recepción',
+                    'Priorizar recepción en sucursales destino',
+                    'Identificar dónde se demora el abasto'
+                ]
+            }
+        ]
+    },
     profitability: {
         category: 'RENTABILIDAD Y MARGEN',
         reports: [

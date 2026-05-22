@@ -4,9 +4,9 @@ import { query } from '@/lib/db';
 export async function GET(req: NextRequest) {
     try {
         const sql = `
-            SELECT 
+            SELECT
                 B.IdSucursal,
-                B.Sucursal, 
+                B.Sucursal,
                 SUM(CASE WHEN A.Exi > 0 THEN A.Exi * A.PrecioBase ELSE 0 END) AS CostoPositivo,
                 SUM(CASE WHEN A.Exi > 0 THEN 1 ELSE 0 END) AS ProductosPositivo,
                 SUM(CASE WHEN A.Exi = 0 THEN A.Exi * A.PrecioBase ELSE 0 END) AS CostoCero,
@@ -17,6 +17,8 @@ export async function GET(req: NextRequest) {
             FROM tblCostoInventario A
             INNER JOIN tblSucursales B ON A.IdSucursal = B.IdSucursal
             LEFT JOIN tblConfiguracionResurtido C ON A.IdArticulo = C.IdArticulo AND A.IdSucursal = C.IdSucursal
+            WHERE LOWER(B.Sucursal) NOT LIKE '%fiscal%'
+              AND LOWER(B.Sucursal) NOT LIKE '%prueba%'
             GROUP BY B.IdSucursal, B.Sucursal
             ORDER BY B.IdSucursal
         `;

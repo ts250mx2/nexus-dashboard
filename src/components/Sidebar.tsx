@@ -18,7 +18,9 @@ import {
     Flame,
     Users,
     Layers,
-    Package
+    Package,
+    ArrowRightLeft,
+    Kanban
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
@@ -57,7 +59,10 @@ const sidebarItems: SidebarItem[] = [
         icon: ShoppingBag,
         color: 'text-blue-900',
         subItems: [
-            { name: 'Órdenes de Compra', href: '/dashboard/compras/ordenes', icon: FileText, color: 'text-blue-900' }
+            { name: 'Compras Global', href: '/dashboard/compras/global', icon: LayoutGrid, color: 'text-blue-900' },
+            { name: 'Órdenes de Compra', href: '/dashboard/compras/ordenes', icon: FileText, color: 'text-blue-900' },
+            { name: 'Traspasos', href: '/dashboard/compras/traspasos', icon: ArrowRightLeft, color: 'text-blue-900' },
+            { name: 'Kanban de Traspasos', href: '/dashboard/compras/traspasos/kanban', icon: Kanban, color: 'text-blue-900' }
         ]
     },
     {

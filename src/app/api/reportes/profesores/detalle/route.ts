@@ -14,15 +14,17 @@ export async function GET(req: Request) {
         }
 
         let sql = `
-            SELECT 
+            SELECT
                 V.IdVenta,
                 V.IdSucursal,
                 V.FolioVenta as Folio,
                 DATE_FORMAT(V.FechaVenta, '%Y-%m-%d %H:%i') as Fecha,
                 S.Sucursal,
+                U.Usuario as Cajero,
                 V.Total
             FROM tblVentas V
             INNER JOIN tblSucursales S ON V.IdSucursal = S.IdSucursal
+            LEFT JOIN tblUsuarios U ON V.IdUsuarioVenta = U.IdUsuario
             WHERE V.IdSocio = ?
             AND V.FechaVenta BETWEEN ? AND ?
         `;

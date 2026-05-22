@@ -13,13 +13,18 @@ export async function GET(req: Request) {
         }
 
         let sql = `
-            SELECT 
+            SELECT
                 S.IdSocio,
                 S.Socio as Cliente,
                 SUC.Sucursal,
                 COUNT(V.IdVenta) as TotalVentas,
                 SUM(V.Total) as ImporteTotal,
-                SUM(V.Total) / COUNT(V.IdVenta) as TicketPromedio
+                SUM(V.Total) / COUNT(V.IdVenta) as TicketPromedio,
+                (SELECT MAX(V2.FechaVenta)
+                 FROM tblVentas V2
+                 WHERE V2.IdSocio = S.IdSocio
+                   AND V2.IdSucursal = SUC.IdSucursal
+                   AND V2.Status = 0) AS UltimaVenta
             FROM tblVentas V
             INNER JOIN tblSocios S ON V.IdSocio = S.IdSocio
             INNER JOIN tblSucursales SUC ON V.IdSucursal = SUC.IdSucursal
