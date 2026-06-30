@@ -20,7 +20,8 @@ import {
     Layers,
     Package,
     ArrowRightLeft,
-    Kanban
+    Kanban,
+    UserX
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
@@ -50,6 +51,7 @@ const sidebarItems: SidebarItem[] = [
             { name: 'Profesores Global', href: '/dashboard/ventas/profesores-global', icon: Users, color: 'text-blue-900' },
             { name: 'Productos Global', href: '/dashboard/ventas/productos-global', icon: Package, color: 'text-blue-900' },
             { name: 'Profesores', href: '/dashboard/reportes/profesores', icon: FileText, color: 'text-blue-900' },
+            { name: 'Profesores Última Venta', href: '/dashboard/ventas/profesores-ultima-venta', icon: UserX, color: 'text-blue-900' },
             { name: 'Margen & Rentabilidad', href: '/dashboard/reportes/margen', icon: DollarSign, color: 'text-blue-900' },
             { name: 'Retiros', href: '/dashboard/ventas/retiros', icon: DollarSign, color: 'text-blue-900' }
         ]

@@ -29,6 +29,7 @@ const segmentMap: Record<string, string> = {
     'ai-history': 'Historial de Preguntas',
     'ai-agent': 'Agente IA',
     'profesores': 'Reporte Profesores',
+    'profesores-ultima-venta': 'Profesores Última Venta',
     'margen': 'Margen & Rentabilidad'
 };
 
@@ -43,6 +44,7 @@ const searchItems = [
     { name: 'Profesores Global', href: '/dashboard/ventas/profesores-global', category: 'Ventas' },
     { name: 'Productos Global', href: '/dashboard/ventas/productos-global', category: 'Ventas' },
     { name: 'Reporte Profesores', href: '/dashboard/reportes/profesores', category: 'Reportes' },
+    { name: 'Profesores Última Venta', href: '/dashboard/ventas/profesores-ultima-venta', category: 'Ventas' },
     { name: 'Margen & Rentabilidad', href: '/dashboard/reportes/margen', category: 'Reportes' },
     { name: 'Retiros de Caja', href: '/dashboard/ventas/retiros', category: 'Ventas' },
     { name: 'Órdenes de Compra', href: '/dashboard/compras/ordenes', category: 'Compras' },
