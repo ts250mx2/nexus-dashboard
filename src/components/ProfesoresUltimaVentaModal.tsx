@@ -140,7 +140,10 @@ export default function ProfesoresUltimaVentaModal({
             ],
             columns: [
                 { header: '#', key: '_idx', width: 6, align: 'center', isNumber: true },
-                { header: 'Profesor', key: 'Cliente', width: 36 },
+                { header: 'Profesor', key: 'Cliente', width: 32 },
+                { header: 'Disciplina', key: 'Disciplina', width: 22 },
+                { header: 'Teléfono', key: 'Telefono', width: 18 },
+                { header: 'Dirección', key: 'Direccion', width: 40 },
                 { header: 'Sucursal', key: 'Sucursal', width: 24 },
                 { header: 'Última Venta', key: 'UltimaVenta', width: 18, align: 'center' },
                 { header: 'Folio', key: 'Folio', width: 16 },
@@ -150,6 +153,9 @@ export default function ProfesoresUltimaVentaModal({
             rows: sortedAndFilteredData.map((r, i) => ({
                 _idx: i + 1,
                 Cliente: r.Cliente,
+                Disciplina: r.Disciplina || '—',
+                Telefono: r.Telefono || '—',
+                Direccion: r.Direccion || '—',
                 Sucursal: r.Sucursal,
                 UltimaVenta: r.UltimaVenta,
                 Folio: r.Folio,
@@ -170,7 +176,7 @@ export default function ProfesoresUltimaVentaModal({
 
     const handleExportPDF = () => {
         if (sortedAndFilteredData.length === 0) return;
-        const doc = new jsPDF();
+        const doc = new jsPDF({ orientation: 'landscape' });
 
         doc.setFontSize(16);
         doc.text(`Profesores sin ventas recientes - ${sucursalName}`, 14, 20);
@@ -178,9 +184,12 @@ export default function ProfesoresUltimaVentaModal({
         doc.text(`Última venta anterior a: ${cutoffDate}`, 14, 28);
         doc.text(`Generado el: ${new Date().toLocaleString()}`, 14, 33);
 
-        const tableColumn = ["Profesor", "Sucursal", "Última Venta", "Folio", "Total", "Días sin comprar"];
+        const tableColumn = ["Profesor", "Disciplina", "Teléfono", "Dirección", "Sucursal", "Última Venta", "Folio", "Total", "Días sin comprar"];
         const tableRows = sortedAndFilteredData.map(row => [
             row.Cliente,
+            row.Disciplina || '—',
+            row.Telefono || '—',
+            row.Direccion || '—',
             row.Sucursal,
             formatShortDate(row.UltimaVentaRaw),
             row.Folio,
@@ -194,10 +203,11 @@ export default function ProfesoresUltimaVentaModal({
             startY: 40,
             theme: 'striped',
             headStyles: { fillColor: [37, 99, 235] },
+            styles: { fontSize: 8, cellPadding: 2.5 },
             columnStyles: {
-                2: { halign: 'center' },
-                4: { halign: 'right' },
-                5: { halign: 'right' }
+                5: { halign: 'center' },
+                7: { halign: 'right' },
+                8: { halign: 'right' }
             }
         });
 
@@ -279,6 +289,14 @@ export default function ProfesoresUltimaVentaModal({
                                             <ArrowUpDown size={14} className={cn("text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig?.key === 'Cliente' && "opacity-100 text-blue-500")} />
                                         </div>
                                     </th>
+                                    <th className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors select-none group" onClick={() => handleSort('Disciplina')}>
+                                        <div className="flex items-center gap-1 justify-between">
+                                            Disciplina
+                                            <ArrowUpDown size={14} className={cn("text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig?.key === 'Disciplina' && "opacity-100 text-blue-500")} />
+                                        </div>
+                                    </th>
+                                    <th className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider select-none">Teléfono</th>
+                                    <th className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider select-none">Dirección</th>
                                     <th className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors select-none group" onClick={() => handleSort('Sucursal')}>
                                         <div className="flex items-center gap-1 justify-between">
                                             Sucursal
@@ -327,6 +345,20 @@ export default function ProfesoresUltimaVentaModal({
                                         <div className="relative">
                                             <input
                                                 type="text"
+                                                placeholder={`Disciplina...`}
+                                                value={filters['Disciplina'] || ''}
+                                                onChange={(e) => handleFilterChange('Disciplina', e.target.value)}
+                                                className="w-full pl-8 pr-3 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 bg-white font-normal"
+                                            />
+                                            <Filter size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                                        </div>
+                                    </th>
+                                    <th className="px-3 py-2"></th>
+                                    <th className="px-3 py-2"></th>
+                                    <th className="px-3 py-2">
+                                        <div className="relative">
+                                            <input
+                                                type="text"
                                                 placeholder={`Filtrar...`}
                                                 value={filters['Sucursal'] || ''}
                                                 onChange={(e) => handleFilterChange('Sucursal', e.target.value)}
@@ -355,7 +387,7 @@ export default function ProfesoresUltimaVentaModal({
                             <tbody className="divide-y divide-slate-100">
                                 {sortedAndFilteredData.length === 0 ? (
                                     <tr>
-                                        <td colSpan={6} className="px-6 py-12 text-center text-slate-400">
+                                        <td colSpan={9} className="px-6 py-12 text-center text-slate-400">
                                             No se encontraron profesores con su última venta antes de la fecha indicada.
                                         </td>
                                     </tr>
@@ -369,6 +401,15 @@ export default function ProfesoresUltimaVentaModal({
                                         >
                                             <td className="px-6 py-4 font-medium text-slate-900 group-hover:text-blue-600 transition-colors">
                                                 {row.Cliente}
+                                            </td>
+                                            <td className="px-6 py-4 text-slate-600">
+                                                {row.Disciplina || <span className="text-slate-300">—</span>}
+                                            </td>
+                                            <td className="px-6 py-4 text-slate-600 tabular-nums">
+                                                {row.Telefono || <span className="text-slate-300">—</span>}
+                                            </td>
+                                            <td className="px-6 py-4 text-slate-500 max-w-[240px] truncate" title={row.Direccion || ''}>
+                                                {row.Direccion || <span className="text-slate-300">—</span>}
                                             </td>
                                             <td className="px-6 py-4 text-slate-500 italic">
                                                 {row.Sucursal}

@@ -23,6 +23,9 @@ export async function GET(req: Request) {
             SELECT
                 LS.IdSocio,
                 S.Socio AS Cliente,
+                S.Contacto AS Disciplina,
+                S.Telefonos AS Telefono,
+                S.Direccion,
                 LS.IdVenta,
                 LS.IdSucursal,
                 SUC.Sucursal,
