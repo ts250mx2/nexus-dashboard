@@ -122,6 +122,32 @@ body {
   background: rgba(99, 102, 241, 0.4);
 }
 
+/* Scrollbar amigable para tablas anchas (ej. Comparativo Profesores):
+   barra más gruesa, con track visible y thumb redondeado fácil de arrastrar. */
+.nice-scroll {
+  scrollbar-width: auto;
+  scrollbar-color: #94a3b8 #eef2f6;
+}
+.nice-scroll::-webkit-scrollbar {
+  height: 14px;
+  width: 14px;
+}
+.nice-scroll::-webkit-scrollbar-track {
+  background: #eef2f6;
+  border-radius: 999px;
+}
+.nice-scroll::-webkit-scrollbar-thumb {
+  background: #c3ccd8;
+  border-radius: 999px;
+  border: 3px solid #eef2f6; /* margen visual alrededor del thumb */
+}
+.nice-scroll::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+.nice-scroll::-webkit-scrollbar-corner {
+  background: #eef2f6;
+}
+
 /* Minimalist Premium Card Utilities (Stripe/Linear Style) */
 .glass-panel {
   background: #ffffff;

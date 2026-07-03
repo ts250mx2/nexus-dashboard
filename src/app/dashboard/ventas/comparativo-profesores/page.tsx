@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import {
     BarChart3,
     Loader2,
@@ -46,6 +46,12 @@ const YEAR_TINTS = [
 const MAX_YEARS = 8;
 const MIN_YEAR = 2000;
 
+// Anchos (px) de las columnas congeladas a la izquierda (panel fijo / "split")
+const ID_W = 72;
+const SOCIO_W_DEFAULT = 176;
+const SOCIO_W_MIN = 96;
+const SOCIO_W_MAX = 460;
+
 export default function ComparativoProfesoresPage() {
     const currentYear = new Date().getFullYear();
 
@@ -58,6 +64,34 @@ export default function ComparativoProfesoresPage() {
 
     const [sucursalFilter, setSucursalFilter] = useState<string>('all');
     const [search, setSearch] = useState('');
+
+    // Ancho (movible) del panel congelado — la columna Socio. Durante el arrastre
+    // se actualiza la variable CSS directamente (sin re-render) y se persiste al soltar.
+    const [socioW, setSocioW] = useState(SOCIO_W_DEFAULT);
+    const tableWrapRef = useRef<HTMLDivElement>(null);
+
+    const startResize = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const startX = e.clientX;
+        const startW = socioW;
+        let latest = startW;
+        const onMove = (ev: MouseEvent) => {
+            latest = Math.min(SOCIO_W_MAX, Math.max(SOCIO_W_MIN, startW + (ev.clientX - startX)));
+            tableWrapRef.current?.style.setProperty('--socio-w', `${latest}px`);
+        };
+        const onUp = () => {
+            window.removeEventListener('mousemove', onMove);
+            window.removeEventListener('mouseup', onUp);
+            document.body.style.userSelect = '';
+            document.body.style.cursor = '';
+            setSocioW(latest);
+        };
+        document.body.style.userSelect = 'none';
+        document.body.style.cursor = 'col-resize';
+        window.addEventListener('mousemove', onMove);
+        window.addEventListener('mouseup', onUp);
+    };
     const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' }>({ key: `Total_${currentYear}`, direction: 'desc' });
 
     const yearsKey = years.join(',');
@@ -444,11 +478,34 @@ export default function ComparativoProfesoresPage() {
                         </div>
                         <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">{modeLabel}</span>
                     </div>
-                    <div className="overflow-auto max-h-[68vh]">
+                    <div ref={tableWrapRef} className="relative" style={{ '--socio-w': `${socioW}px` } as React.CSSProperties}>
+                    <div className="overflow-auto max-h-[68vh] nice-scroll">
                         <table className="w-full text-left text-sm whitespace-nowrap border-collapse">
-                            <thead className="bg-white sticky top-0 z-10 shadow-sm">
+                            <thead className="bg-white sticky top-0 z-30 shadow-sm">
                                 <tr className="border-b border-slate-200">
-                                    {identityCols.map(col => (
+                                    {/* Panel congelado: IdSocio */}
+                                    <th
+                                        onClick={() => handleSort('IdSocio')}
+                                        style={{ left: 0, width: ID_W, minWidth: ID_W, maxWidth: ID_W }}
+                                        className="sticky z-20 bg-white px-2 py-3 font-bold text-slate-600 text-[11px] uppercase tracking-wider cursor-pointer hover:bg-slate-50 transition-colors select-none group overflow-hidden"
+                                    >
+                                        <div className="flex items-center gap-1 justify-center">
+                                            IdSocio
+                                            <ArrowUpDown size={12} className={cn('text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity', sortConfig.key === 'IdSocio' && 'opacity-100 text-blue-500')} />
+                                        </div>
+                                    </th>
+                                    {/* Panel congelado: Socio + línea divisoria (split) */}
+                                    <th
+                                        onClick={() => handleSort('Socio')}
+                                        style={{ left: ID_W, width: 'var(--socio-w)', minWidth: 'var(--socio-w)', maxWidth: 'var(--socio-w)' }}
+                                        className="sticky z-20 bg-white border-r-2 border-slate-300 shadow-[2px_0_5px_-2px_rgba(15,23,42,0.12)] px-3 py-3 font-bold text-slate-600 text-[11px] uppercase tracking-wider cursor-pointer hover:bg-slate-50 transition-colors select-none group"
+                                    >
+                                        <div className="flex items-center gap-1 justify-between">
+                                            Socio
+                                            <ArrowUpDown size={12} className={cn('text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity', sortConfig.key === 'Socio' && 'opacity-100 text-blue-500')} />
+                                        </div>
+                                    </th>
+                                    {identityCols.slice(2).map(col => (
                                         <th
                                             key={col.key}
                                             onClick={() => handleSort(col.key)}
@@ -495,9 +552,9 @@ export default function ComparativoProfesoresPage() {
                                     </tr>
                                 ) : (
                                     filteredData.map((r, idx) => (
-                                        <tr key={idx} className="hover:bg-blue-50/40 transition-colors">
-                                            <td className="px-4 py-3 text-center text-slate-400 font-mono text-xs">{r.IdSocio}</td>
-                                            <td className="px-4 py-3 font-semibold text-slate-800">{r.Socio}</td>
+                                        <tr key={idx} className="group hover:bg-blue-50/40 transition-colors">
+                                            <td style={{ left: 0, width: ID_W, minWidth: ID_W, maxWidth: ID_W }} className="sticky z-20 bg-white group-hover:bg-blue-50/40 px-2 py-3 text-center text-slate-400 font-mono text-xs overflow-hidden">{r.IdSocio}</td>
+                                            <td style={{ left: ID_W, width: 'var(--socio-w)', minWidth: 'var(--socio-w)', maxWidth: 'var(--socio-w)' }} title={r.Socio} className="sticky z-20 bg-white group-hover:bg-blue-50/40 border-r-2 border-slate-300 shadow-[2px_0_5px_-2px_rgba(15,23,42,0.12)] px-3 py-3 font-semibold text-slate-800 truncate">{r.Socio}</td>
                                             <td className="px-4 py-3 text-slate-500 italic text-xs">{r.Sucursal}</td>
                                             <td className="px-4 py-3 text-slate-500 text-xs tabular-nums">{r.Telefono || <span className="text-slate-300">—</span>}</td>
                                             <td className="px-4 py-3 text-slate-500 text-xs max-w-[220px] truncate" title={r.Direccion || ''}>{r.Direccion || <span className="text-slate-300">—</span>}</td>
@@ -535,9 +592,11 @@ export default function ComparativoProfesoresPage() {
                                 )}
                             </tbody>
                             {filteredData.length > 0 && (
-                                <tfoot className="sticky bottom-0 bg-slate-50 border-t-2 border-slate-200">
+                                <tfoot className="sticky bottom-0 z-30 bg-slate-50 border-t-2 border-slate-200">
                                     <tr className="font-bold text-slate-700">
-                                        <td className="px-4 py-3 text-xs uppercase tracking-wider text-slate-400" colSpan={identityCols.length}>Totales ({filteredData.length})</td>
+                                        <td style={{ left: 0, width: ID_W, minWidth: ID_W, maxWidth: ID_W }} className="sticky z-20 bg-slate-50 px-2 py-3"></td>
+                                        <td style={{ left: ID_W, width: 'var(--socio-w)', minWidth: 'var(--socio-w)', maxWidth: 'var(--socio-w)' }} className="sticky z-20 bg-slate-50 border-r-2 border-slate-300 shadow-[2px_0_5px_-2px_rgba(15,23,42,0.12)] px-3 py-3 text-xs uppercase tracking-wider text-slate-400 truncate">Totales ({filteredData.length})</td>
+                                        <td className="px-4 py-3" colSpan={identityCols.length - 2}></td>
                                         {sortedYears.map((y, yi) => {
                                             const tint = YEAR_TINTS[yi % YEAR_TINTS.length];
                                             const tt = totals[y];
@@ -554,6 +613,17 @@ export default function ComparativoProfesoresPage() {
                                 </tfoot>
                             )}
                         </table>
+                    </div>
+                        {/* Divisor movible del split: arrastra para ajustar el ancho del panel fijo */}
+                        <div
+                            onMouseDown={startResize}
+                            style={{ left: `calc(${ID_W}px + var(--socio-w))` }}
+                            className="absolute top-0 bottom-0 z-40 w-3 -ml-1.5 cursor-col-resize group flex items-center justify-center"
+                            title="Arrastra para ajustar el ancho de la columna fija"
+                        >
+                            <div className="h-full w-0.5 bg-transparent group-hover:bg-blue-500/70 transition-colors" />
+                            <div className="absolute top-1/2 -translate-y-1/2 h-8 w-1.5 rounded-full bg-slate-300 group-hover:bg-blue-500 shadow-sm transition-colors" />
+                        </div>
                     </div>
                 </div>
             )}
