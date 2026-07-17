@@ -22,7 +22,8 @@ import {
     ArrowRightLeft,
     Kanban,
     UserX,
-    BarChart3
+    BarChart3,
+    UserRound
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
@@ -54,6 +55,7 @@ const sidebarItems: SidebarItem[] = [
             { name: 'Profesores', href: '/dashboard/reportes/profesores', icon: FileText, color: 'text-blue-900' },
             { name: 'Profesores Última Venta', href: '/dashboard/ventas/profesores-ultima-venta', icon: UserX, color: 'text-blue-900' },
             { name: 'Comparativo Profesores', href: '/dashboard/ventas/comparativo-profesores', icon: BarChart3, color: 'text-blue-900' },
+            { name: 'Ventas por Usuario', href: '/dashboard/ventas/ventas-por-usuario', icon: UserRound, color: 'text-blue-900' },
             { name: 'Margen & Rentabilidad', href: '/dashboard/reportes/margen', icon: DollarSign, color: 'text-blue-900' },
             { name: 'Retiros', href: '/dashboard/ventas/retiros', icon: DollarSign, color: 'text-blue-900' }
         ]

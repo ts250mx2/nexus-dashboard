@@ -31,6 +31,7 @@ const segmentMap: Record<string, string> = {
     'profesores': 'Reporte Profesores',
     'profesores-ultima-venta': 'Profesores Última Venta',
     'comparativo-profesores': 'Comparativo Profesores',
+    'ventas-por-usuario': 'Ventas por Usuario',
     'margen': 'Margen & Rentabilidad'
 };
 
@@ -47,6 +48,7 @@ const searchItems = [
     { name: 'Reporte Profesores', href: '/dashboard/reportes/profesores', category: 'Reportes' },
     { name: 'Profesores Última Venta', href: '/dashboard/ventas/profesores-ultima-venta', category: 'Ventas' },
     { name: 'Comparativo Profesores', href: '/dashboard/ventas/comparativo-profesores', category: 'Ventas' },
+    { name: 'Ventas por Usuario', href: '/dashboard/ventas/ventas-por-usuario', category: 'Ventas' },
     { name: 'Margen & Rentabilidad', href: '/dashboard/reportes/margen', category: 'Reportes' },
     { name: 'Retiros de Caja', href: '/dashboard/ventas/retiros', category: 'Ventas' },
     { name: 'Órdenes de Compra', href: '/dashboard/compras/ordenes', category: 'Compras' },
