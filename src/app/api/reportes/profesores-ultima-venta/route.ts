@@ -26,6 +26,7 @@ export async function GET(req: Request) {
                 S.Contacto AS Disciplina,
                 S.Telefonos AS Telefono,
                 S.Direccion,
+                S.CorreoElectronico AS Correo,
                 LS.IdVenta,
                 LS.IdSucursal,
                 SUC.Sucursal,

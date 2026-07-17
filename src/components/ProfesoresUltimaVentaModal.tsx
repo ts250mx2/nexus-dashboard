@@ -144,6 +144,7 @@ export default function ProfesoresUltimaVentaModal({
                 { header: 'Disciplina', key: 'Disciplina', width: 22 },
                 { header: 'Teléfono', key: 'Telefono', width: 18 },
                 { header: 'Dirección', key: 'Direccion', width: 40 },
+                { header: 'Correo', key: 'Correo', width: 30 },
                 { header: 'Sucursal', key: 'Sucursal', width: 24 },
                 { header: 'Última Venta', key: 'UltimaVenta', width: 18, align: 'center' },
                 { header: 'Folio', key: 'Folio', width: 16 },
@@ -156,6 +157,7 @@ export default function ProfesoresUltimaVentaModal({
                 Disciplina: r.Disciplina || '—',
                 Telefono: r.Telefono || '—',
                 Direccion: r.Direccion || '—',
+                Correo: r.Correo || '—',
                 Sucursal: r.Sucursal,
                 UltimaVenta: r.UltimaVenta,
                 Folio: r.Folio,
@@ -184,12 +186,13 @@ export default function ProfesoresUltimaVentaModal({
         doc.text(`Última venta anterior a: ${cutoffDate}`, 14, 28);
         doc.text(`Generado el: ${new Date().toLocaleString()}`, 14, 33);
 
-        const tableColumn = ["Profesor", "Disciplina", "Teléfono", "Dirección", "Sucursal", "Última Venta", "Folio", "Total", "Días sin comprar"];
+        const tableColumn = ["Profesor", "Disciplina", "Teléfono", "Dirección", "Correo", "Sucursal", "Última Venta", "Folio", "Total", "Días sin comprar"];
         const tableRows = sortedAndFilteredData.map(row => [
             row.Cliente,
             row.Disciplina || '—',
             row.Telefono || '—',
             row.Direccion || '—',
+            row.Correo || '—',
             row.Sucursal,
             formatShortDate(row.UltimaVentaRaw),
             row.Folio,
@@ -203,11 +206,11 @@ export default function ProfesoresUltimaVentaModal({
             startY: 40,
             theme: 'striped',
             headStyles: { fillColor: [37, 99, 235] },
-            styles: { fontSize: 8, cellPadding: 2.5 },
+            styles: { fontSize: 7.5, cellPadding: 2 },
             columnStyles: {
-                5: { halign: 'center' },
-                7: { halign: 'right' },
-                8: { halign: 'right' }
+                6: { halign: 'center' },
+                8: { halign: 'right' },
+                9: { halign: 'right' }
             }
         });
 
@@ -297,6 +300,7 @@ export default function ProfesoresUltimaVentaModal({
                                     </th>
                                     <th className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider select-none">Teléfono</th>
                                     <th className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider select-none">Dirección</th>
+                                    <th className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider select-none">Correo</th>
                                     <th className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors select-none group" onClick={() => handleSort('Sucursal')}>
                                         <div className="flex items-center gap-1 justify-between">
                                             Sucursal
@@ -355,6 +359,7 @@ export default function ProfesoresUltimaVentaModal({
                                     </th>
                                     <th className="px-3 py-2"></th>
                                     <th className="px-3 py-2"></th>
+                                    <th className="px-3 py-2"></th>
                                     <th className="px-3 py-2">
                                         <div className="relative">
                                             <input
@@ -387,7 +392,7 @@ export default function ProfesoresUltimaVentaModal({
                             <tbody className="divide-y divide-slate-100">
                                 {sortedAndFilteredData.length === 0 ? (
                                     <tr>
-                                        <td colSpan={9} className="px-6 py-12 text-center text-slate-400">
+                                        <td colSpan={10} className="px-6 py-12 text-center text-slate-400">
                                             No se encontraron profesores con su última venta antes de la fecha indicada.
                                         </td>
                                     </tr>
@@ -410,6 +415,9 @@ export default function ProfesoresUltimaVentaModal({
                                             </td>
                                             <td className="px-6 py-4 text-slate-500 max-w-[240px] truncate" title={row.Direccion || ''}>
                                                 {row.Direccion || <span className="text-slate-300">—</span>}
+                                            </td>
+                                            <td className="px-6 py-4 text-slate-500 max-w-[220px] truncate" title={row.Correo || ''}>
+                                                {row.Correo || <span className="text-slate-300">—</span>}
                                             </td>
                                             <td className="px-6 py-4 text-slate-500 italic">
                                                 {row.Sucursal}
