@@ -16,6 +16,8 @@ export async function GET(req: Request) {
             SELECT
                 S.IdSocio,
                 S.Socio as Cliente,
+                S.Telefonos AS Telefono,
+                S.CorreoElectronico AS Correo,
                 SUC.Sucursal,
                 COUNT(V.IdVenta) as TotalVentas,
                 SUM(V.Total) as ImporteTotal,
@@ -47,7 +49,7 @@ export async function GET(req: Request) {
             }
         }
 
-        sql += ` GROUP BY S.IdSocio, S.Socio, SUC.Sucursal ORDER BY ImporteTotal DESC`;
+        sql += ` GROUP BY S.IdSocio, S.Socio, S.Telefonos, S.CorreoElectronico, SUC.Sucursal ORDER BY ImporteTotal DESC`;
 
         const rows = await query(sql, params);
         return NextResponse.json({ success: true, data: rows });

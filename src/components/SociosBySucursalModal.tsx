@@ -157,6 +157,8 @@ export default function SociosBySucursalModal({
             columns: [
                 { header: '#', key: '_idx', width: 6, align: 'center', isNumber: true },
                 { header: 'Profesor', key: 'Cliente', width: 36 },
+                { header: 'Teléfono', key: 'Telefono', width: 18 },
+                { header: 'Correo', key: 'Correo', width: 30 },
                 { header: 'Sucursal', key: 'Sucursal', width: 24 },
                 { header: 'Ventas', key: 'TotalVentas', width: 10, isNumber: true, align: 'right' },
                 { header: 'Ticket Promedio', key: 'TicketPromedio', width: 18, isCurrency: true, align: 'right' },
@@ -166,6 +168,8 @@ export default function SociosBySucursalModal({
             rows: sortedAndFilteredData.map((r, i) => ({
                 _idx: i + 1,
                 Cliente: r.Cliente,
+                Telefono: r.Telefono || '—',
+                Correo: r.Correo || '—',
                 Sucursal: r.Sucursal,
                 TotalVentas: r.TotalVentas,
                 TicketPromedio: r.TicketPromedio,
@@ -223,6 +227,8 @@ export default function SociosBySucursalModal({
                 columns: [
                     { header: '#', key: '_idx', width: 6, align: 'center', isNumber: true },
                     { header: 'Profesor', key: 'Cliente', width: 36 },
+                    { header: 'Teléfono', key: 'Telefono', width: 18 },
+                    { header: 'Correo', key: 'Correo', width: 30 },
                     { header: 'Sucursal', key: 'Sucursal', width: 24 },
                     { header: 'Ventas', key: 'TotalVentas', width: 10, isNumber: true, align: 'right' },
                     { header: 'Ticket Promedio', key: 'TicketPromedio', width: 18, isCurrency: true, align: 'right' },
@@ -231,6 +237,8 @@ export default function SociosBySucursalModal({
                 rows: sortedAndFilteredData.map((r, i) => ({
                     _idx: i + 1,
                     Cliente: r.Cliente,
+                    Telefono: r.Telefono || '—',
+                    Correo: r.Correo || '—',
                     Sucursal: r.Sucursal,
                     TotalVentas: r.TotalVentas,
                     TicketPromedio: r.TicketPromedio,
@@ -359,17 +367,19 @@ export default function SociosBySucursalModal({
 
     const handleExportPDF = () => {
         if (sortedAndFilteredData.length === 0) return;
-        const doc = new jsPDF();
-        
+        const doc = new jsPDF({ orientation: 'landscape' });
+
         doc.setFontSize(18);
         doc.text(`Socios - ${sucursalName}`, 14, 20);
         doc.setFontSize(10);
         doc.text(`Periodo: ${startDate} al ${endDate}`, 14, 28);
         doc.text(`Generado el: ${new Date().toLocaleString()}`, 14, 33);
 
-        const tableColumn = ["Profesor", "Sucursal", "# Ventas", "T. Promedio", "Importe Total", "Última Venta"];
+        const tableColumn = ["Profesor", "Teléfono", "Correo", "Sucursal", "# Ventas", "T. Promedio", "Importe Total", "Última Venta"];
         const tableRows = sortedAndFilteredData.map(row => [
             row.Cliente,
+            row.Telefono || '—',
+            row.Correo || '—',
             row.Sucursal,
             row.TotalVentas,
             formatCurrency(row.TicketPromedio),
@@ -383,11 +393,12 @@ export default function SociosBySucursalModal({
             startY: 40,
             theme: 'striped',
             headStyles: { fillColor: [37, 99, 235] },
+            styles: { fontSize: 8, cellPadding: 2 },
             columnStyles: {
-                2: { halign: 'center' },
-                3: { halign: 'right' },
-                4: { halign: 'right' },
-                5: { halign: 'center' }
+                4: { halign: 'center' },
+                5: { halign: 'right' },
+                6: { halign: 'right' },
+                7: { halign: 'center' }
             }
         });
 
@@ -479,6 +490,8 @@ export default function SociosBySucursalModal({
                                             <ArrowUpDown size={14} className={cn("text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig?.key === 'Cliente' && "opacity-100 text-blue-500")} />
                                         </div>
                                     </th>
+                                    <th className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider select-none">Teléfono</th>
+                                    <th className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider select-none">Correo</th>
                                     <th className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors select-none group" onClick={() => handleSort('Sucursal')}>
                                         <div className="flex items-center gap-1 justify-between">
                                             Sucursal
@@ -523,6 +536,8 @@ export default function SociosBySucursalModal({
                                             <Filter size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
                                         </div>
                                     </th>
+                                    <th className="px-3 py-2"></th>
+                                    <th className="px-3 py-2"></th>
                                     <th className="px-3 py-2">
                                         <div className="relative">
                                             <input
@@ -544,7 +559,7 @@ export default function SociosBySucursalModal({
                             <tbody className="divide-y divide-slate-100">
                                 {sortedAndFilteredData.length === 0 ? (
                                     <tr>
-                                        <td colSpan={6} className="px-6 py-12 text-center text-slate-400">
+                                        <td colSpan={8} className="px-6 py-12 text-center text-slate-400">
                                             No se encontraron socios para esta sucursal.
                                         </td>
                                     </tr>
@@ -557,6 +572,12 @@ export default function SociosBySucursalModal({
                                         >
                                             <td className="px-6 py-4 font-medium text-slate-900 group-hover:text-blue-600 transition-colors">
                                                 {row.Cliente}
+                                            </td>
+                                            <td className="px-6 py-4 text-slate-500 text-xs tabular-nums">
+                                                {row.Telefono || <span className="text-slate-300">—</span>}
+                                            </td>
+                                            <td className="px-6 py-4 text-slate-500 text-xs max-w-[220px] truncate" title={row.Correo || ''}>
+                                                {row.Correo || <span className="text-slate-300">—</span>}
                                             </td>
                                             <td className="px-6 py-4 text-slate-500 italic">
                                                 {row.Sucursal}
