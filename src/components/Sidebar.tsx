@@ -23,7 +23,9 @@ import {
     Kanban,
     UserX,
     BarChart3,
-    UserRound
+    UserRound,
+    Tags,
+    Tag
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
@@ -80,6 +82,14 @@ const sidebarItems: SidebarItem[] = [
         ]
     },
     {
+        name: 'Precios y Costos',
+        icon: Tags,
+        color: 'text-blue-900',
+        subItems: [
+            { name: 'Lista de Precios', href: '/dashboard/precios/lista-precios', icon: Tag, color: 'text-blue-900' }
+        ]
+    },
+    {
         name: 'Configuración',
         icon: Settings,
         color: 'text-blue-900',
@@ -104,6 +114,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, isMobileOpen, set
         'Ventas': pathname.includes('/ventas') || pathname.includes('/reportes'),
         'Compras': pathname.includes('/compras'),
         'Inventarios': pathname.includes('/inventarios'),
+        'Precios y Costos': pathname.includes('/precios'),
         'Configuración': pathname.includes('/settings'),
     });
 
@@ -120,6 +131,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, isMobileOpen, set
                 'Ventas': pathname.includes('/ventas') || pathname.includes('/reportes'),
                 'Compras': pathname.includes('/compras'),
                 'Inventarios': pathname.includes('/inventarios'),
+                'Precios y Costos': pathname.includes('/precios'),
                 'Configuración': pathname.includes('/settings'),
             });
         }

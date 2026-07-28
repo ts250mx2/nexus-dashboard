@@ -32,7 +32,9 @@ const segmentMap: Record<string, string> = {
     'profesores-ultima-venta': 'Profesores Última Venta',
     'comparativo-profesores': 'Comparativo Profesores',
     'ventas-por-usuario': 'Ventas por Usuario',
-    'margen': 'Margen & Rentabilidad'
+    'margen': 'Margen & Rentabilidad',
+    'precios': 'Precios y Costos',
+    'lista-precios': 'Lista de Precios'
 };
 
 const searchItems = [
@@ -54,6 +56,7 @@ const searchItems = [
     { name: 'Órdenes de Compra', href: '/dashboard/compras/ordenes', category: 'Compras' },
     { name: 'Traspasos entre Sucursales', href: '/dashboard/compras/traspasos', category: 'Compras' },
     { name: 'Kanban de Traspasos', href: '/dashboard/compras/traspasos/kanban', category: 'Compras' },
+    { name: 'Lista de Precios', href: '/dashboard/precios/lista-precios', category: 'Precios y Costos' },
     { name: 'Diseñador de Consultas', href: '/dashboard/settings/query-designer', category: 'Configuración' },
     { name: 'Aprendizaje IA', href: '/dashboard/settings/ai-learning', category: 'Configuración' },
     { name: 'Historial de Preguntas IA', href: '/dashboard/settings/ai-history', category: 'Configuración' }
