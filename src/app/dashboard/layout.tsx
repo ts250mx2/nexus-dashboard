@@ -13,7 +13,9 @@ const segmentMap: Record<string, string> = {
     ventas: 'Ventas',
     compras: 'Compras',
     reportes: 'Reportes',
-    settings: 'Configuración',
+    'reportes-ia': 'Reportes IA',
+    'agente-avanzado': 'Agente Avanzado',
+    'mis-reportes': 'Mis Reportes',
     'profesores-global': 'Profesores Global',
     'productos-global': 'Productos Global',
     'mapadecalor': 'Mapa de Calor',
@@ -24,9 +26,6 @@ const segmentMap: Record<string, string> = {
     'ordenes': 'Órdenes de Compra',
     'traspasos': 'Traspasos',
     'kanban': 'Kanban',
-    'query-designer': 'Diseñador de Consultas',
-    'ai-learning': 'Aprendizaje IA',
-    'ai-history': 'Historial de Preguntas',
     'ai-agent': 'Agente IA',
     'profesores': 'Reporte Profesores',
     'profesores-ultima-venta': 'Profesores Última Venta',
@@ -57,9 +56,8 @@ const searchItems = [
     { name: 'Traspasos entre Sucursales', href: '/dashboard/compras/traspasos', category: 'Compras' },
     { name: 'Kanban de Traspasos', href: '/dashboard/compras/traspasos/kanban', category: 'Compras' },
     { name: 'Lista de Precios', href: '/dashboard/precios/lista-precios', category: 'Precios y Costos' },
-    { name: 'Diseñador de Consultas', href: '/dashboard/settings/query-designer', category: 'Configuración' },
-    { name: 'Aprendizaje IA', href: '/dashboard/settings/ai-learning', category: 'Configuración' },
-    { name: 'Historial de Preguntas IA', href: '/dashboard/settings/ai-history', category: 'Configuración' }
+    { name: 'Agente Avanzado', href: '/dashboard/reportes-ia/agente-avanzado', category: 'Reportes IA' },
+    { name: 'Mis Reportes', href: '/dashboard/reportes-ia/mis-reportes', category: 'Reportes IA' }
 ];
 
 export default function DashboardLayout({
@@ -220,7 +218,10 @@ export default function DashboardLayout({
                     "flex-1 flex flex-col min-h-[calc(100vh-4rem)] transition-all duration-300",
                     isCollapsed ? "lg:ml-20" : "lg:ml-64"
                 )}>
-                    <main className="flex-1 p-4 lg:p-8 relative z-10">
+                    {/* Sin z-index propio: un `z-10` aquí crearía un contexto de apilamiento
+                        que encierra a los hijos y evita que sus overlays (pantalla completa,
+                        modales) puedan cubrir el header (z-40) y el sidebar (z-20). */}
+                    <main className="flex-1 p-4 lg:p-8 relative">
                         <div className="max-w-7xl mx-auto">
                             {children}
                         </div>

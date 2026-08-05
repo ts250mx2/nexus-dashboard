@@ -5,12 +5,12 @@ import { usePathname } from 'next/navigation';
 import {
     LayoutDashboard,
     FileText,
-    Settings,
     ChevronRight,
     ChevronDown,
     Bot,
-    Brain,
-    History,
+    Sparkles,
+    Terminal,
+    FolderOpen,
     ShoppingBag,
     TrendingUp,
     DollarSign,
@@ -24,6 +24,7 @@ import {
     UserX,
     BarChart3,
     UserRound,
+    ContactRound,
     Tags,
     Tag
 } from 'lucide-react';
@@ -55,6 +56,7 @@ const sidebarItems: SidebarItem[] = [
             { name: 'Profesores Global', href: '/dashboard/ventas/profesores-global', icon: Users, color: 'text-blue-900' },
             { name: 'Productos Global', href: '/dashboard/ventas/productos-global', icon: Package, color: 'text-blue-900' },
             { name: 'Profesores', href: '/dashboard/reportes/profesores', icon: FileText, color: 'text-blue-900' },
+            { name: 'Lista de Profesores', href: '/dashboard/ventas/lista-profesores', icon: ContactRound, color: 'text-blue-900' },
             { name: 'Profesores Última Venta', href: '/dashboard/ventas/profesores-ultima-venta', icon: UserX, color: 'text-blue-900' },
             { name: 'Comparativo Profesores', href: '/dashboard/ventas/comparativo-profesores', icon: BarChart3, color: 'text-blue-900' },
             { name: 'Ventas por Usuario', href: '/dashboard/ventas/ventas-por-usuario', icon: UserRound, color: 'text-blue-900' },
@@ -90,13 +92,12 @@ const sidebarItems: SidebarItem[] = [
         ]
     },
     {
-        name: 'Configuración',
-        icon: Settings,
+        name: 'Reportes IA',
+        icon: Sparkles,
         color: 'text-blue-900',
         subItems: [
-            { name: 'Diseñador de Consultas', href: '/dashboard/settings/query-designer', icon: LayoutGrid, color: 'text-blue-900' },
-            { name: 'Aprendizaje IA', href: '/dashboard/settings/ai-learning', icon: Brain, color: 'text-blue-900' },
-            { name: 'Historial de Preguntas', href: '/dashboard/settings/ai-history', icon: History, color: 'text-blue-900' }
+            { name: 'Agente Avanzado', href: '/dashboard/reportes-ia/agente-avanzado', icon: Terminal, color: 'text-blue-900' },
+            { name: 'Mis Reportes', href: '/dashboard/reportes-ia/mis-reportes', icon: FolderOpen, color: 'text-blue-900' }
         ]
     },
 ];
@@ -111,11 +112,11 @@ interface SidebarProps {
 export default function Sidebar({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen }: SidebarProps) {
     const pathname = usePathname();
     const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>({
-        'Ventas': pathname.includes('/ventas') || pathname.includes('/reportes'),
+        'Ventas': pathname.includes('/ventas') || pathname.includes('/reportes/'),
         'Compras': pathname.includes('/compras'),
         'Inventarios': pathname.includes('/inventarios'),
         'Precios y Costos': pathname.includes('/precios'),
-        'Configuración': pathname.includes('/settings'),
+        'Reportes IA': pathname.includes('/reportes-ia'),
     });
 
     const toggleExpanded = (name: string) => {
@@ -128,11 +129,11 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, isMobileOpen, set
             setExpandedMenus({});
         } else {
             setExpandedMenus({
-                'Ventas': pathname.includes('/ventas') || pathname.includes('/reportes'),
+                'Ventas': pathname.includes('/ventas') || pathname.includes('/reportes/'),
                 'Compras': pathname.includes('/compras'),
                 'Inventarios': pathname.includes('/inventarios'),
                 'Precios y Costos': pathname.includes('/precios'),
-                'Configuración': pathname.includes('/settings'),
+                'Reportes IA': pathname.includes('/reportes-ia'),
             });
         }
     }, [isCollapsed, pathname]);

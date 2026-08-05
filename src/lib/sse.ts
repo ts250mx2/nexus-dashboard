@@ -15,7 +15,14 @@ export type SseEventName =
     | 'metadata'
     | 'clarification'
     | 'error'
-    | 'done';
+    | 'done'
+    // Eventos del Agente Avanzado (/api/agent/advanced/run)
+    | 'reasoning'
+    | 'tool-call'
+    | 'tool-result'
+    | 'sql'
+    | 'usage'
+    | 'report-proposed';
 
 export interface SseEvent {
     event: SseEventName;

@@ -59,6 +59,19 @@ export const AVAILABLE_REPORTS: Record<string, ReportCategory> = {
                 description: 'Comisiones, ventas atribuidas y desempeño por profesor con drill-down por sucursal.',
                 keywords: ['profesor', 'maestro', 'comisión', 'instructor', 'socio'],
                 useCases: ['Pago de comisiones', 'Performance por profesor', 'Atribución de ventas']
+            },
+            {
+                id: 'lista-profesores',
+                name: 'Lista de Profesores',
+                path: '/dashboard/ventas/lista-profesores',
+                description: 'Directorio alfabético del padrón de profesores: nombre, teléfono, correo electrónico, sucursal, fecha de alta y fecha de última compra. Filtros por sucursal y por si tienen o no compras registradas.',
+                keywords: ['lista profesores', 'directorio', 'padrón', 'contacto', 'teléfono', 'correo', 'email', 'alta', 'datos de profesor', 'catálogo de socios'],
+                useCases: [
+                    'Contactar profesores por teléfono o correo',
+                    'Exportar el padrón completo a Excel o PDF',
+                    'Ver antigüedad de un profesor y cuándo compró por última vez',
+                    'Detectar profesores dados de alta que nunca han comprado'
+                ]
             }
         ]
     },
@@ -144,20 +157,20 @@ export const AVAILABLE_REPORTS: Record<string, ReportCategory> = {
                 useCases: ['Documentar campos para la IA', 'Enseñar relaciones de base de datos a la IA', 'Definir joins y glosarios']
             },
             {
-                id: 'ai-learning',
-                name: 'Aprendizaje IA',
-                path: '/dashboard/settings/ai-learning',
-                description: 'Configuración de reglas dinámicas (palabras clave) para mejora del agente.',
-                keywords: ['ia', 'reglas', 'aprendizaje', 'palabras clave', 'configurar agente'],
-                useCases: ['Afinar respuestas del agente', 'Reglas de negocio', 'Vocabulario']
+                id: 'agente-avanzado',
+                name: 'Agente Avanzado',
+                path: '/dashboard/reportes-ia/agente-avanzado',
+                description: 'Consola conversacional que diseña y crea reportes nuevos a la medida (gráficas, filtros, KPIs y tableros) hablando en lenguaje natural.',
+                keywords: ['crear reporte', 'reporte nuevo', 'a la medida', 'personalizado', 'tablero', 'dashboard', 'agente avanzado'],
+                useCases: ['Crear un reporte que no existe en el portal', 'Armar un tablero con varias vistas', 'Editar un reporte por comandos']
             },
             {
-                id: 'ai-history',
-                name: 'Historial de Preguntas',
-                path: '/dashboard/settings/ai-history',
-                description: 'Auditoría de consultas hechas al agente, usuarios activos y SQL ejecutado.',
-                keywords: ['historial', 'preguntas', 'auditoría', 'log', 'consultas'],
-                useCases: ['Auditoría', 'Patrones de uso', 'Debug del agente']
+                id: 'mis-reportes',
+                name: 'Mis Reportes',
+                path: '/dashboard/reportes-ia/mis-reportes',
+                description: 'Galería de los reportes creados con el Agente Avanzado, organizados en carpetas. Se re-ejecutan con datos en vivo al abrirlos.',
+                keywords: ['mis reportes', 'guardados', 'galería', 'carpetas', 'reportes creados'],
+                useCases: ['Abrir un reporte creado antes', 'Organizar reportes en carpetas', 'Clonar o exportar un reporte']
             }
         ]
     }
