@@ -26,7 +26,11 @@ import {
     UserRound,
     ContactRound,
     Tags,
-    Tag
+    Tag,
+    PackageX,
+    Boxes,
+    Warehouse,
+    ClipboardList
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
@@ -80,7 +84,11 @@ const sidebarItems: SidebarItem[] = [
         icon: Layers,
         color: 'text-blue-900',
         subItems: [
-            { name: 'Costo de Inventario', href: '/dashboard/inventarios/costo', icon: DollarSign, color: 'text-blue-900' }
+            { name: 'Costo de Inventario', href: '/dashboard/inventarios/costo', icon: DollarSign, color: 'text-blue-900' },
+            { name: 'Inventario por Sucursal', href: '/dashboard/inventarios/por-sucursal', icon: Warehouse, color: 'text-blue-900' },
+            { name: 'Quiebres de Stock', href: '/dashboard/inventarios/quiebres', icon: PackageX, color: 'text-blue-900' },
+            { name: 'Sobre-Inventario', href: '/dashboard/inventarios/sobre-inventario', icon: Boxes, color: 'text-blue-900' },
+            { name: 'Sugerencia de Pedidos', href: '/dashboard/inventarios/sugerencia-pedidos', icon: ClipboardList, color: 'text-blue-900' }
         ]
     },
     {

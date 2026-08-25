@@ -127,6 +127,63 @@ export const AVAILABLE_REPORTS: Record<string, ReportCategory> = {
             }
         ]
     },
+    inventory: {
+        category: 'INVENTARIOS Y RESURTIDO',
+        reports: [
+            {
+                id: 'inventario-por-sucursal',
+                name: 'Inventario por Sucursal',
+                path: '/dashboard/inventarios/por-sucursal',
+                description: 'Tablero de estado del inventario de toda la red: valorizado, unidades, SKUs con existencia / en cero / negativos, y cuántos artículos están en quiebre, bajo mínimo, en exceso o sin rotación en cada sucursal. Drill-down al detalle por artículo.',
+                keywords: ['inventario por sucursal', 'existencias', 'stock por tienda', 'valorizado', 'cuánto tengo', 'panorama inventario', 'existencia a la fecha'],
+                useCases: [
+                    'Ver el inventario valorizado de cada sucursal',
+                    'Comparar la salud del inventario entre tiendas',
+                    'Detectar sucursales con muchas existencias negativas',
+                    'Consultar la existencia de un artículo en toda la red'
+                ]
+            },
+            {
+                id: 'quiebres-stock',
+                name: 'Quiebres de Stock',
+                path: '/dashboard/inventarios/quiebres',
+                description: 'Artículos agotados o por debajo del mínimo, solo en las sucursales donde efectivamente se venden. Estima la venta perdida en pesos y el costo de reposición, con desglose por sucursal, departamento y marca.',
+                keywords: ['quiebre', 'quiebres', 'faltante', 'faltantes', 'agotado', 'sin stock', 'desabasto', 'bajo mínimo', 'venta perdida', 'stockout'],
+                useCases: [
+                    'Saber qué productos faltan y en qué sucursal',
+                    'Cuantificar en pesos la venta perdida por desabasto',
+                    'Priorizar qué resurtir primero',
+                    'Detectar sucursales con más faltantes'
+                ]
+            },
+            {
+                id: 'sobre-inventario',
+                name: 'Sobre-Inventario',
+                path: '/dashboard/inventarios/sobre-inventario',
+                description: 'Capital inmovilizado por exceso de existencia. Separa el exceso (rota, pero cubre más días de los necesarios) del inventario sin rotación (cero salidas en el periodo), con concentración por departamento y sucursal.',
+                keywords: ['sobre inventario', 'sobreinventario', 'exceso', 'capital inmovilizado', 'dinero parado', 'sin rotación', 'inventario muerto', 'dead stock', 'sobrante', 'cobertura alta'],
+                useCases: [
+                    'Identificar dónde está atrapado el capital',
+                    'Detectar productos sin una sola salida en el periodo',
+                    'Elegir candidatos a liquidación o traspaso',
+                    'Comparar exceso entre sucursales y departamentos'
+                ]
+            },
+            {
+                id: 'sugerencia-pedidos',
+                name: 'Sugerencia de Pedidos',
+                path: '/dashboard/inventarios/sugerencia-pedidos',
+                description: 'Sugerido de compra por punto de reorden: calcula cuánto pedir de cada artículo y sucursal usando demanda diaria, lead time y cobertura objetivo, descontando la mercancía ya en tránsito (órdenes de compra pendientes y traspasos enviados). Agrupa por proveedor y exporta a Excel.',
+                keywords: ['sugerencia de pedidos', 'sugerido', 'qué comprar', 'resurtido', 'reorden', 'punto de reorden', 'pedido', 'orden de compra sugerida', 'cuánto pedir', 'reabastecer'],
+                useCases: [
+                    'Armar el pedido de la semana por proveedor',
+                    'Saber cuánto pedir de cada artículo sin duplicar lo que ya viene en camino',
+                    'Priorizar el resurtido de lo agotado',
+                    'Estimar la inversión necesaria para reabastecer'
+                ]
+            }
+        ]
+    },
     profitability: {
         category: 'RENTABILIDAD Y MARGEN',
         reports: [

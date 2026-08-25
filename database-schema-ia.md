@@ -71,6 +71,51 @@ Catálogos auxiliares.
 
 **Costo de una venta**: `tblCostoInventario.PrecioBase × Cantidad` (join por IdArticulo + IdSucursal)
 
+### tblReporteMovimientos — Existencia a fecha de corte (tabla de trabajo)
+**Fuente oficial de EXISTENCIAS para los reportes de inventario.**
+
+| Columna | Tipo | Notas |
+|---|---|---|
+| IdArticulo, IdSucursal | int | PK compuesta (junto con IdComputadora, TipoMovimiento, Folio, Iteracion) |
+| **TipoMovimiento** | int | **99 = 'INVENTARIO A FECHA'** (0=ajuste, 1=venta, 3=traspaso, 4=compra) |
+| **Mov** | double | **Aquí vive la existencia cuando TipoMovimiento = 99** |
+| Exi | double | Llega NULL en los renglones tipo 99 — NO usar |
+| Concepto | varchar | Descripción del movimiento |
+| FechaMovimiento | datetime | Fecha de corte del inventario |
+
+⚠️ **Es una tabla MyISAM de trabajo**: el ERP la trunca y la repuebla cada vez que
+alguien corre el reporte de movimientos, así que en un momento dado solo contiene
+las sucursales del último corte. Por eso los reportes del portal la combinan con
+`tblCostoInventario` (columna vertebral con todas las sucursales y el costo) y
+dejan que el tipo 99 la sobrescriba donde exista. Se validó que ambos valores
+coinciden al 100% en los pares artículo-sucursal presentes en las dos tablas.
+
+Existencia vigente por artículo-sucursal:
+```sql
+SELECT IdArticulo, IdSucursal, Mov AS Exi
+FROM (
+  SELECT IdArticulo, IdSucursal, Mov,
+         ROW_NUMBER() OVER (PARTITION BY IdArticulo, IdSucursal
+                            ORDER BY FechaMovimiento DESC, Iteracion DESC) rn
+  FROM tblReporteMovimientos WHERE TipoMovimiento = 99
+) t WHERE rn = 1
+```
+
+La implementación vive en `src/lib/inventory/source.ts`; cualquier reporte nuevo
+de inventario debe reutilizar esos CTE en lugar de escribir su propio SQL.
+
+### tblConfiguracionResurtido — Mínimos y máximos por artículo-sucursal (37K filas)
+| Columna | Tipo | Notas |
+|---|---|---|
+| IdArticulo, IdSucursal | int | PK compuesta |
+| ExiMinRes | double | Existencia mínima (punto de reorden). Solo ~11,900 filas la tienen > 0 |
+| DiasMin, DiasMax | double | Días de cobertura mínima y objetivo |
+| DiasSurtido | double | Lead time esperado del resurtido |
+| PVM15 | double | Promedio de venta de referencia |
+
+Como está poblada parcialmente, todo cálculo de mínimo necesita respaldo:
+`demanda diaria × (DiasSurtido + DiasMin)` cuando `ExiMinRes = 0`.
+
 ### tblCostoInventarioHistorial — Costos por día (31M filas, usar con cuidado)
 Snapshot diario de costos. Útil para reconstruir margen histórico exacto.
 Columnas: `Dia, Mes, Anio, Fecha, IdArticulo, IdSucursal, PrecioBase, ...`
@@ -213,6 +258,11 @@ Tabla de usuarios del sistema.
 - **Margen %**: `(Revenue - Costo) / NULLIF(Revenue, 0) * 100`.
 - **Ticket promedio**: `SUM(Total) / COUNT(DISTINCT IdVenta)`.
 - **Stock muerto**: artículos con `Exi > 0` y sin movimiento de ventas en los últimos 90 días.
+- **Demanda / consumo**: NO son solo ventas. Una sucursal también descarga inventario
+  al enviar traspasos, así que la demanda = `tblDetalleVentas` + `tblDetalleTraspasos`
+  (por sucursal ORIGEN). Sin los traspasos, bodegas y fábrica aparecen con demanda cero.
+- **Mercancía en tránsito**: órdenes de compra sin recibir (`Cantidad - Rec`, `Status = 0`,
+  `FechaRecibo IS NULL`) + traspasos enviados sin recepción, contra la sucursal DESTINO.
 - **Días de inventario**: `(Exi / NULLIF(VentasPromedioDiario, 0))`.
 - **Lead time real proveedor**: `DATEDIFF(FechaRecibo, FechaOrdenCompra)`.
 
