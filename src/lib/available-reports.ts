@@ -131,6 +131,32 @@ export const AVAILABLE_REPORTS: Record<string, ReportCategory> = {
         category: 'INVENTARIOS Y RESURTIDO',
         reports: [
             {
+                id: 'existencias',
+                name: 'Existencias de Artículos',
+                path: '/dashboard/inventarios/existencias',
+                description: 'Lista completa de artículos de UNA sucursal, igual que la pantalla "Existencia de artículos" del ERP pero al momento: existencia inicial (corte tipo 99 del ERP), entradas y salidas posteriores al corte leídas en vivo de ventas, recibos, traspasos, devoluciones y consignaciones, existencia final, costo, valor total, consignación y última actualización. Filtro "Solo con movimientos hoy", búsqueda instantánea por palabras y exportación a Excel.',
+                keywords: ['existencia', 'existencias', 'cuánto hay', 'cuántas piezas', 'stock de un artículo', 'existencia de artículo', 'entradas y salidas', 'existencia inicial', 'existencia final', 'consulta de existencia', 'buscar artículo', 'lista de productos', 'catálogo con existencia'],
+                useCases: [
+                    'Ver la existencia de todos los artículos de una sucursal',
+                    'Buscar cuántas piezas hay de un artículo en la sucursal',
+                    'Revisar las entradas y salidas de hoy de cada artículo',
+                    'Detectar artículos con existencia negativa'
+                ]
+            },
+            {
+                id: 'cierres-inventario',
+                name: 'Cierres de Inventario',
+                path: '/dashboard/inventarios/cierres',
+                description: 'Foto diaria del inventario de cada sucursal (se conservan hoy y los 3 días anteriores) comparada, artículo por artículo, con el inventario de hoy en vivo. Verifica cada día que el corte que el ERP recalculó en la madrugada coincide con el cierre que el portal guardó la noche anterior, y expone las diferencias.',
+                keywords: ['cierre de inventario', 'cierres', 'foto del inventario', 'inventario de ayer', 'comparar inventario', 'inventario cuadra', 'diferencias de inventario', 'historial de inventario', 'auditoría de inventario', 'confiar en el inventario'],
+                useCases: [
+                    'Ver si el inventario de hoy cuadra con el de ayer',
+                    'Encontrar los artículos cuya existencia cambió sin documento',
+                    'Comparar el inventario de una sucursal con el de hace tres días',
+                    'Guardar el cierre del día manualmente'
+                ]
+            },
+            {
                 id: 'inventario-por-sucursal',
                 name: 'Inventario por Sucursal',
                 path: '/dashboard/inventarios/por-sucursal',

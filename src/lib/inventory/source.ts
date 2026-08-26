@@ -23,6 +23,42 @@
 /** Tipo de movimiento que representa la existencia a fecha de corte. */
 export const TIPO_MOVIMIENTO_EXISTENCIA = 99;
 
+/**
+ * Tipos de movimiento que mueven la existencia después de la fecha de corte:
+ *   0 = ajuste de inventario, 1 = venta, 2 = recibo de compra, 3 = traspaso
+ *   enviado, 4 = traspaso recibido, 6 = consignación abierta.
+ * Es decir, TODOS salvo el propio corte (99). Además solo cuentan los renglones
+ * con `Status = 0`: `Status = 2` son documentos cancelados que el ERP no aplica.
+ *
+ * Validado reconstruyendo el corte 99 de MONTERREY (3,747 pares) desde el último
+ * ajuste físico de cada par (2026-08-25):
+ *   Status = 0, tipos 1-4 y 6 ........ 3,747 / 3,747 (100%)
+ *   Status = 0, tipos 1-4 (sin 6) .... 3,740 (99.8%)
+ *   sin filtrar Status, tipos 1-4 .... 3,694 (98.6%)
+ *   sin filtrar Status, con 6 ........ 2,912 (77.7%)
+ * La creencia previa de que la consignación "no descarga inventario" venía de
+ * sumarla sin filtrar Status: el 98% de los renglones tipo 6 son cancelados.
+ *
+ * `Mov` ya viene con signo (las salidas son negativas). La excepción es el tipo 0:
+ * ahí `Mov` (= `Exi`) es la existencia CONTADA tras el ajuste y la diferencia
+ * aplicada viaja en `Ajuste`; ver exprMovimiento().
+ */
+export const TIPOS_MOVIMIENTO_INVENTARIO = [0, 1, 2, 3, 4, 6] as const;
+
+/** Ajuste de inventario físico: `Mov` es el conteo, `Ajuste` la diferencia aplicada. */
+export const TIPO_MOVIMIENTO_AJUSTE = 0;
+
+/** Consignación abierta. Sí descarga inventario cuando el documento está vigente (Status = 0). */
+export const TIPO_MOVIMIENTO_CONSIGNACION = 6;
+
+/**
+ * Expresión SQL del efecto neto de un renglón de tblReporteMovimientos sobre la
+ * existencia: `Mov` con signo, salvo en los ajustes (tipo 0), donde es `Ajuste`.
+ */
+export function exprMovimiento(alias = 'M'): string {
+    return `CASE WHEN ${alias}.TipoMovimiento = ${TIPO_MOVIMIENTO_AJUSTE} THEN IFNULL(${alias}.Ajuste, 0) ELSE ${alias}.Mov END`;
+}
+
 /** Sucursales excluidas por convención en todos los reportes de inventario. */
 export const SUCURSAL_EXCLUSION =
     "LOWER(S.Sucursal) NOT LIKE '%fiscal%' AND LOWER(S.Sucursal) NOT LIKE '%prueba%'";
@@ -45,42 +81,139 @@ function inClause(column: string, sucursales: number[]): string {
     return sucursales.length ? ` AND ${column} IN (${sucursales.join(',')})` : '';
 }
 
+/** Artículos a los que se acota el cálculo de existencia. */
+export interface ExistenciaOptions {
+    /** IDs de artículo ya validados como enteros. Con al menos uno se suma el delta. */
+    articulos?: number[];
+}
+
+/**
+ * CTE `corte`: el último renglón tipo 99 de cada par artículo-sucursal.
+ * `FechaActCorte` es la fecha del último movimiento real que el ERP conocía
+ * al generar el corte; es lo que la pantalla del ERP muestra como
+ * "Última actualización".
+ *
+ * El origen depende del filtro:
+ *   - Catálogo completo: barrer el índice por TipoMovimiento (52k renglones, ~0.4 s)
+ *     es lo más barato.
+ *   - Con lista de artículos: filtrar `TipoMovimiento = 99` sobre esa lista obliga
+ *     a leer TODOS los movimientos de los artículos (2.7 s para 300). Se recorre
+ *     entonces desde tblCostoInventario (una fila por par y columna vertebral de
+ *     todos los consumidores) y el corte se localiza por el índice
+ *     (IdArticulo, IdSucursal, TipoMovimiento): 0.07 s.
+ *
+ * Con `opts.soloActivos` se descartan desde aquí los artículos dados de baja
+ * (~30% de los pares), de modo que los consumidores que después barren los
+ * movimientos de cada par no paguen por artículos que no van a mostrar.
+ *
+ * Columnas: IdArticulo, IdSucursal, ExiCorte, FechaCorte, FechaActCorte
+ */
+export function cteCorte(
+    sucursales: number[],
+    articulos: number[] = [],
+    opts: { soloActivos?: boolean } = {}
+): string {
+    const joinActivos = opts.soloActivos
+        ? `
+        INNER JOIN tblArticulos A
+                ON A.IdArticulo = M.IdArticulo
+               AND IFNULL(A.Status, 0) = 0`
+        : '';
+
+    const origen = articulos.length
+        ? `FROM tblCostoInventario CI
+        INNER JOIN tblReporteMovimientos M
+                ON M.IdArticulo     = CI.IdArticulo
+               AND M.IdSucursal     = CI.IdSucursal
+               AND M.TipoMovimiento = ${TIPO_MOVIMIENTO_EXISTENCIA}${joinActivos}
+        WHERE 1 = 1${inClause('CI.IdSucursal', sucursales)}${inClause('CI.IdArticulo', articulos)}`
+        : `FROM tblReporteMovimientos M${joinActivos}
+        WHERE M.TipoMovimiento = ${TIPO_MOVIMIENTO_EXISTENCIA}${inClause('M.IdSucursal', sucursales)}`;
+
+    return `
+corte AS (
+    SELECT IdArticulo, IdSucursal, ExiCorte, FechaCorte, FechaActCorte
+    FROM (
+        SELECT
+            M.IdArticulo,
+            M.IdSucursal,
+            M.Mov             AS ExiCorte,
+            M.FechaMovimiento AS FechaCorte,
+            M.FechaAct        AS FechaActCorte,
+            ROW_NUMBER() OVER (
+                PARTITION BY M.IdArticulo, M.IdSucursal
+                ORDER BY M.FechaMovimiento DESC, M.Iteracion DESC, M.Folio DESC
+            ) AS rn
+        ${origen}
+    ) ranked
+    WHERE rn = 1
+)`;
+}
+
 /**
  * CTE `existencia`: una fila por artículo-sucursal con la existencia vigente,
  * el costo unitario y la fuente de la que salió el dato.
  *
- * Columnas: IdArticulo, IdSucursal, Exi, CostoUnitario, Fuente
+ * EXISTENCIA = corte tipo 99 ± los movimientos posteriores a la fecha de ese corte.
+ * El ERP refresca el corte cada vez que corre el reporte de movimientos (queda
+ * fechado a las 00:00 del día), así que el delta cubre lo que se movió durante el
+ * día en curso. Se topa con NOW() porque la base contiene tickets con fecha futura.
+ *
+ * El delta solo se calcula cuando `opts.articulos` acota la consulta: sin filtro de
+ * artículo MySQL tiene que recorrer los 4.1M de renglones de tblReporteMovimientos
+ * (no hay índice por FechaMovimiento) y la consulta pasa de 0.15s a 20s. Los
+ * reportes de catálogo completo se quedan con el corte, que para planeación es
+ * suficiente; la consulta puntual de existencias (`./stock.ts`) sí aplica el delta.
+ *
+ * Columnas: IdArticulo, IdSucursal, Exi, ExiCorte, MovPosterior, NumMovPosteriores,
+ *           FechaCorte, CostoUnitario, Fuente
  */
-export function cteExistencia(sucursales: number[]): string {
+export function cteExistencia(sucursales: number[], opts: ExistenciaOptions = {}): string {
+    const articulos = opts.articulos ?? [];
+    const conDelta = articulos.length > 0;
+
+    const ctePosteriores = conDelta ? `
+posteriores AS (
+    SELECT
+        C.IdArticulo,
+        C.IdSucursal,
+        SUM(${exprMovimiento('M')}) AS MovPosterior,
+        COUNT(*)                    AS NumMovimientos
+    FROM corte C
+    INNER JOIN tblReporteMovimientos M
+            ON M.IdArticulo      = C.IdArticulo
+           AND M.IdSucursal      = C.IdSucursal
+           AND M.TipoMovimiento IN (${TIPOS_MOVIMIENTO_INVENTARIO.join(',')})
+           AND M.Status          = 0
+           AND M.FechaMovimiento >  C.FechaCorte
+           AND M.FechaMovimiento <= NOW()
+    WHERE 1 = 1${inClause('M.IdArticulo', articulos)}
+    GROUP BY C.IdArticulo, C.IdSucursal
+),` : '';
+
+    const joinPosteriores = conDelta
+        ? 'LEFT JOIN posteriores P ON P.IdArticulo = CI.IdArticulo AND P.IdSucursal = CI.IdSucursal'
+        : '';
+    const delta = conDelta ? 'IFNULL(P.MovPosterior, 0)' : '0';
+    const numMovs = conDelta ? 'IFNULL(P.NumMovimientos, 0)' : '0';
+
     return `
-existencia_mov AS (
-    SELECT IdArticulo, IdSucursal, Mov AS Exi
-    FROM (
-        SELECT
-            IdArticulo,
-            IdSucursal,
-            Mov,
-            ROW_NUMBER() OVER (
-                PARTITION BY IdArticulo, IdSucursal
-                ORDER BY FechaMovimiento DESC, Iteracion DESC, Folio DESC
-            ) AS rn
-        FROM tblReporteMovimientos
-        WHERE TipoMovimiento = ${TIPO_MOVIMIENTO_EXISTENCIA}${inClause('IdSucursal', sucursales)}
-    ) ranked
-    WHERE rn = 1
-),
+${cteCorte(sucursales, articulos)},${ctePosteriores}
 existencia AS (
     SELECT
         CI.IdArticulo,
         CI.IdSucursal,
-        COALESCE(EM.Exi, CI.Exi) AS Exi,
-        CI.PrecioBase            AS CostoUnitario,
-        CASE WHEN EM.Exi IS NULL THEN 'costo' ELSE 'movimientos' END AS Fuente
+        COALESCE(C.ExiCorte, CI.Exi) + ${delta} AS Exi,
+        COALESCE(C.ExiCorte, CI.Exi)            AS ExiCorte,
+        ${delta}                                AS MovPosterior,
+        ${numMovs}                              AS NumMovPosteriores,
+        C.FechaCorte,
+        CI.PrecioBase                           AS CostoUnitario,
+        CASE WHEN C.ExiCorte IS NULL THEN 'costo' ELSE 'movimientos' END AS Fuente
     FROM tblCostoInventario CI
-    LEFT JOIN existencia_mov EM
-           ON EM.IdArticulo = CI.IdArticulo
-          AND EM.IdSucursal = CI.IdSucursal
-    WHERE 1 = 1${inClause('CI.IdSucursal', sucursales)}
+    LEFT JOIN corte C ON C.IdArticulo = CI.IdArticulo AND C.IdSucursal = CI.IdSucursal
+    ${joinPosteriores}
+    WHERE 1 = 1${inClause('CI.IdSucursal', sucursales)}${inClause('CI.IdArticulo', articulos)}
 )`;
 }
 

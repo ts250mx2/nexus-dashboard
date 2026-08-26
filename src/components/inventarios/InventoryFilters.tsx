@@ -43,12 +43,20 @@ export function useSucursales(): SucursalOption[] {
 
 interface InventoryFiltersProps {
     sucursales: SucursalOption[];
+    /**
+     * `multi` (por defecto) permite varias sucursales; `single` muestra un
+     * selector de una sola sucursal y entrega una lista de 0 o 1 elementos.
+     */
+    selectionMode?: 'multi' | 'single';
     selectedSucursales: string[];
     onSucursalesChange: (ids: string[]) => void;
-    dias: number;
-    onDiasChange: (dias: number) => void;
+    /** Ventana de demanda. Si se omite, el selector no se muestra. */
+    dias?: number;
+    onDiasChange?: (dias: number) => void;
     search: string;
     onSearchChange: (value: string) => void;
+    /** Texto de ayuda del buscador. */
+    searchPlaceholder?: string;
     onExport?: () => void;
     exportDisabled?: boolean;
     /** Controles propios de cada módulo (umbrales, interruptores). */
@@ -57,45 +65,66 @@ interface InventoryFiltersProps {
 
 export default function InventoryFilters({
     sucursales,
+    selectionMode = 'multi',
     selectedSucursales,
     onSucursalesChange,
     dias,
     onDiasChange,
     search,
     onSearchChange,
+    searchPlaceholder = 'Producto, código o marca',
     onExport,
     exportDisabled = false,
     children,
 }: InventoryFiltersProps) {
+    const showDias = dias !== undefined && typeof onDiasChange === 'function';
+
     return (
         <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-xs flex flex-col lg:flex-row lg:items-end gap-4">
             <div className="flex-1 min-w-[200px]">
                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 block">
-                    Sucursales
+                    {selectionMode === 'single' ? 'Sucursal' : 'Sucursales'}
                 </label>
-                <MultiSelect
-                    options={sucursales.map(s => ({ id: String(s.IdSucursal), name: s.Sucursal }))}
-                    selected={selectedSucursales}
-                    onChange={onSucursalesChange}
-                    placeholder="Todas las sucursales"
-                    searchable
-                />
+                {selectionMode === 'single' ? (
+                    <select
+                        value={selectedSucursales[0] ?? ''}
+                        onChange={e => onSucursalesChange(e.target.value ? [e.target.value] : [])}
+                        className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                        {selectedSucursales.length === 0 && (
+                            <option value="">Selecciona una sucursal</option>
+                        )}
+                        {sucursales.map(s => (
+                            <option key={s.IdSucursal} value={String(s.IdSucursal)}>{s.Sucursal}</option>
+                        ))}
+                    </select>
+                ) : (
+                    <MultiSelect
+                        options={sucursales.map(s => ({ id: String(s.IdSucursal), name: s.Sucursal }))}
+                        selected={selectedSucursales}
+                        onChange={onSucursalesChange}
+                        placeholder="Todas las sucursales"
+                        searchable
+                    />
+                )}
             </div>
 
-            <div className="w-full lg:w-40">
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 block">
-                    Historia de demanda
-                </label>
-                <select
-                    value={dias}
-                    onChange={e => onDiasChange(Number(e.target.value))}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                    {VENTANAS_DEMANDA.map(v => (
-                        <option key={v.value} value={v.value}>{v.label}</option>
-                    ))}
-                </select>
-            </div>
+            {showDias && (
+                <div className="w-full lg:w-40">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 block">
+                        Historia de demanda
+                    </label>
+                    <select
+                        value={dias}
+                        onChange={e => onDiasChange(Number(e.target.value))}
+                        className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                        {VENTANAS_DEMANDA.map(v => (
+                            <option key={v.value} value={v.value}>{v.label}</option>
+                        ))}
+                    </select>
+                </div>
+            )}
 
             {children}
 
@@ -109,7 +138,7 @@ export default function InventoryFilters({
                         type="text"
                         value={search}
                         onChange={e => onSearchChange(e.target.value)}
-                        placeholder="Producto, código o marca"
+                        placeholder={searchPlaceholder}
                         className="w-full pl-9 pr-8 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     {search && (

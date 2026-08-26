@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { query } from '@/lib/db';
 import { getErrorMessage } from '@/lib/errors';
+import { listarSucursalesInventario } from '@/lib/inventory/sucursales';
 
 /**
  * Catálogo de sucursales que participan en los reportes de inventario.
@@ -15,16 +15,7 @@ interface SucursalOption {
 
 export async function GET() {
     try {
-        const sql = `
-            SELECT S.IdSucursal, S.Sucursal
-            FROM tblSucursales S
-            WHERE LOWER(S.Sucursal) NOT LIKE '%fiscal%'
-              AND LOWER(S.Sucursal) NOT LIKE '%prueba%'
-              AND IFNULL(S.Status, 0) = 0
-            ORDER BY S.Sucursal
-        `;
-
-        const data = (await query(sql)) as SucursalOption[];
+        const data: SucursalOption[] = await listarSucursalesInventario();
         return NextResponse.json({ success: true, data });
     } catch (error: unknown) {
         console.error('Error al obtener el catálogo de sucursales:', error);

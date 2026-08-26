@@ -28,6 +28,8 @@ import {
     Tags,
     Tag,
     PackageX,
+    PackageSearch,
+    CalendarCheck,
     Boxes,
     Warehouse,
     ClipboardList
@@ -84,6 +86,8 @@ const sidebarItems: SidebarItem[] = [
         icon: Layers,
         color: 'text-blue-900',
         subItems: [
+            { name: 'Existencias', href: '/dashboard/inventarios/existencias', icon: PackageSearch, color: 'text-blue-900' },
+            { name: 'Cierres de Inventario', href: '/dashboard/inventarios/cierres', icon: CalendarCheck, color: 'text-blue-900' },
             { name: 'Costo de Inventario', href: '/dashboard/inventarios/costo', icon: DollarSign, color: 'text-blue-900' },
             { name: 'Inventario por Sucursal', href: '/dashboard/inventarios/por-sucursal', icon: Warehouse, color: 'text-blue-900' },
             { name: 'Quiebres de Stock', href: '/dashboard/inventarios/quiebres', icon: PackageX, color: 'text-blue-900' },
