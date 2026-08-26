@@ -47,16 +47,10 @@ const PREFIX: Record<LogKind, string> = {
 
 let lineCounter = 0;
 const newId = () => `l${++lineCounter}_${Date.now().toString(36)}_${Math.round(performance.now())}`;
-const fmtMxn = (n: number) => `$${n.toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-const fmtUsd = (n: number) => `$${n.toFixed(n < 1 ? 4 : 2)}`;
-
 const sigOf = (s: Session) => `${s.title}|${s.lines.length}|${s.history.length}|${s.editingReportId ?? ""}|${s.lines[s.lines.length - 1]?.id || ""}`;
 const VIZ_LABELS: Record<string, string> = { bar: "Barras", line: "Línea", area: "Área", pie: "Pastel", treemap: "Rectángulos", table: "Tabla" };
 const PARAM_KIND_LABELS: Record<string, string> = { date: "fecha", storeList: "sucursales", text: "texto/búsqueda", number: "número" };
 const QUICK_PARAMS = ["Filtro por producto", "Filtro por proveedor", "Filtro por profesor", "Filtro por categoría", "Comparar vs período anterior"];
-const BUILD_EST_IN = 2500;
-const BUILD_EST_OUT = 700;
-const USD_MXN = 18.5;
 
 const SPINNER_FRAMES = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
 const THINKING_MSGS = ["Pensando", "Analizando tu petición", "Consultando datos", "Afinando el reporte", "Casi listo"];
@@ -91,7 +85,7 @@ function freshSession(): Session {
     return {
         id: `s_${Date.now().toString(36)}_${Math.round(performance.now())}`,
         title: "Agente 1",
-        lines: [{ id: newId(), kind: "system", text: "Cuéntame qué reporte necesitas; te haré preguntas y sugerencias. El costo aparece solo al crearlo." }],
+        lines: [{ id: newId(), kind: "system", text: "Cuéntame qué reporte necesitas; te haré preguntas y sugerencias." }],
         history: [], input: "", suggestions: [], savedUrl: null, proposal: null, busy: false,
     };
 }
@@ -305,7 +299,7 @@ export default function AgenteAvanzadoPage() {
                         } as Proposal;
                         const editingId = sessions.find((s) => s.id === sid)?.editingReportId;
                         if (editingId) {
-                            // EDICIÓN: se reescribe directo (sin modal, sin costo) y te manda a verlo.
+                            // EDICIÓN: se reescribe directo (sin modal) y te manda a verlo.
                             assistantText += (assistantText ? "\n" : "") + `Aplicando cambios a "${def.title || "el reporte"}".`;
                             pushLine(sid, "phase", "Aplicando cambios al reporte…");
                             try {
@@ -316,16 +310,15 @@ export default function AgenteAvanzadoPage() {
                                 });
                                 const d = await r.json();
                                 if (!r.ok) throw new Error(d?.error || "No se pudo actualizar");
-                                const costTxt = d.presentationOnly ? "solo presentación, sin costo" : `${fmtMxn(d?.cost?.costMxn || 0)} MXN`;
-                                pushLine(sid, "report-saved", `REPORTE ACTUALIZADO: ${d.title || def.title} · ${costTxt}`, d.url);
+                                pushLine(sid, "report-saved", `REPORTE ACTUALIZADO: ${d.title || def.title}`, d.url);
                                 updateSession(sid, (s) => ({ ...s, savedUrl: d.url || null, suggestions: Array.isArray(def.suggestedQuestions) ? def.suggestedQuestions : [] }));
                             } catch (e: any) {
                                 pushLine(sid, "error", `No se pudo actualizar el reporte: ${e?.message || "error"}`);
                             }
                         } else {
-                            // NUEVO reporte: abre el modal de costo/nombre/modelo
+                            // NUEVO reporte: abre el modal de nombre/modelo
                             assistantText += (assistantText ? "\n" : "") + `Reporte propuesto: ${def.title || "(sin título)"}`;
-                            pushLine(sid, "report-proposed", `Propuesta lista: ${def.title || "Reporte"}. Revisa nombre, modelo y costo para crearlo.`);
+                            pushLine(sid, "report-proposed", `Propuesta lista: ${def.title || "Reporte"}. Revisa nombre y modelo para crearlo.`);
                             updateSession(sid, (s) => ({ ...s, proposal: def, suggestions: Array.isArray(def.suggestedQuestions) ? def.suggestedQuestions : [], title: (def.title || s.title).slice(0, 24) }));
                         }
                         break;
@@ -377,8 +370,8 @@ export default function AgenteAvanzadoPage() {
             const d = await r.json();
             if (!r.ok) throw new Error(d?.error || "No se pudo crear el reporte");
             if (buildModel) localStorage.setItem("advanced_agent_model", buildModel);
-            pushLine(sid, "report-saved", `REPORTE CREADO: ${d.title || name} · ${fmtMxn(d?.cost?.costMxn || 0)} MXN`, d.url);
-            // Tras crearlo, futuros cambios en esta pestaña EDITAN ese reporte (sin modal/costo).
+            pushLine(sid, "report-saved", `REPORTE CREADO: ${d.title || name}`, d.url);
+            // Tras crearlo, futuros cambios en esta pestaña EDITAN ese reporte (sin modal).
             updateSession(sid, (s) => ({ ...s, proposal: null, savedUrl: d.url || null, editingReportId: d.idReporte ?? s.editingReportId, editingTitle: d.title || s.editingTitle }));
         } catch (e: any) {
             setBuildError(e?.message || "Error creando el reporte");
@@ -432,10 +425,6 @@ export default function AgenteAvanzadoPage() {
     const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }
     };
-
-    const buildModelInfo = models.find((m) => m.id === buildModel);
-    const estUsd = buildModelInfo ? (BUILD_EST_IN / 1e6) * buildModelInfo.inputUsdPerMTok + (BUILD_EST_OUT / 1e6) * buildModelInfo.outputUsdPerMTok : 0;
-    const estMxn = estUsd * USD_MXN;
 
     if (!ready || !active) {
         return (
@@ -523,7 +512,7 @@ export default function AgenteAvanzadoPage() {
                     <button onClick={() => handleSend()} disabled={active.busy || !active.input.trim()} className="px-4 py-1.5 rounded bg-emerald-500/90 hover:bg-emerald-400 text-[#0a0e14] font-bold disabled:opacity-40 disabled:cursor-not-allowed transition-colors">Enviar</button>
                 </div>
                 <div className="flex items-center justify-between gap-3 mt-1.5 flex-wrap">
-                    <p className="text-[11px] text-slate-600">Enter envía · Shift+Enter salto · pestañas persistentes · sin costo durante la charla</p>
+                    <p className="text-[11px] text-slate-600">Enter envía · Shift+Enter salto · pestañas persistentes</p>
                     <label className="flex items-center gap-2 text-[11px] text-slate-500">
                         Conversación:
                         <select
@@ -603,11 +592,6 @@ export default function AgenteAvanzadoPage() {
                                     Recomendado por complejidad <b>{active.proposal.complexity}</b>: {models.find((m) => m.id === active.proposal?.recommendedModel)?.label || active.proposal.recommendedModel}
                                 </p>
                             )}
-                            <div className="flex items-center justify-between bg-white/5 rounded-lg px-4 py-3">
-                                <span className="text-[11px] text-slate-500 uppercase tracking-wider">Costo estimado</span>
-                                <span className="text-emerald-300 font-bold">{fmtUsd(estUsd)} · {fmtMxn(estMxn)} MXN</span>
-                            </div>
-
                             {/* Agregar más parámetros / filtros (re-propone con el agente) */}
                             <div className="border-t border-white/10 pt-3 space-y-2">
                                 <div className="text-[11px] text-slate-500 uppercase tracking-wider">¿Agregar más filtros o parámetros?</div>
@@ -632,7 +616,7 @@ export default function AgenteAvanzadoPage() {
                                         Ajustar
                                     </button>
                                 </div>
-                                <p className="text-[10px] text-slate-600">Ajustar reabre la conversación para rehacer la propuesta con el cambio (sin costo).</p>
+                                <p className="text-[10px] text-slate-600">Ajustar reabre la conversación para rehacer la propuesta con el cambio.</p>
                             </div>
 
                             {buildError && <div className="bg-red-500/10 border border-red-500/30 text-red-300 rounded-lg p-3 text-sm">{buildError}</div>}

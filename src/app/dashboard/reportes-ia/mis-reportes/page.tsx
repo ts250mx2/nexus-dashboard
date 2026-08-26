@@ -10,9 +10,6 @@ interface ReportItem {
     descripcion: string | null;
     visualization: string | null;
     blockCount?: number;
-    realCostoUsd: number | null;
-    realCostoMxn: number | null;
-    estCostoMxn: number | null;
     modelo: string | null;
     idFolder: number | null;
     fechaCreacion: string;
@@ -138,7 +135,7 @@ export default function MisReportesPage() {
             <div className="flex items-center justify-between flex-wrap gap-3">
                 <div>
                     <h1 className="text-2xl font-black tracking-tight text-slate-900 flex items-center gap-2"><span>📁</span> Mis Reportes</h1>
-                    <p className="text-slate-500 font-medium mt-1">Arrastra un reporte a una carpeta para organizarlo. El costo mostrado es de <b>crearlos (una vez)</b>; abrirlos no cuesta.</p>
+                    <p className="text-slate-500 font-medium mt-1">Arrastra un reporte a una carpeta para organizarlo.</p>
                 </div>
                 <div className="flex items-center gap-2">
                     <button onClick={load} className="p-2.5 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-100 transition-colors" title="Recargar"><RefreshCw className="w-4 h-4" /></button>
@@ -213,11 +210,6 @@ export default function MisReportesPage() {
                             <Link href={`${REPORTS_PATH}/${r.idReporte}`} className="flex-1 p-5">
                                 <div className="flex items-start justify-between gap-2">
                                     <span className="text-2xl">{(r.blockCount ?? 0) > 1 ? "🗂️" : (VIZ_EMOJI[r.visualization || "table"] || "📋")}</span>
-                                    {(r.realCostoMxn != null || r.estCostoMxn != null) && (
-                                        <span title="Costo ÚNICO de crear el reporte con IA. Abrirlo no cuesta." className="text-[10px] font-bold text-slate-400 bg-slate-50 border border-slate-100 rounded-full px-2 py-0.5">
-                                            Creación: ${(r.realCostoMxn ?? r.estCostoMxn ?? 0).toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN
-                                        </span>
-                                    )}
                                 </div>
                                 <h3 className="font-black text-slate-800 mt-3 leading-tight group-hover:text-indigo-700">{r.titulo}</h3>
                                 {r.descripcion && <p className="text-sm text-slate-500 mt-1.5 line-clamp-2">{r.descripcion}</p>}

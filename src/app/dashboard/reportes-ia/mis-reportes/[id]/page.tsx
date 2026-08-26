@@ -16,7 +16,6 @@ interface AiAnalysis {
     narrative: string;
     insights: string[];
     recommendations: string[];
-    cost: { tokensInput: number; tokensOutput: number; costUsd: number; costMxn: number };
 }
 
 /** Un bloque ya cargado con sus filas (lo que devuelve el data route en multi-bloque). */
@@ -30,7 +29,6 @@ interface ReportData {
     title: string;
     descripcion: string | null;
     modelo?: string | null;
-    cost: { realCostoMxn: number | null };
     fechaCreacion: string;
 }
 
@@ -398,7 +396,6 @@ export default function ReporteGuardadoPage() {
                             {data.descripcion && <p className="text-slate-500 font-medium mt-1">{data.descripcion}</p>}
                             <p className="text-[11px] text-slate-400 mt-2">
                                 {hasBlocks ? `${data.blocks!.length} bloque(s)` : `${data.rowCount ?? 0} fila(s)`} · creado {new Date(data.fechaCreacion).toLocaleDateString("es-MX", { dateStyle: "medium" })}
-                                {data.cost?.realCostoMxn != null && ` · creación: $${data.cost.realCostoMxn.toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN (única vez; abrirlo no cuesta)`}
                             </p>
                         </div>
                         <div className="flex items-center gap-2">
@@ -557,7 +554,7 @@ export default function ReporteGuardadoPage() {
                                     </ul>
                                 )}
                                 <span className="inline-block text-[11px] font-bold text-slate-400 bg-white border border-slate-200 rounded-full px-2.5 py-1">
-                                    Analizado con {ai.modelLabel} · ${ai.cost.costMxn.toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN
+                                    Analizado con {ai.modelLabel}
                                 </span>
                             </div>
                         )}
