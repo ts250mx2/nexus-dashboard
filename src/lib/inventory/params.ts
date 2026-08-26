@@ -75,3 +75,9 @@ export function searchClause(search: string, alias = 'A'): { sql: string; params
         params: [like, like, like, like, like],
     };
 }
+
+/** Entero positivo o null. Para IDs sueltos (artículo, sucursal) que viajan como `?`. */
+export function parseEntero(raw: string | null): number | null {
+    const n = Number(raw);
+    return Number.isInteger(n) && n > 0 ? n : null;
+}

@@ -10,6 +10,10 @@ import { cn } from '@/lib/utils';
  * se pagina y se pinta.
  */
 
+// Un solo comparador para toda la app: `localeCompare` con locale resuelve
+// los datos de Intl en cada llamada y triplica el costo de ordenar 18k filas.
+const collator = new Intl.Collator('es-MX');
+
 export interface Column<T> {
     key: string;
     label: string;
@@ -31,6 +35,8 @@ interface DataTableProps<T> {
     emptyMessage?: string;
     /** Resalta la fila completa, por ejemplo por severidad. */
     rowClassName?: (row: T) => string;
+    /** Vuelve las filas clicables, por ejemplo para abrir un detalle. */
+    onRowClick?: (row: T) => void;
 }
 
 export default function DataTable<T>({
@@ -41,6 +47,7 @@ export default function DataTable<T>({
     pageSize = 50,
     emptyMessage = 'No hay registros que cumplan el criterio.',
     rowClassName,
+    onRowClick,
 }: DataTableProps<T>) {
     const [sort, setSort] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(initialSort ?? null);
     const [page, setPage] = useState(1);
@@ -59,7 +66,7 @@ export default function DataTable<T>({
             const dir = sort.direction === 'asc' ? 1 : -1;
 
             if (typeof va === 'string' || typeof vb === 'string') {
-                return String(va ?? '').localeCompare(String(vb ?? ''), 'es-MX') * dir;
+                return collator.compare(String(va ?? ''), String(vb ?? '')) * dir;
             }
             return ((Number(va) || 0) - (Number(vb) || 0)) * dir;
         });
@@ -95,37 +102,65 @@ export default function DataTable<T>({
                 <table className="w-full text-sm border-collapse">
                     <thead>
                         <tr className="border-b border-slate-200">
-                            {columns.map(col => (
-                                <th
-                                    key={col.key}
-                                    className={cn(
-                                        'py-2.5 px-3 text-[10px] font-black text-slate-400 uppercase tracking-wider whitespace-nowrap',
-                                        col.align === 'right' && 'text-right',
-                                        col.align === 'center' && 'text-center',
-                                        !col.align && 'text-left',
-                                        col.sortable !== false && 'cursor-pointer hover:text-slate-700 select-none'
-                                    )}
-                                    onClick={col.sortable !== false ? () => toggleSort(col.key) : undefined}
-                                >
-                                    <span className={cn('inline-flex items-center gap-1', col.align === 'right' && 'flex-row-reverse')}>
+                            {columns.map(col => {
+                                const sortable = col.sortable !== false;
+                                const activa = sort?.key === col.key;
+                                const contenido = (
+                                    <>
                                         {col.label}
-                                        {col.sortable !== false && (
-                                            <ArrowUpDown
-                                                size={11}
-                                                className={cn(sort?.key === col.key ? 'text-blue-600' : 'text-slate-300')}
-                                            />
+                                        {sortable && (
+                                            <ArrowUpDown size={11} className={cn(activa ? 'text-blue-600' : 'text-slate-300')} />
                                         )}
-                                    </span>
-                                </th>
-                            ))}
+                                    </>
+                                );
+                                const claseContenido = cn('inline-flex items-center gap-1', col.align === 'right' && 'flex-row-reverse');
+                                return (
+                                    <th
+                                        key={col.key}
+                                        aria-sort={activa ? (sort.direction === 'asc' ? 'ascending' : 'descending') : undefined}
+                                        className={cn(
+                                            'py-2.5 px-3 text-[10px] font-black text-slate-400 uppercase tracking-wider whitespace-nowrap',
+                                            col.align === 'right' && 'text-right',
+                                            col.align === 'center' && 'text-center',
+                                            !col.align && 'text-left'
+                                        )}
+                                    >
+                                        {sortable ? (
+                                            // Botón real: ordenable también con teclado (Tab + Enter).
+                                            <button
+                                                type="button"
+                                                onClick={() => toggleSort(col.key)}
+                                                className={cn(
+                                                    claseContenido,
+                                                    'uppercase tracking-wider cursor-pointer select-none hover:text-slate-700 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500'
+                                                )}
+                                            >
+                                                {contenido}
+                                            </button>
+                                        ) : (
+                                            <span className={claseContenido}>{contenido}</span>
+                                        )}
+                                    </th>
+                                );
+                            })}
                         </tr>
                     </thead>
                     <tbody>
                         {pageRows.map((row, i) => (
                             <tr
                                 key={rowKey(row, i)}
+                                onClick={onRowClick ? () => onRowClick(row) : undefined}
+                                // Fila enfocable para que el detalle también se abra con teclado.
+                                tabIndex={onRowClick ? 0 : undefined}
+                                onKeyDown={onRowClick ? e => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        e.preventDefault();
+                                        onRowClick(row);
+                                    }
+                                } : undefined}
                                 className={cn(
                                     'border-b border-slate-50 hover:bg-slate-50/70 transition-colors',
+                                    onRowClick && 'cursor-pointer focus:outline-none focus-visible:bg-blue-50/60 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500',
                                     rowClassName?.(row)
                                 )}
                             >

@@ -39,11 +39,35 @@ export function formatCobertura(value: unknown): string {
     return `${formatDecimal(n, 0)} d`;
 }
 
+/**
+ * Una fecha de calendario ('YYYY-MM-DD') se interpreta en hora LOCAL. `new Date`
+ * la tomaría como medianoche UTC y en UTC-6 caería en el día anterior.
+ */
+function parseFecha(value: unknown): Date {
+    const texto = String(value);
+    return /^\d{4}-\d{2}-\d{2}$/.test(texto) ? new Date(`${texto}T00:00:00`) : new Date(texto);
+}
+
 export function formatDate(value: unknown): string {
     if (!value) return '—';
-    const d = new Date(String(value));
+    const d = parseFecha(value);
     if (Number.isNaN(d.getTime())) return '—';
     return d.toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+/** Fecha y hora, para marcas de última actualización. */
+export function formatDateTime(value: unknown): string {
+    if (!value) return '—';
+    const d = parseFecha(value);
+    if (Number.isNaN(d.getTime())) return '—';
+    return d.toLocaleString('es-MX', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+    });
 }
 
 export function formatTime(date = new Date()): string {
