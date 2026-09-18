@@ -29,6 +29,14 @@ import {
 } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 
+/** Lo que HL Console dice que está atendiendo (GET /api/agent/ia-activa). */
+interface IaActiva {
+    proveedor: string;
+    modelo: string;
+    agente: string;
+    sdk: 'anthropic' | 'openai';
+}
+
 interface Message {
     id?: string;
     role: 'user' | 'assistant';
@@ -142,6 +150,7 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
     const pathname = usePathname();
     const router = useRouter();
     const isEmbedded = mode === 'embedded';
+    const [iaActiva, setIaActiva] = useState<IaActiva | null>(null);
     const [isOpen, setIsOpen] = useState(isEmbedded);
     const [messages, setMessages] = useState<Message[]>([]);
     const [defaultSuggestions, setDefaultSuggestions] = useState<string[]>([]);
@@ -375,6 +384,24 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
         }
     }, [isOpen, fetchProactivePrompts]);
 
+    // Qué IA está atendiendo, según HL Console. Se pide al abrir para no
+    // anunciar un modelo inventado; cada respuesta la refresca más abajo.
+    useEffect(() => {
+        if (!isOpen) return;
+        let vigente = true;
+        fetch('/api/agent/ia-activa')
+            .then((r) => (r.ok ? r.json() : null))
+            .then((d) => {
+                if (vigente && d?.ia) setIaActiva(d.ia);
+            })
+            .catch(() => {
+                // Sin HL la interfaz simplemente no promete un modelo.
+            });
+        return () => {
+            vigente = false;
+        };
+    }, [isOpen]);
+
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
@@ -537,6 +564,7 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
                                 conversational: evt.data?.conversational === true,
                                 ai_model: evt.data?.ai_model
                             });
+                            if (evt.data?.ia) setIaActiva(evt.data.ia);
                             break;
                         }
                         case 'error': {
@@ -574,6 +602,7 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
                     streaming: false,
                     streamPhase: undefined
                 });
+                if (data.ia) setIaActiva(data.ia);
             }
         } catch (err: any) {
             if (err?.name === 'AbortError') {
@@ -634,7 +663,9 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
                                 <h3 className="font-black text-slate-900 tracking-tight leading-none uppercase text-xs">Agente Nexus IA</h3>
                                 <div className="flex items-center space-x-1.5 mt-1">
                                     <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">En línea (Claude Opus 4.7)</span>
+                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                        {iaActiva ? `En línea (${iaActiva.modelo})` : 'En línea'}
+                                    </span>
                                 </div>
                             </div>
                         </div>

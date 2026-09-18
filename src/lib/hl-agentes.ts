@@ -114,3 +114,12 @@ export function clienteOpenAIHl(cred: CredencialHl): OpenAI {
 export function iaDeCredencial(cred: CredencialHl): IAUsada {
     return { proveedor: cred.proveedor, modelo: cred.modelo, agente: cred.nombre, sdk: cred.sdk };
 }
+
+/**
+ * Qué IA está activa, para que la interfaz la muestre antes de la primera
+ * pregunta. null si HL no está configurado o no contesta.
+ */
+export async function iaActiva(): Promise<IAUsada | null> {
+    const cred = await credencialOpcional();
+    return cred ? iaDeCredencial(cred) : null;
+}
