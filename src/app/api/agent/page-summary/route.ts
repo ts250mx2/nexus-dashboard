@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { anthropic } from '@/lib/anthropic';
+import { FAST_MODEL } from '@/lib/anthropic';
+import { textoIA } from '@/lib/llm';
 
 /**
  * POST /api/agent/page-summary
@@ -91,13 +92,11 @@ RESPONDE SOLO EN JSON (sin markdown):
   "tone": "positive" | "attention" | "neutral"
 }`;
 
-        const response = await anthropic.messages.create({
-            model: 'claude-haiku-4-5-20251001',
-            max_tokens: 800,
-            messages: [{ role: 'user', content: prompt }]
+        const text = await textoIA({
+            prompt,
+            maxTokens: 800,
+            modeloRespaldo: FAST_MODEL,
         });
-
-        const text = (response.content[0] as any)?.text || '';
         const start = text.indexOf('{');
         const end = text.lastIndexOf('}');
 

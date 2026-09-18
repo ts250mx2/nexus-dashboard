@@ -59,3 +59,37 @@ export function recommendModelForComplexity(complexity?: string | null): string 
         default: return DEFAULT_MODEL_ID;
     }
 }
+
+/**
+ * Modelo con el que REALMENTE corre el reporte.
+ *
+ * Con HL Console activo el modelo lo fija el portal: su proxy sustituye el
+ * `model` que mande la app, así que el que eligió el usuario en la interfaz
+ * queda solo como preferencia. Aquí se devuelve el de HL para que el reporte,
+ * la bitácora y el costo digan el que de verdad contestó, no el del selector.
+ *
+ * El precio sale del catálogo por prefijo con límite de guion (igual que HL):
+ * `claude-opus-5` cubre `claude-opus-5-20260101`. Si el modelo de HL no está en
+ * el catálogo, el precio queda en 0 y el costo mostrado es 0: el gasto real de
+ * esa llamada está en la bitácora de HL Console, que sí tiene sus precios.
+ */
+export function modeloEfectivo(elegido: ModelInfo, hl: { sdk: Provider; modelo: string } | null): ModelInfo {
+    if (!hl) return elegido;
+    const precio = precioDeModelo(hl.modelo);
+    return {
+        id: hl.modelo,
+        label: hl.modelo,
+        provider: hl.sdk,
+        inputUsdPerMTok: precio?.inputUsdPerMTok ?? 0,
+        outputUsdPerMTok: precio?.outputUsdPerMTok ?? 0,
+    };
+}
+
+/** Precio del catálogo para un id de modelo. Gana el prefijo más largo. */
+export function precioDeModelo(id: string): ModelInfo | null {
+    const limpio = id.trim();
+    const candidatos = MODEL_REGISTRY
+        .filter((m) => limpio === m.id || limpio.startsWith(`${m.id}-`))
+        .sort((a, b) => b.id.length - a.id.length);
+    return candidatos[0] ?? null;
+}

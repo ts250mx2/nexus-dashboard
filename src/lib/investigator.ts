@@ -12,7 +12,7 @@
  *  - El SQL propuesto pasa por el sandbox antes de ejecutarse
  */
 
-import { anthropic } from '@/lib/anthropic';
+import { textoIA } from '@/lib/llm';
 
 export interface FollowUpProposal {
     question: string;
@@ -82,13 +82,11 @@ Si SÍ hay que investigar:
 Devuelve SOLO el JSON, sin markdown ni explicaciones extra.`;
 
     try {
-        const response = await anthropic.messages.create({
-            model,
-            max_tokens: 1500,
-            messages: [{ role: 'user', content: detectorPrompt }]
+        const text = await textoIA({
+            prompt: detectorPrompt,
+            maxTokens: 1500,
+            modeloRespaldo: model,
         });
-
-        const text = (response.content[0] as any)?.text || '';
         const start = text.indexOf('{');
         const end = text.lastIndexOf('}');
         if (start < 0 || end <= start) return null;

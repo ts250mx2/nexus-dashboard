@@ -9,7 +9,8 @@
  *  5. generateDeepDive() — sub-hipótesis para la dimensión concentrada
  */
 
-import { anthropic } from '@/lib/anthropic';
+import { FAST_MODEL } from '@/lib/anthropic';
+import { textoIA } from '@/lib/llm';
 import { query } from '@/lib/db';
 import { assertReadOnly } from '@/lib/sql-sandbox';
 
@@ -124,13 +125,11 @@ RESPONDE EN JSON ESTRICTO (sin markdown):
 Genera entre 4 y 6 hipótesis. Devuelve SOLO el JSON.`;
 
     try {
-        const response = await anthropic.messages.create({
-            model: 'claude-haiku-4-5-20251001',
-            max_tokens: 3000,
-            messages: [{ role: 'user', content: designerPrompt }]
+        const text = await textoIA({
+            prompt: designerPrompt,
+            maxTokens: 3000,
+            modeloRespaldo: FAST_MODEL,
         });
-
-        const text = (response.content[0] as any)?.text || '';
         const start = text.indexOf('{');
         const end = text.lastIndexOf('}');
         if (start < 0 || end <= start) return [];
@@ -306,13 +305,11 @@ RESPONDE EN JSON ESTRICTO (sin markdown):
 Devuelve SOLO el JSON.`;
 
     try {
-        const response = await anthropic.messages.create({
-            model: 'claude-haiku-4-5-20251001',
-            max_tokens: 1500,
-            messages: [{ role: 'user', content: designerPrompt }]
+        const text = await textoIA({
+            prompt: designerPrompt,
+            maxTokens: 1500,
+            modeloRespaldo: FAST_MODEL,
         });
-
-        const text = (response.content[0] as any)?.text || '';
         const start = text.indexOf('{');
         const end = text.lastIndexOf('}');
         if (start < 0 || end <= start) return [];

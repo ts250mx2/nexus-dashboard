@@ -4,7 +4,8 @@ import { openai } from '@/lib/ai';
 import { getUserId } from '@/lib/conversations';
 import { getReportById } from '@/lib/advanced-reports/reports-store';
 import { substituteParams } from '@/lib/advanced-reports/params';
-import { getModel } from '@/lib/advanced-reports/models';
+import { getModel, modeloEfectivo } from '@/lib/advanced-reports/models';
+import { clienteAnthropicHl, clienteOpenAIHl, credencialOpcional } from '@/lib/hl-agentes';
 import { localizeDatesForModel } from '@/lib/advanced-reports/tools';
 import { assertReadOnly } from '@/lib/sql-sandbox';
 import { query } from '@/lib/db';
@@ -72,7 +73,11 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 
     const userId = await getUserId().catch(() => 'anonymous');
     const body = await req.json().catch(() => ({}));
-    const model = getModel(body?.model);
+    const hlCred = await credencialOpcional();
+    const anthropicClient = hlCred ? clienteAnthropicHl(hlCred) : anthropic;
+    const openaiClient = hlCred ? clienteOpenAIHl(hlCred) : openai;
+    // Con HL Console activo el modelo lo fija el portal, no el selector de la interfaz.
+    const model = modeloEfectivo(getModel(body?.model), hlCred);
 
     const report = await getReportById(userId, idReporte);
     if (!report || !report.definition) {
@@ -118,7 +123,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
         let outTok = 0;
 
         if (model.provider === 'anthropic') {
-            const resp = await anthropic.messages.create({
+            const resp = await anthropicClient.messages.create({
                 model: model.id,
                 max_tokens: 1500,
                 messages: [{ role: 'user', content: prompt }],
@@ -127,7 +132,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
             inTok = resp.usage?.input_tokens || 0;
             outTok = resp.usage?.output_tokens || 0;
         } else {
-            const resp = await openai.chat.completions.create({
+            const resp = await openaiClient.chat.completions.create({
                 model: model.id,
                 max_tokens: 1500,
                 messages: [{ role: 'user', content: prompt }],

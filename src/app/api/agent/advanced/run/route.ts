@@ -6,7 +6,8 @@ import { queryLimiter } from '@/lib/rate-limit';
 import { getUserId } from '@/lib/conversations';
 import { recordMetric } from '@/lib/metrics';
 import { costUsd, costMxn, USD_MXN_RATE } from '@/lib/pricing';
-import { getModel, recommendModelForComplexity } from '@/lib/advanced-reports/models';
+import { getModel, modeloEfectivo, recommendModelForComplexity } from '@/lib/advanced-reports/models';
+import { clienteAnthropicHl, clienteOpenAIHl, credencialOpcional } from '@/lib/hl-agentes';
 import {
     ADVANCED_TOOLS,
     ADVANCED_OPENAI_TOOLS,
@@ -66,7 +67,11 @@ export async function POST(req: Request) {
 
     // La conversación (preguntas/propuestas) usa un modelo más barato por defecto;
     // el modelo de GENERACIÓN del reporte se elige al armarlo (endpoint /build).
-    const model = getModel(body?.model || process.env.ADVANCED_CONVERSATION_MODEL || 'claude-sonnet-5');
+    const hlCred = await credencialOpcional();
+    const anthropicClient = hlCred ? clienteAnthropicHl(hlCred) : anthropic;
+    const openaiClient = hlCred ? clienteOpenAIHl(hlCred) : openai;
+    // Con HL Console activo el modelo lo fija el portal, no el selector de la interfaz.
+    const model = modeloEfectivo(getModel(body?.model || process.env.ADVANCED_CONVERSATION_MODEL || 'claude-sonnet-5'), hlCred);
     const system = buildAdvancedSystemPrompt(getAdvancedSchemaString());
     const baseMessages = buildMessages(prompt, body?.history);
 
@@ -114,7 +119,7 @@ export async function POST(req: Request) {
                 let stop = false;
                 while (!stop && turns < MAX_TURNS) {
                     turns++;
-                    const resp = await anthropic.messages.create({
+                    const resp = await anthropicClient.messages.create({
                         model: model.id,
                         max_tokens: 8192,
                         system,
@@ -162,7 +167,7 @@ export async function POST(req: Request) {
                 let stop = false;
                 while (!stop && turns < MAX_TURNS) {
                     turns++;
-                    const resp = await openai.chat.completions.create({
+                    const resp = await openaiClient.chat.completions.create({
                         model: model.id,
                         max_tokens: 4096,
                         messages,

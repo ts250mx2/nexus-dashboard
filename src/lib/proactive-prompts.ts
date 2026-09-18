@@ -9,7 +9,8 @@
  */
 
 import { query } from '@/lib/db';
-import { anthropic } from '@/lib/anthropic';
+import { FAST_MODEL } from '@/lib/anthropic';
+import { textoIA } from '@/lib/llm';
 
 let tableEnsured = false;
 
@@ -177,12 +178,11 @@ Genera EXACTAMENTE ${candidates.length} prompts en el mismo orden del input. Dev
 
     let reformulated: any[] = [];
     try {
-        const resp = await anthropic.messages.create({
-            model: 'claude-haiku-4-5-20251001',
-            max_tokens: 2000,
-            messages: [{ role: 'user', content: reformulationPrompt }]
+        const text = await textoIA({
+            prompt: reformulationPrompt,
+            maxTokens: 2000,
+            modeloRespaldo: FAST_MODEL,
         });
-        const text = (resp.content[0] as any)?.text || '';
         const start = text.indexOf('{');
         const end = text.lastIndexOf('}');
         if (start >= 0 && end > start) {

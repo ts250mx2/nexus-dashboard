@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { openai } from '@/lib/ai';
-import { anthropic, DEFAULT_MODEL } from '@/lib/anthropic';
+import { anthropic, anthropicText, DEFAULT_MODEL } from '@/lib/anthropic';
+import { clienteAnthropicHl, clienteOpenAIHl, credencialOpcional, iaDeCredencial } from '@/lib/hl-agentes';
 import { query } from '@/lib/db';
 import { reportsCatalogForPrompt, AVAILABLE_REPORTS, findRelevantReports } from '@/lib/available-reports';
 import { assertReadOnly } from '@/lib/sql-sandbox';
@@ -543,7 +544,18 @@ export async function POST(req: Request) {
 
         const url = new URL(req.url);
         const wantsStreaming = url.searchParams.get('stream') === 'true';
-        const isAnthropic = selectedModel.includes('claude');
+        // ── HL Console: el proveedor y el modelo del agente los fija el portal
+        // (HL_AGENTE) y las llamadas van por su proxy, así que esta app nunca
+        // tiene la llave del proveedor. Sin HL (o si no contesta) se respeta el
+        // modelo que pidió el cliente, con las llaves del .env.
+        const hlCred = await credencialOpcional();
+        const iaUsada = hlCred ? iaDeCredencial(hlCred) : null;
+        if (hlCred) selectedModel = hlCred.modelo;
+        const isAnthropic = hlCred ? hlCred.sdk === 'anthropic' : selectedModel.includes('claude');
+        const anthropicClient = hlCred ? clienteAnthropicHl(hlCred) : anthropic;
+        const openaiClient = hlCred ? clienteOpenAIHl(hlCred) : openai;
+        /** Modelo para el SDK de OpenAI: con HL manda el del agente. */
+        const openaiModel = hlCred ? hlCred.modelo : 'gpt-4o';
 
         // ───────────────────────────── STREAMING ─────────────────────────────
         if (wantsStreaming && isAnthropic) {
@@ -554,7 +566,7 @@ export async function POST(req: Request) {
                 try {
                     emit({ event: 'status', data: { phase: 'thinking' } });
 
-                    const decision = await anthropic.messages.create({
+                    const decision = await anthropicClient.messages.create({
                         model: selectedModel,
                         max_tokens: 4096,
                         system: systemPrompt,
@@ -572,7 +584,7 @@ export async function POST(req: Request) {
                         const text = initialText.trim() ||
                             'Estoy aquí. Cuéntame qué necesitas — puedo darte el pulso del negocio o ayudarte con cualquier otra pregunta.';
                         emit({ event: 'text-delta', data: { text } });
-                        emit({ event: 'metadata', data: { conversational: true, ai_model: selectedModel } });
+                        emit({ event: 'metadata', data: { conversational: true, ai_model: selectedModel, ia: iaUsada } });
                         emit({ event: 'done', data: {} });
                         await logQuestion(prompt, { message: text, conversational: true }, null);
                         return;
@@ -639,7 +651,7 @@ export async function POST(req: Request) {
                         } catch (sqlErr: any) {
                             emit({ event: 'status', data: { phase: 'correcting-sql' } });
                             try {
-                                const correction = await anthropic.messages.create({
+                                const correction = await anthropicClient.messages.create({
                                     model: selectedModel,
                                     max_tokens: 1024,
                                     messages: [{
@@ -799,7 +811,7 @@ export async function POST(req: Request) {
                             forecastResult
                         );
 
-                        const streamResp = anthropic.messages.stream({
+                        const streamResp = anthropicClient.messages.stream({
                             model: selectedModel,
                             max_tokens: 2500,
                             messages: [{ role: 'user', content: metaPrompt }]
@@ -851,6 +863,7 @@ export async function POST(req: Request) {
                             event: 'metadata',
                             data: {
                                 ai_model: selectedModel,
+                                ia: iaUsada,
                                 sql: lastSql,
                                 data: results,
                                 visualization,
@@ -936,7 +949,7 @@ export async function POST(req: Request) {
 
         if (isAnthropic) {
             try {
-                const response = await anthropic.messages.create({
+                const response = await anthropicClient.messages.create({
                     model: selectedModel,
                     max_tokens: 4096,
                     system: systemPrompt,
@@ -955,13 +968,13 @@ export async function POST(req: Request) {
                 }));
             } catch (err: any) {
                 log.warn('Anthropic call failed, falling back to OpenAI', { error: err?.message });
-                selectedModel = 'gpt-4o';
+                selectedModel = openaiModel;
             }
         }
 
         if (!message) {
-            const completion = await openai.chat.completions.create({
-                model: 'gpt-4o',
+            const completion = await openaiClient.chat.completions.create({
+                model: openaiModel,
                 messages: [
                     { role: 'system', content: systemPrompt },
                     ...messagesForModel.map(m => ({ role: m.role as 'user' | 'assistant', content: m.content }))
@@ -1049,8 +1062,8 @@ export async function POST(req: Request) {
                     results = await query(safeSql);
                 } catch (sqlErr: any) {
                     try {
-                        const correction = await openai.chat.completions.create({
-                            model: 'gpt-4o',
+                        const correction = await openaiClient.chat.completions.create({
+                            model: openaiModel,
                             messages: [
                                 { role: 'system', content: `Error MySQL: ${sqlErr.message}. Corrige el SQL. Solo devuelve el SQL corregido sin markdown.` },
                                 { role: 'user', content: safeSql }
@@ -1068,16 +1081,16 @@ export async function POST(req: Request) {
                 // Non-streaming: simpler, no causal/forecast (keep latency reasonable)
                 const metaPrompt = buildMetaPrompt(prompt, lastSql, results);
                 let metaContent = '';
-                if (selectedModel.includes('claude')) {
-                    const metaResp = await anthropic.messages.create({
+                if (isAnthropic) {
+                    const metaResp = await anthropicClient.messages.create({
                         model: selectedModel,
                         max_tokens: 2500,
                         messages: [{ role: 'user', content: metaPrompt }]
                     });
-                    metaContent = (metaResp.content[0] as any).text || '';
+                    metaContent = anthropicText(metaResp);
                 } else {
-                    const metaResp = await openai.chat.completions.create({
-                        model: 'gpt-4o',
+                    const metaResp = await openaiClient.chat.completions.create({
+                        model: openaiModel,
                         messages: [{ role: 'user', content: metaPrompt }]
                     });
                     metaContent = metaResp.choices[0].message.content || '';

@@ -4,7 +4,8 @@ import { openai } from '@/lib/ai';
 import { getUserId } from '@/lib/conversations';
 import { assertReadOnly } from '@/lib/sql-sandbox';
 import { query } from '@/lib/db';
-import { getModel } from '@/lib/advanced-reports/models';
+import { getModel, modeloEfectivo } from '@/lib/advanced-reports/models';
+import { clienteAnthropicHl, clienteOpenAIHl, credencialOpcional } from '@/lib/hl-agentes';
 import { normalizeViz, localizeDatesForModel } from '@/lib/advanced-reports/tools';
 import { ADVANCED_REPORT_SCHEMA_VERSION, type AdvancedReportDefinition, type ReportBlock, type ReportBlockType } from '@/lib/advanced-reports/types';
 import { createReport, updateReport, insertReportRun, getReportById } from '@/lib/advanced-reports/reports-store';
@@ -41,7 +42,11 @@ export async function POST(req: Request) {
 
     const proposal = body?.definition || {};
     const name = String(body?.name || proposal?.title || 'Reporte sin título').trim().slice(0, 300);
-    const model = getModel(body?.model);
+    const hlCred = await credencialOpcional();
+    const anthropicClient = hlCred ? clienteAnthropicHl(hlCred) : anthropic;
+    const openaiClient = hlCred ? clienteOpenAIHl(hlCred) : openai;
+    // Con HL Console activo el modelo lo fija el portal, no el selector de la interfaz.
+    const model = modeloEfectivo(getModel(body?.model), hlCred);
 
     const rawSql = String(proposal?.sql || '');
     const params = Array.isArray(proposal?.params) ? proposal.params : undefined;
@@ -145,12 +150,12 @@ Responde SOLO con JSON válido (sin markdown), en español:
             let outTok = 0;
             if (digest.some((d) => d.rowCount > 0)) {
                 if (model.provider === 'anthropic') {
-                    const resp = await anthropic.messages.create({ model: model.id, max_tokens: 1200, messages: [{ role: 'user', content: prompt }] });
+                    const resp = await anthropicClient.messages.create({ model: model.id, max_tokens: 1200, messages: [{ role: 'user', content: prompt }] });
                     text = (resp.content.find((c: any) => c.type === 'text') as any)?.text || '';
                     inTok = resp.usage?.input_tokens || 0;
                     outTok = resp.usage?.output_tokens || 0;
                 } else {
-                    const resp = await openai.chat.completions.create({ model: model.id, max_tokens: 1200, messages: [{ role: 'user', content: prompt }], response_format: { type: 'json_object' } });
+                    const resp = await openaiClient.chat.completions.create({ model: model.id, max_tokens: 1200, messages: [{ role: 'user', content: prompt }], response_format: { type: 'json_object' } });
                     text = resp.choices[0]?.message?.content || '';
                     inTok = resp.usage?.prompt_tokens || 0;
                     outTok = resp.usage?.completion_tokens || 0;
@@ -259,7 +264,7 @@ Responde SOLO con JSON válido (sin markdown), en español:
 
         if (rows.length > 0) {
             if (model.provider === 'anthropic') {
-                const resp = await anthropic.messages.create({
+                const resp = await anthropicClient.messages.create({
                     model: model.id,
                     max_tokens: 1200,
                     messages: [{ role: 'user', content: prompt }],
@@ -268,7 +273,7 @@ Responde SOLO con JSON válido (sin markdown), en español:
                 inTok = resp.usage?.input_tokens || 0;
                 outTok = resp.usage?.output_tokens || 0;
             } else {
-                const resp = await openai.chat.completions.create({
+                const resp = await openaiClient.chat.completions.create({
                     model: model.id,
                     max_tokens: 1200,
                     messages: [{ role: 'user', content: prompt }],

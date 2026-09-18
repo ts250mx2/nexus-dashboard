@@ -9,7 +9,8 @@
  */
 
 import { NextResponse } from 'next/server';
-import { anthropic, FAST_MODEL } from '@/lib/anthropic';
+import { FAST_MODEL } from '@/lib/anthropic';
+import { respuestaIA } from '@/lib/llm';
 import { query } from '@/lib/db';
 import { assertReadOnly } from '@/lib/sql-sandbox';
 import { INSIGHT_SCANNERS } from '@/lib/insights-scanners';
@@ -86,13 +87,12 @@ REGLAS:
 DATOS DE SCANNERS:
 ${JSON.stringify(usefulScans, null, 2)}`;
 
-        const completion = await anthropic.messages.create({
-            model: FAST_MODEL,
-            max_tokens: 2500,
-            messages: [{ role: 'user', content: synthesisPrompt }]
+        const completion = await respuestaIA({
+            prompt: synthesisPrompt,
+            maxTokens: 2500,
+            modeloRespaldo: FAST_MODEL,
         });
-
-        const text = (completion.content[0] as any)?.text || '{}';
+        const text = completion.texto || '{}';
         const start = text.indexOf('{');
         const end = text.lastIndexOf('}');
 
@@ -119,11 +119,11 @@ ${JSON.stringify(usefulScans, null, 2)}`;
         void recordMetric({
             userId,
             endpoint: '/api/agent/daily-insights',
-            model: FAST_MODEL,
+            model: completion.modelo,
             status: 'ok',
             latencyMs: Date.now() - startTime,
-            tokensInput: completion.usage?.input_tokens,
-            tokensOutput: completion.usage?.output_tokens,
+            tokensInput: completion.tokensEntrada,
+            tokensOutput: completion.tokensSalida,
             extra: { scanners: scanResults.length, insights: insights.length }
         });
 

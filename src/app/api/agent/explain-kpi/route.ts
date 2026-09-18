@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { anthropic, DEFAULT_MODEL, FAST_MODEL } from '@/lib/anthropic';
+import { DEFAULT_MODEL, FAST_MODEL } from '@/lib/anthropic';
+import { textoIA } from '@/lib/llm';
 import { query } from '@/lib/db';
 import { assertReadOnly } from '@/lib/sql-sandbox';
 
@@ -109,12 +110,11 @@ Si SÍ necesitas:
         let extraPurpose: string | null = null;
 
         try {
-            const planResp = await anthropic.messages.create({
-                model: FAST_MODEL,
-                max_tokens: 800,
-                messages: [{ role: 'user', content: planPrompt }]
+            const planText = await textoIA({
+                prompt: planPrompt,
+                maxTokens: 800,
+                modeloRespaldo: FAST_MODEL,
             });
-            const planText = (planResp.content[0] as any)?.text || '';
             const start = planText.indexOf('{');
             const end = planText.lastIndexOf('}');
             if (start >= 0 && end > start) {
@@ -176,12 +176,11 @@ RESPONDE SOLO EN JSON:
   "followUpQuestions": ["Pregunta 1", "Pregunta 2", "Pregunta 3"]
 }`;
 
-        const explainResp = await anthropic.messages.create({
-            model: DEFAULT_MODEL,
-            max_tokens: 1500,
-            messages: [{ role: 'user', content: explainPrompt }]
+        const text = await textoIA({
+            prompt: explainPrompt,
+            maxTokens: 1500,
+            modeloRespaldo: DEFAULT_MODEL,
         });
-        const text = (explainResp.content[0] as any)?.text || '';
         const start = text.indexOf('{');
         const end = text.lastIndexOf('}');
 
