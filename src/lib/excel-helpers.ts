@@ -206,11 +206,37 @@ export function buildFormattedSheet(opts: BuildSheetOptions): any {
     return ws;
 }
 
+/**
+ * Nombre de pestaña que Excel acepta: sin los caracteres que prohíbe
+ * (`: \\ / ? * [ ]`), de 31 caracteres como máximo y sin repetirse dentro del
+ * libro. Un archivo con dos hojas del mismo nombre no abre, y la comparación de
+ * Excel ignora mayúsculas, por eso el registro de usados va en minúsculas.
+ *
+ * `usados` se recibe y se modifica: un libro se arma hoja por hoja y cada nombre
+ * tiene que conocer los anteriores.
+ */
+export function sheetName(name: string, usados: Set<string>): string {
+    const base = (name || 'Hoja').replace(/[:\\/?*[\]]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 31) || 'Hoja';
+    if (!usados.has(base.toLowerCase())) {
+        usados.add(base.toLowerCase());
+        return base;
+    }
+    for (let i = 2; ; i++) {
+        const sufijo = ` (${i})`;
+        const candidato = `${base.slice(0, 31 - sufijo.length)}${sufijo}`;
+        if (!usados.has(candidato.toLowerCase())) {
+            usados.add(candidato.toLowerCase());
+            return candidato;
+        }
+    }
+}
+
 /** Genera y descarga un archivo XLSX con uno o varios sheets. */
 export function downloadXLSX(filename: string, sheets: { name: string; ws: any }[]) {
     const wb = XLSX.utils.book_new();
+    const usados = new Set<string>();
     for (const { name, ws } of sheets) {
-        XLSX.utils.book_append_sheet(wb, ws, name.slice(0, 31));
+        XLSX.utils.book_append_sheet(wb, ws, sheetName(name, usados));
     }
     XLSX.writeFile(wb, filename);
 }

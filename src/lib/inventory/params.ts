@@ -27,7 +27,14 @@ export interface InventoryFilters {
     limit: number;
 }
 
-const MAX_LIMIT = 1000;
+/**
+ * Tope de filas de detalle. Es alto a propósito: la exportación "Excel con
+ * Detalle" de inventario por sucursal baja el universo completo en una sola
+ * consulta (hoy ~34,900 renglones artículo-sucursal) para repartirlo en una
+ * hoja por sucursal. El valor por defecto sigue siendo 500, así que solo lo
+ * alcanza quien lo pide explícitamente.
+ */
+const MAX_LIMIT = 50000;
 
 function toInt(raw: string | null, fallback: number, min: number, max: number): number {
     const n = Number(raw);

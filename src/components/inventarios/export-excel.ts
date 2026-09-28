@@ -7,6 +7,33 @@ import {
     safeFileName,
 } from '@/lib/excel-helpers';
 
+/** Una hoja del libro, con su propio título, metadata y tabla. */
+export interface HojaExcel {
+    /** Nombre de la pestaña. Se recorta y se hace único al generar el archivo. */
+    nombre: string;
+    titulo: string;
+    meta?: { label: string; value: string }[];
+    columnas: SheetColumn[];
+    filas: Record<string, unknown>[];
+    totales?: { label: string; values: Record<string, unknown> };
+}
+
+/** Descarga un libro con varias hojas, todas con el formato estándar del portal. */
+export function exportarExcelMultihoja(opts: { archivo: string; hojas: HojaExcel[] }): void {
+    const sheets = opts.hojas.map(hoja => ({
+        name: hoja.nombre,
+        ws: buildFormattedSheet({
+            title: hoja.titulo,
+            meta: hoja.meta ?? [],
+            columns: hoja.columnas,
+            rows: hoja.filas,
+            totalRow: hoja.totales,
+        }),
+    }));
+    const fecha = new Date().toISOString().slice(0, 10);
+    downloadXLSX(`${safeFileName(opts.archivo)}_${fecha}.xlsx`, sheets);
+}
+
 /** Descarga una hoja con el formato estándar del portal. */
 export function exportarExcel(opts: {
     archivo: string;
@@ -17,15 +44,17 @@ export function exportarExcel(opts: {
     filas: Record<string, unknown>[];
     totales?: { label: string; values: Record<string, unknown> };
 }): void {
-    const ws = buildFormattedSheet({
-        title: opts.titulo,
-        meta: opts.meta ?? [],
-        columns: opts.columnas,
-        rows: opts.filas,
-        totalRow: opts.totales,
+    exportarExcelMultihoja({
+        archivo: opts.archivo,
+        hojas: [{
+            nombre: opts.hoja,
+            titulo: opts.titulo,
+            meta: opts.meta,
+            columnas: opts.columnas,
+            filas: opts.filas,
+            totales: opts.totales,
+        }],
     });
-    const fecha = new Date().toISOString().slice(0, 10);
-    downloadXLSX(`${safeFileName(opts.archivo)}_${fecha}.xlsx`, [{ name: opts.hoja, ws }]);
 }
 
 /** Columna de moneda con el formato contable del portal. */
@@ -36,6 +65,11 @@ export function colMoneda(header: string, key: string, width = 16): SheetColumn 
 /** Columna numérica entera. */
 export function colNumero(header: string, key: string, width = 12): SheetColumn {
     return { header, key, width, align: 'right', isNumber: true, format: FORMAT_INT };
+}
+
+/** Columna numérica con dos decimales, para promedios y tasas. */
+export function colDecimal(header: string, key: string, width = 14): SheetColumn {
+    return { header, key, width, align: 'right', isNumber: true, format: '#,##0.00' };
 }
 
 /** Columna de texto. */

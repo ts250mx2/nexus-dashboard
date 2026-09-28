@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Download, Search, SlidersHorizontal, X } from 'lucide-react';
+import { Download, Loader2, Search, Sheet, SlidersHorizontal, X } from 'lucide-react';
 import MultiSelect from '@/components/MultiSelect';
 
 /**
@@ -59,6 +59,12 @@ interface InventoryFiltersProps {
     searchPlaceholder?: string;
     onExport?: () => void;
     exportDisabled?: boolean;
+    /** Segunda descarga opcional (por ejemplo, el mismo reporte con detalle). */
+    onExportDetalle?: () => void;
+    exportDetalleLabel?: string;
+    exportDetalleDisabled?: boolean;
+    /** Mientras se arma el archivo: bloquea el botón y avisa que va en camino. */
+    exportDetalleLoading?: boolean;
     /** Controles propios de cada módulo (umbrales, interruptores). */
     children?: React.ReactNode;
 }
@@ -75,6 +81,10 @@ export default function InventoryFilters({
     searchPlaceholder = 'Producto, código o marca',
     onExport,
     exportDisabled = false,
+    onExportDetalle,
+    exportDetalleLabel = 'Excel con Detalle',
+    exportDetalleDisabled = false,
+    exportDetalleLoading = false,
     children,
 }: InventoryFiltersProps) {
     const showDias = dias !== undefined && typeof onDiasChange === 'function';
@@ -163,6 +173,21 @@ export default function InventoryFilters({
                 >
                     <Download size={14} />
                     Excel
+                </button>
+            )}
+
+            {onExportDetalle && (
+                <button
+                    type="button"
+                    onClick={onExportDetalle}
+                    disabled={exportDetalleDisabled || exportDetalleLoading}
+                    title="Descarga el resumen y, en una hoja por sucursal, el detalle de sus artículos"
+                    className="flex items-center gap-2 px-4 py-2 bg-white border border-emerald-600 text-emerald-700 rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-emerald-50 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+                >
+                    {exportDetalleLoading
+                        ? <Loader2 size={14} className="animate-spin" />
+                        : <Sheet size={14} />}
+                    {exportDetalleLoading ? 'Armando...' : exportDetalleLabel}
                 </button>
             )}
         </div>
