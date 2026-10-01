@@ -1,5 +1,11 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
+import {
+    aFechaCalendario,
+    coberturaDelPeriodo,
+    hoyCalendario,
+    type GroupBy,
+} from '@/lib/periodos';
 
 export async function GET(req: Request) {
     try {
@@ -44,7 +50,8 @@ export async function GET(req: Request) {
             }
         }
 
-        const groupBy = searchParams.get('groupBy') || 'dia';
+        const groupByParam = searchParams.get('groupBy');
+        const groupBy: GroupBy = groupByParam === 'semana' || groupByParam === 'mes' ? groupByParam : 'dia';
 
         let dateSelector = 'DATE(a.FechaVenta)';
         if (groupBy === 'semana') {
@@ -132,9 +139,18 @@ export async function GET(req: Request) {
             query(branchTrendsSql, [fechaInicio, fechaFin, prevStartStr, prevEndStr, prevStartStr, fechaFin])
         ]);
 
+        // Se marca cada punto con cuánto del periodo entró en el rango, para que
+        // la gráfica no dibuje un mes de un día igual que uno completo.
+        const finEfectivo = fechaFin < hoyCalendario() ? fechaFin : hoyCalendario();
+        const timeSeriesConCobertura = (timeSeries as Record<string, unknown>[]).map(fila => ({
+            ...fila,
+            ...coberturaDelPeriodo(aFechaCalendario(fila.Fecha), groupBy, fechaInicio, finEfectivo),
+        }));
+
         return NextResponse.json({
             success: true,
-            timeSeries,
+            groupBy,
+            timeSeries: timeSeriesConCobertura,
             branchTrends,
             comparisonPeriod: {
                 start: prevStartStr,
