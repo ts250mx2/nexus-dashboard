@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from 'react';
+import { aFechaLocal } from '@/lib/periodos';
 import {
   ResponsiveContainer,
   AreaChart,
@@ -91,7 +92,7 @@ export function SalesTrendsChart({
   };
 
   const formatDate = (dateStr: string) => {
-    const d = new Date(dateStr);
+    const d = aFechaLocal(dateStr);
     if (isNaN(d.getTime())) return dateStr;
     if (groupBy === 'mes') {
       return d.toLocaleDateString("es-MX", {
@@ -131,7 +132,7 @@ export function SalesTrendsChart({
   const transformedData = useMemo(() => {
     const map = new Map<string, any>();
     data.forEach(item => {
-      const date = new Date(item.Fecha).toISOString();
+      const date = aFechaLocal(item.Fecha).toISOString();
       if (!map.has(date)) {
         map.set(date, {
           Fecha: item.Fecha,
@@ -155,7 +156,7 @@ export function SalesTrendsChart({
     });
 
     const ordenados = Array.from(map.values()).sort(
-      (a, b) => new Date(a.Fecha).getTime() - new Date(b.Fecha).getTime()
+      (a, b) => aFechaLocal(a.Fecha).getTime() - aFechaLocal(b.Fecha).getTime()
     );
 
     // El tramo punteado incluye también al vecino completo de cada periodo
@@ -176,6 +177,11 @@ export function SalesTrendsChart({
     () => transformedData.some(p => p.Parcial),
     [transformedData]
   );
+
+  // Con pocos puntos se marca cada dato. No es solo estético: cuando el rango
+  // deja un periodo completo aislado entre dos parciales, su tramo sólido se
+  // queda con un único punto y un Area de un solo dato no dibuja nada.
+  const marcarPuntos = transformedData.length <= 31;
 
   return (
     <div className="h-full flex flex-col">
@@ -296,6 +302,7 @@ export function SalesTrendsChart({
               fillOpacity={1}
               fill={`url(#${idGradiente(serie.clave)})`}
               connectNulls={false}
+              dot={marcarPuntos ? { r: 3, fill: serie.color, strokeWidth: 0 } : false}
               animationDuration={1000}
             />
           ))}

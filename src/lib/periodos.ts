@@ -80,6 +80,25 @@ export function coberturaDelPeriodo(
     };
 }
 
+/**
+ * Convierte a Date lo que viaja en una serie de tiempo, respetando el calendario
+ * local.
+ *
+ * Una fecha sola ("2026-10-01") la especificación manda parsearla como medianoche
+ * UTC: en México eso cae el 30 de septiembre a las 18:00, y cualquier etiqueta de
+ * mes se recorre un mes hacia atrás. Agrupado por mes el API manda justo ese
+ * formato (viene de DATE_FORMAT), mientras que por día y por semana manda un DATE
+ * que se serializa con la hora local incluida — por eso solo el eje de meses salía
+ * corrido. Las que ya traen hora se parsean tal cual.
+ */
+export function aFechaLocal(valor: string | Date): Date {
+    if (valor instanceof Date) return valor;
+    const texto = String(valor);
+    const soloFecha = /^(\d{4})-(\d{2})-(\d{2})$/.exec(texto);
+    if (!soloFecha) return new Date(texto);
+    return new Date(Number(soloFecha[1]), Number(soloFecha[2]) - 1, Number(soloFecha[3]));
+}
+
 /** Hoy en YYYY-MM-DD, en la zona del servidor. */
 export function hoyCalendario(): string {
     return aFechaCalendario(new Date());

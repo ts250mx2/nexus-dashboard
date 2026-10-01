@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SalesTrendsChart } from '@/components/dashboard/sales-trends-chart';
+import { aFechaLocal } from '@/lib/periodos';
 import { SalesTrendsDetails } from '@/components/dashboard/sales-trends-details';
 import MultiSelect from '@/components/MultiSelect';
 import jsPDF from 'jspdf';
@@ -264,7 +265,7 @@ export default function SalesTrendsPage() {
             // Aggregate by date to show a clean summary in the PDF table
             const aggregatedSeriesMap = new Map<string, { date: string, total: number, ops: number }>();
             (data.timeSeries || []).forEach((item: any) => {
-                const dateStr = new Date(item.Fecha).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' });
+                const dateStr = aFechaLocal(item.Fecha).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' });
                 if (!aggregatedSeriesMap.has(dateStr)) {
                     aggregatedSeriesMap.set(dateStr, { date: dateStr, total: 0, ops: 0 });
                 }

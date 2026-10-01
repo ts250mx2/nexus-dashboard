@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { aFechaCalendario, coberturaDelPeriodo, finDelPeriodo } from '../../src/lib/periodos.ts';
+import { aFechaCalendario, aFechaLocal, coberturaDelPeriodo, finDelPeriodo } from '../../src/lib/periodos.ts';
 
 describe('aFechaCalendario', () => {
     it('lee un Date por sus componentes locales, no por UTC', () => {
@@ -84,5 +84,40 @@ describe('coberturaDelPeriodo', () => {
         // Assert
         assert.equal(c.Parcial, true);
         assert.equal(c.DiasCubiertos, 1);
+    });
+});
+
+describe('aFechaLocal', () => {
+    it('parsea una fecha sola en el calendario local, no en UTC', () => {
+        // Arrange: new Date('2026-10-01') da medianoche UTC, que en México es el
+        // 30 de septiembre; así se corría un mes la etiqueta del eje.
+        const d = aFechaLocal('2026-10-01');
+
+        // Assert
+        assert.equal(d.getFullYear(), 2026);
+        assert.equal(d.getMonth(), 9);
+        assert.equal(d.getDate(), 1);
+    });
+
+    it('no corre el mes al etiquetar, que era el síntoma', () => {
+        // Arrange / Act
+        const etiqueta = (f) => aFechaLocal(f).toLocaleDateString('es-MX', { month: 'short' });
+
+        // Assert
+        assert.match(etiqueta('2026-09-01'), /sep/);
+        assert.match(etiqueta('2026-10-01'), /oct/);
+    });
+
+    it('respeta una marca de tiempo completa tal como viene', () => {
+        // Arrange: así llegan las fechas agrupadas por día y por semana.
+        const d = aFechaLocal('2026-09-28T06:00:00.000Z');
+
+        // Assert
+        assert.equal(d.getTime(), new Date('2026-09-28T06:00:00.000Z').getTime());
+    });
+
+    it('deja pasar un Date sin tocarlo', () => {
+        const original = new Date(2026, 8, 28);
+        assert.equal(aFechaLocal(original), original);
     });
 });
