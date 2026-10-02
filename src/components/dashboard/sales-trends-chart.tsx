@@ -33,31 +33,12 @@ const DEFAULT_COLORS = [
   '#EF4444', // Red
 ];
 
-/**
- * Sufijo de la serie que dibuja el tramo incompleto.
- *
- * El primero y el último periodo casi siempre quedan cortados por el rango (un
- * mes en curso con tres días, una semana que arranca a media semana). Si se
- * pintan igual que los completos, la línea se desploma y parece una caída de
- * venta. Por eso cada serie se parte en dos: la sólida corta en los periodos
- * parciales y esta los dibuja punteados.
- */
-const SUFIJO_PARCIAL = '__parcial';
-
 /** Lo que recharts entrega por serie en el tooltip. */
 interface EntradaTooltip {
   name: string;
   value: number | null;
   color?: string;
   payload: Record<string, number | string | boolean | null | undefined>;
-}
-
-/** Lo que recharts entrega al pintar el punto de un dato. */
-interface PuntoDeLinea {
-  cx?: number;
-  cy?: number;
-  index?: number;
-  payload?: { Parcial?: boolean };
 }
 
 const getStoreColor = (name: string, index: number) => {
@@ -136,11 +117,9 @@ export function SalesTrendsChart({
       if (!map.has(date)) {
         map.set(date, {
           Fecha: item.Fecha,
-          // La cobertura la manda el API y es la misma para todas las sucursales
-          // de esa fecha, porque depende del rango, no de la tienda.
+          // Lo manda el API y es igual para todas las sucursales de esa fecha,
+          // porque depende del rango consultado y no de la tienda.
           Parcial: item.Parcial === true,
-          DiasCubiertos: item.DiasCubiertos,
-          DiasPeriodo: item.DiasPeriodo,
         });
       }
       const entry = map.get(date);
@@ -155,33 +134,26 @@ export function SalesTrendsChart({
       entry[`${storeKey}_ops`] = item.Operaciones;
     });
 
-    const ordenados = Array.from(map.values()).sort(
-      (a, b) => aFechaLocal(a.Fecha).getTime() - aFechaLocal(b.Fecha).getTime()
-    );
+    // Los periodos que el rango deja cortados no se grafican: un mes en curso
+    // con un día, o la semana en que arranca el rango, valen una fracción de lo
+    // que vale un periodo completo y deforman la tendencia. El API los marca.
+    //
+    // La excepción es cuando no queda ninguno completo (un rango dentro del mes
+    // en curso, por ejemplo): ahí se grafica lo que haya, porque más vale un
+    // periodo a medias que una gráfica en blanco.
+    const todos = Array.from(map.values())
+      .sort((a, b) => aFechaLocal(a.Fecha).getTime() - aFechaLocal(b.Fecha).getTime());
+    const completos = todos.filter(punto => !punto.Parcial);
+    return completos.length > 0 ? completos : todos;
+  }, [data, metric]);
 
-    // El tramo punteado incluye también al vecino completo de cada periodo
-    // parcial; si no, el segmento que los une no se dibujaría.
-    return ordenados.map((punto, i) => {
-      const vecinoParcial = Boolean(ordenados[i - 1]?.Parcial || ordenados[i + 1]?.Parcial);
-      const copia = { ...punto };
-      for (const { clave } of series) {
-        const valor = punto[clave] ?? null;
-        copia[clave] = punto.Parcial ? null : valor;
-        copia[`${clave}${SUFIJO_PARCIAL}`] = punto.Parcial || vecinoParcial ? valor : null;
-      }
-      return copia;
-    });
-  }, [data, metric, series]);
-
-  const hayParciales = useMemo(
-    () => transformedData.some(p => p.Parcial),
-    [transformedData]
-  );
-
-  // Con pocos puntos se marca cada dato. No es solo estético: cuando el rango
-  // deja un periodo completo aislado entre dos parciales, su tramo sólido se
-  // queda con un único punto y un Area de un solo dato no dibuja nada.
+  // Con pocos puntos se marca cada dato: así un periodo suelto (que como línea
+  // de un solo punto sería invisible) se sigue viendo.
   const marcarPuntos = transformedData.length <= 31;
+
+  // Cuando lo único que hay son periodos a medias se grafican de todos modos,
+  // pero conviene decirlo: si no, un mes de dos días se lee como un mes normal.
+  const soloIncompletos = transformedData.length > 0 && transformedData.every(p => p.Parcial);
 
   return (
     <div className="h-full flex flex-col">
@@ -237,18 +209,11 @@ export function SalesTrendsChart({
               });
               if (!lineas.length) return null;
 
-              const punto = lineas[0].payload;
-
               return (
                 <div className="bg-slate-900 text-white p-3 rounded-xl shadow-2xl border border-white/10 min-w-[200px]">
                   <p className="text-[10px] font-bold text-white/50 uppercase mb-2 border-b border-white/10 pb-1">
                     {formatDate(label as string)}
                   </p>
-                  {punto?.Parcial && (
-                    <p className="text-[9px] font-black uppercase text-amber-400 mb-2 leading-tight">
-                      Periodo incompleto · {punto.DiasCubiertos} de {punto.DiasPeriodo} días
-                    </p>
-                  )}
                   <div className="space-y-3">
                     {lineas.map((p, i) => (
                       <div key={i} className="flex flex-col gap-1">
@@ -306,34 +271,12 @@ export function SalesTrendsChart({
               animationDuration={1000}
             />
           ))}
-
-          {/* Tramo incompleto: misma línea, punteada y sin relleno. */}
-          {series.map(serie => (
-            <Area
-              key={`${serie.clave}${SUFIJO_PARCIAL}`}
-              type="monotone"
-              dataKey={`${serie.clave}${SUFIJO_PARCIAL}`}
-              name={serie.nombre}
-              stroke={serie.color}
-              strokeWidth={isMulti ? 3 : 4}
-              strokeDasharray="7 5"
-              fillOpacity={0}
-              connectNulls={false}
-              legendType="none"
-              animationDuration={1000}
-              dot={(props: PuntoDeLinea) => (
-                props.payload?.Parcial
-                  ? <circle key={props.index} cx={props.cx} cy={props.cy} r={4} fill="#fff" stroke={serie.color} strokeWidth={2} />
-                  : <g key={props.index} />
-              )}
-            />
-          ))}
         </AreaChart>
       </ResponsiveContainer>
 
-      {hayParciales && (
-        <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400 text-center pt-1">
-          <span className="text-amber-500">— — —</span> Periodo incompleto: al primero o al último le faltan días del rango
+      {soloIncompletos && (
+        <p className="text-[9px] font-bold uppercase tracking-wider text-amber-600/70 text-center pt-1">
+          El rango no cubre ningún periodo completo: lo que se muestra va a medias
         </p>
       )}
     </div>
