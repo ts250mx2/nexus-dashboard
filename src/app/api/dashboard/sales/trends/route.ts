@@ -60,7 +60,11 @@ export async function GET(req: Request) {
             dateSelector = 'DATE_FORMAT(a.FechaVenta, "%Y-%m-01")';
         }
 
-        const isMulti = idTienda && idTienda !== 'all' && idTienda.includes(',');
+        // Con varias sucursales, el desglose por tienda solo sale si se pide: sin
+        // él la consulta las agrega y devuelve una sola serie con la suma, que es
+        // lo que el tablero grafica cuando el usuario elige "sumar".
+        const desglosarPorSucursal = searchParams.get('desglose') === '1';
+        const isMulti = desglosarPorSucursal && idTienda && idTienda !== 'all' && idTienda.includes(',');
         const storeFields = isMulti ? ', a.IdSucursal, t.Sucursal as Tienda' : '';
         const storeJoin = isMulti ? 'LEFT JOIN tblSucursales t ON a.IdSucursal = t.IdSucursal' : '';
         const storeGrouping = isMulti ? ', a.IdSucursal, t.Sucursal' : '';

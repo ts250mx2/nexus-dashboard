@@ -5,7 +5,8 @@ import {
     TrendingUp, TrendingDown, Calendar, Store, ArrowUpRight, 
     ArrowDownRight, RefreshCcw, LayoutGrid, 
     ShoppingCart, Ticket, DollarSign, Clock, CalendarDays, CalendarRange,
-    CheckSquare, Square, Package, Layers, Info, X, FileText
+    CheckSquare, Square, Package, Layers, Info, X, FileText,
+    Circle, CheckCircle2, Sigma, GitCompareArrows
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SalesTrendsChart } from '@/components/dashboard/sales-trends-chart';
@@ -69,7 +70,13 @@ export default function SalesTrendsPage() {
     const [fechaFin, setFechaFin] = useState(today);
     const [selectedStoreIds, setSelectedStoreIds] = useState<string[]>([]);
     const [groupBy, setGroupBy] = useState<'dia' | 'semana' | 'mes'>('dia');
+    /** Apagado: se elige una sucursal a la vez. Encendido: se marcan varias y se suman. */
+    const [sumarSucursales, setSumarSucursales] = useState(false);
+    /** Solo con `sumarSucursales`: en vez de la suma, una línea por sucursal. */
+    const [compararSucursales, setCompararSucursales] = useState(false);
     const [metric, setMetric] = useState<'venta' | 'operaciones' | 'ticket'>('venta');
+    /** Comparación de verdad: varias sucursales marcadas y pedidas por separado. */
+    const comparando = sumarSucursales && compararSucursales && selectedStoreIds.length > 1;
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState<any>(null);
     const [stores, setStores] = useState<any[]>([]);
@@ -112,6 +119,8 @@ export default function SalesTrendsPage() {
         try {
             const idTiendaParam = selectedStoreIds.length > 0 ? selectedStoreIds.join(',') : 'all';
             let url = `/api/dashboard/sales/trends?fechaInicio=${fechaInicio}&fechaFin=${fechaFin}&idTienda=${idTiendaParam}&groupBy=${groupBy}`;
+            // Sin desglose el API suma las sucursales en una sola serie.
+            if (comparando) url += '&desglose=1';
             if (selectedDeptos.length > 0) url += `&idDepto=${encodeURIComponent(selectedDeptos.join(','))}`;
             if (selectedArticulos.length > 0) url += `&codigoInterno=${selectedArticulos.join(',')}`;
 
@@ -125,7 +134,7 @@ export default function SalesTrendsPage() {
         } finally {
             setLoading(false);
         }
-    }, [fechaInicio, fechaFin, selectedStoreIds, groupBy, selectedDeptos, selectedArticulos]);
+    }, [fechaInicio, fechaFin, selectedStoreIds, groupBy, selectedDeptos, selectedArticulos, comparando]);
 
     useEffect(() => {
         fetchData();
@@ -313,13 +322,29 @@ export default function SalesTrendsPage() {
         }
     };
 
+    /**
+     * Con "sumar" apagado el selector se comporta como un option: la sucursal
+     * elegida reemplaza a la anterior. Encendido es un check y se acumulan.
+     */
     const handleStoreToggle = (id: string) => {
         setSelectedStoreIds(prev => {
-            if (prev.includes(id)) {
-                return prev.filter(i => i !== id);
-            } else {
-                return [...prev, id];
+            if (!sumarSucursales) return prev.includes(id) && prev.length === 1 ? [] : [id];
+            return prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id];
+        });
+    };
+
+    /**
+     * Al apagar "sumar" la selección tiene que caber en un option, así que se
+     * queda con la primera sucursal y se abandona la comparación.
+     */
+    const handleSumarToggle = () => {
+        setSumarSucursales(prev => {
+            const siguiente = !prev;
+            if (!siguiente) {
+                setCompararSucursales(false);
+                setSelectedStoreIds(ids => (ids.length > 1 ? [ids[0]] : ids));
             }
+            return siguiente;
         });
     };
 
@@ -348,8 +373,10 @@ export default function SalesTrendsPage() {
         if (selectedStoreIds.length === 1) {
             return stores.find(s => s.IdTienda.toString() === selectedStoreIds[0])?.Tienda || 'Sucursal';
         }
-        return `${selectedStoreIds.length} sucursales seleccionadas`;
-    }, [selectedStoreIds, stores]);
+        return comparando
+            ? `${selectedStoreIds.length} sucursales comparadas`
+            : `${selectedStoreIds.length} sucursales sumadas`;
+    }, [selectedStoreIds, stores, comparando]);
 
     const filterTitle = useMemo(() => {
         const parts = [];
@@ -619,15 +646,56 @@ export default function SalesTrendsPage() {
                                 <Store size={14} />
                                 Seleccionar Sucursales
                              </h2>
-                             {selectedStoreIds.length > 0 && (
-                                <button 
-                                    onClick={() => setSelectedStoreIds([])}
-                                    className="text-[10px] font-black text-blue-600 uppercase hover:underline"
+                             <div className="flex items-center gap-3">
+                                {selectedStoreIds.length > 0 && (
+                                    <button
+                                        onClick={() => setSelectedStoreIds([])}
+                                        className="text-[10px] font-black text-blue-600 uppercase hover:underline"
+                                    >
+                                        Limpiar
+                                    </button>
+                                )}
+                                <button
+                                    onClick={handleSumarToggle}
+                                    title={sumarSucursales
+                                        ? 'Marca varias sucursales y se suman'
+                                        : 'Actívalo para marcar varias sucursales y sumarlas'}
+                                    className={cn(
+                                        'flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all border',
+                                        sumarSucursales
+                                            ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
+                                            : 'bg-white text-slate-400 border-slate-200 hover:text-slate-600 hover:border-slate-300'
+                                    )}
                                 >
-                                    Limpiar
+                                    <Sigma size={11} /> Sumar
                                 </button>
-                             )}
+                             </div>
                         </div>
+
+                        {sumarSucursales && selectedStoreIds.length > 1 && (
+                            <button
+                                onClick={() => setCompararSucursales(v => !v)}
+                                className={cn(
+                                    'flex items-center justify-between gap-2 px-4 py-2 border-b text-[10px] font-black uppercase tracking-widest transition-colors',
+                                    compararSucursales
+                                        ? 'bg-blue-50 border-blue-100 text-blue-700'
+                                        : 'bg-white border-slate-100 text-slate-400 hover:text-slate-600'
+                                )}
+                            >
+                                <span className="flex items-center gap-1.5">
+                                    <GitCompareArrows size={12} /> Una línea por sucursal
+                                </span>
+                                <span className={cn(
+                                    'w-7 h-4 rounded-full transition-colors relative shrink-0',
+                                    compararSucursales ? 'bg-blue-600' : 'bg-slate-200'
+                                )}>
+                                    <span className={cn(
+                                        'absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all',
+                                        compararSucursales ? 'left-3.5' : 'left-0.5'
+                                    )} />
+                                </span>
+                            </button>
+                        )}
                         <div className="flex-1 overflow-y-auto no-scrollbar p-3 space-y-1 bg-white">
                             <button
                                 onClick={() => setSelectedStoreIds([])}
@@ -647,11 +715,13 @@ export default function SalesTrendsPage() {
                                     </div>
                                     <span className="text-xs font-black tracking-tight uppercase">Todas las Sucursales</span>
                                 </div>
-                                {selectedStoreIds.length === 0 ? (
-                                    <CheckSquare size={14} className="text-white" />
-                                ) : (
-                                    <Square size={14} className="text-slate-200 group-hover:text-slate-300" />
-                                )}
+                                {selectedStoreIds.length === 0
+                                    ? (sumarSucursales
+                                        ? <CheckSquare size={14} className="text-white" />
+                                        : <CheckCircle2 size={14} className="text-white" />)
+                                    : (sumarSucursales
+                                        ? <Square size={14} className="text-slate-200 group-hover:text-slate-300" />
+                                        : <Circle size={14} className="text-slate-200 group-hover:text-slate-300" />)}
                             </button>
 
                             {stores.map((store, i) => {
@@ -683,11 +753,13 @@ export default function SalesTrendsPage() {
                                                 isActive ? "text-slate-900" : "text-slate-500 group-hover:text-slate-800"
                                             )}>{store.Tienda}</span>
                                         </div>
-                                        {isActive ? (
-                                            <CheckSquare size={14} style={{ color: color }} />
-                                        ) : (
-                                            <Square size={14} className="text-slate-200 group-hover:text-slate-300" />
-                                        )}
+                                        {isActive
+                                            ? (sumarSucursales
+                                                ? <CheckSquare size={14} style={{ color }} />
+                                                : <CheckCircle2 size={14} style={{ color }} />)
+                                            : (sumarSucursales
+                                                ? <Square size={14} className="text-slate-200 group-hover:text-slate-300" />
+                                                : <Circle size={14} className="text-slate-200 group-hover:text-slate-300" />)}
                                     </button>
                                 );
                             })}
@@ -797,7 +869,7 @@ export default function SalesTrendsPage() {
                                     height={380} 
                                     color={storeColor} 
                                     groupBy={groupBy} 
-                                    isMulti={selectedStoreIds.length > 1} 
+                                    isMulti={comparando} 
                                     metric={metric}
                                 />
                             )}
