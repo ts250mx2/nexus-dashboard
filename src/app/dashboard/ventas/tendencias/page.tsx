@@ -37,6 +37,15 @@ const getStoreColor = (name: string, index: number) => {
     return DEFAULT_COLORS[colorIndex];
 };
 
+/** Una fila de `branchTrends`: la venta de la sucursal en el periodo y en el anterior. */
+interface TendenciaSucursal {
+    IdTienda: number;
+    Tienda: string;
+    CurrentTotal: number;
+    PrevTotal: number;
+    TrendPercentage: number;
+}
+
 export default function SalesTrendsPage() {
     const getFormattedDate = (offset = 0) => {
         const d = new Date();
@@ -365,8 +374,20 @@ export default function SalesTrendsPage() {
     const totalOps = data?.timeSeries?.reduce((acc: number, curr: any) => acc + curr.Operaciones, 0) || 0;
     const ticketPromedio = totalOps > 0 ? totalSales / totalOps : 0;
     
-    const currentTotal = data?.branchTrends?.reduce((acc: number, curr: any) => acc + curr.CurrentTotal, 0) || 0;
-    const prevTotal = data?.branchTrends?.reduce((acc: number, curr: any) => acc + curr.PrevTotal, 0) || 0;
+    // `branchTrends` SIEMPRE llega con todas las sucursales, porque lo necesita la
+    // tabla comparativa de abajo. La variación es un KPI del periodo que se está
+    // viendo, así que tiene que respetar el filtro igual que Venta Total y
+    // Operaciones; sumarlo entero hacía que la cifra fuera la misma para
+    // cualquier sucursal.
+    const branchTrendsFiltrados = useMemo<TendenciaSucursal[]>(() => {
+        const filas: TendenciaSucursal[] = data?.branchTrends ?? [];
+        if (selectedStoreIds.length === 0) return filas;
+        const seleccionadas = new Set(selectedStoreIds.map(String));
+        return filas.filter(fila => seleccionadas.has(String(fila.IdTienda)));
+    }, [data, selectedStoreIds]);
+
+    const currentTotal = branchTrendsFiltrados.reduce((acc, fila) => acc + fila.CurrentTotal, 0);
+    const prevTotal = branchTrendsFiltrados.reduce((acc, fila) => acc + fila.PrevTotal, 0);
     const globalTrend = prevTotal > 0 ? ((currentTotal - prevTotal) / prevTotal) * 100 : 0;
 
     return (
