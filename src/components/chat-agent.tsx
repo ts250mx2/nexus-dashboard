@@ -459,7 +459,10 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
         const selectedModel = typeof window !== 'undefined'
             ? localStorage.getItem('ai_query_model') || 'claude-opus-4-7'
             : 'claude-opus-4-7';
-        const useStreaming = selectedModel.includes('claude');
+        // El servidor sabe con qué proveedor corre el agente y hace streaming con
+        // cualquiera de los dos SDK, así que siempre se le pide; si por alguna
+        // razón contesta JSON, más abajo se detecta por el content-type.
+        const useStreaming = true;
 
         if (streamControllerRef.current) {
             streamControllerRef.current.abort();
