@@ -81,3 +81,4 @@ export function createRateLimiter(config: RateLimitConfig): RateLimiter {
 export const queryLimiter = createRateLimiter({ windowMs: 60_000, max: 30 });
 export const alertCreateLimiter = createRateLimiter({ windowMs: 60_000, max: 10 });
 export const cronLimiter = createRateLimiter({ windowMs: 60_000, max: 5 });
+export const configLimiter = createRateLimiter({ windowMs: 60_000, max: 10 });

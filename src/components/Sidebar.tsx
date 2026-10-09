@@ -32,7 +32,9 @@ import {
     CalendarCheck,
     Boxes,
     Warehouse,
-    ClipboardList
+    ClipboardList,
+    Settings,
+    Mail
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
@@ -112,6 +114,14 @@ const sidebarItems: SidebarItem[] = [
             { name: 'Mis Reportes', href: '/dashboard/reportes-ia/mis-reportes', icon: FolderOpen, color: 'text-blue-900' }
         ]
     },
+    {
+        name: 'Configuración',
+        icon: Settings,
+        color: 'text-blue-900',
+        subItems: [
+            { name: 'Correo y Cierres', href: '/dashboard/configuracion/correo', icon: Mail, color: 'text-blue-900' }
+        ]
+    },
 ];
 
 interface SidebarProps {
@@ -128,6 +138,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, isMobileOpen, set
         'Compras': pathname.includes('/compras'),
         'Inventarios': pathname.includes('/inventarios'),
         'Precios y Costos': pathname.includes('/precios'),
+        'Configuración': pathname.includes('/configuracion'),
         'Reportes IA': pathname.includes('/reportes-ia'),
     });
 
@@ -145,6 +156,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, isMobileOpen, set
                 'Compras': pathname.includes('/compras'),
                 'Inventarios': pathname.includes('/inventarios'),
                 'Precios y Costos': pathname.includes('/precios'),
+        'Configuración': pathname.includes('/configuracion'),
                 'Reportes IA': pathname.includes('/reportes-ia'),
             });
         }
