@@ -10,8 +10,10 @@ export type AccesoAdmin = { ok: true; usuario: string } | { ok: false; status: 4
 
 export async function accesoAdmin(): Promise<AccesoAdmin> {
     const session = await getSession().catch(() => null);
-    const usuario = typeof session?.username === 'string' ? session.username : '';
-    if (!usuario) return { ok: false, status: 401, error: 'No autorizado' };
+    if (!session) return { ok: false, status: 401, error: 'No autorizado' };
+    const usuario = typeof session.username === 'string' ? session.username : '';
+    // Sesiones abiertas antes de corregir el login no traen el usuario.
+    if (!usuario) return { ok: false, status: 401, error: 'Tu sesión no trae el usuario. Cierra sesión y vuelve a entrar.' };
 
     const admins = (process.env.ADMIN_USERS ?? '')
         .split(',')

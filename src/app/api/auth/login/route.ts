@@ -16,7 +16,8 @@ export async function POST(request: NextRequest) {
 
         if (result && result.length > 0) {
             const user = result[0];
-            const sessionData = { username: user.login, id: user.IdUsuario }; // Adjust based on table schema
+            // Las columnas de tblUsuarios son Login / IdUsuario (MySQL respeta el nombre declarado).
+            const sessionData = { username: String(user.Login ?? user.login ?? username), id: user.IdUsuario };
             const expires = new Date(Date.now() + 2 * 60 * 60 * 1000); // 2 hours
             const session = await encrypt(sessionData);
 
