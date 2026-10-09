@@ -193,7 +193,8 @@ export default function DashboardLayout({
 
                     {/* Cerrar Sesión (Logout) */}
                     <button
-                        onClick={() => {
+                        onClick={async () => {
+                            await fetch('/api/auth/logout', { method: 'POST' }).catch(() => null);
                             window.location.href = '/login';
                         }}
                         className="flex items-center gap-2 p-2 px-3 text-xs font-bold uppercase tracking-wider text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg border border-slate-200 hover:border-red-200 transition-all cursor-pointer bg-white"
