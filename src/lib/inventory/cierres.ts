@@ -48,7 +48,7 @@ export function cierreEnCurso(): boolean {
     return enCurso !== null;
 }
 
-const ESQUEMA = process.env.CIERRES_SCHEMA || 'BDNexusWeb';
+export const ESQUEMA = process.env.CIERRES_SCHEMA || 'BDNexusWeb';
 if (!/^[A-Za-z0-9_]+$/.test(ESQUEMA)) {
     throw new Error(`CIERRES_SCHEMA inválido: ${ESQUEMA}`);
 }

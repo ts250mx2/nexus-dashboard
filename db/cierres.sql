@@ -55,5 +55,7 @@ CREATE TABLE IF NOT EXISTS BDNexusWeb.inventario_cierre_detalle (
 -- Retención: el portal conserva hoy + 3 días; la purga corre tras cada cierre:
 -- DELETE FROM BDNexusWeb.inventario_cierre WHERE Fecha < DATE_SUB(CURDATE(), INTERVAL 3 DAY);
 
--- Tarea programada (23:55, todos los días), desde el servidor del portal:
--- curl -X POST -H "x-cierre-token: <CIERRE_TOKEN de .env.local>" http://localhost:3012/api/inventarios/cierres
+-- Tarea programada (23:55, todos los días), desde el servidor del portal. Con
+-- ?enviar=1 manda el Excel a CIERRE_EMAIL_TO (requiere SMTP_HOST/PORT/USER/PASS)
+-- y guarda copia en CIERRE_EXCEL_DIR si está definido:
+-- curl -X POST -H "x-cierre-token: <CIERRE_TOKEN de .env.local>" "http://localhost:3012/api/inventarios/cierres?enviar=1"
