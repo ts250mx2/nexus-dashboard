@@ -18,7 +18,7 @@ import {
     Minimize
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { diasDesde, formatAntiguedad, formatDate } from '@/lib/format';
+import { diasDesde, formatAntiguedad, formatDate, formatHora } from '@/lib/format';
 import * as XLSX from 'xlsx';
 import {
     BarChart,
@@ -585,7 +585,7 @@ export default function CostoInventarioPage() {
                                                             'text-[10px] font-bold uppercase tracking-wider',
                                                             (diasDesde(row.UltimaVenta) ?? 0) >= 7 ? 'text-amber-600' : 'text-slate-400'
                                                         )}>
-                                                            {formatAntiguedad(row.UltimaVenta)}
+                                                            {formatHora(row.UltimaVenta)} · {formatAntiguedad(row.UltimaVenta)}
                                                         </span>
                                                     </div>
                                                 ) : (

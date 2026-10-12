@@ -41,6 +41,7 @@ import {
     formatCurrencyShort,
     formatDate,
     formatDecimal,
+    formatHora,
     formatInt,
 } from '@/lib/format';
 
@@ -162,7 +163,7 @@ function filasResumen(filas: SucursalRow[]): Record<string, unknown>[] {
     return filas.map(s => ({
         ...s,
         CoberturaRedondeada: s.CoberturaGlobal === null ? '' : Math.round(Number(s.CoberturaGlobal)),
-        UltimaVentaTexto: s.UltimaVenta ? formatDate(s.UltimaVenta) : 'Sin ventas',
+        UltimaVentaTexto: s.UltimaVenta ? `${formatDate(s.UltimaVenta)} ${formatHora(s.UltimaVenta)}` : 'Sin ventas',
     }));
 }
 
@@ -360,7 +361,7 @@ export default function InventarioPorSucursalPage() {
                     <div className="flex flex-col items-end leading-tight">
                         <span className="font-semibold text-slate-700">{formatDate(r.UltimaVenta)}</span>
                         <span className={`text-[10px] font-bold uppercase tracking-wider ${dias >= 7 ? 'text-amber-600' : 'text-slate-400'}`}>
-                            {formatAntiguedad(r.UltimaVenta)}
+                            {formatHora(r.UltimaVenta)} · {formatAntiguedad(r.UltimaVenta)}
                         </span>
                     </div>
                 );

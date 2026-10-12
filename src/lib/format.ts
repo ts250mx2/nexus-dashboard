@@ -70,6 +70,14 @@ export function formatDateTime(value: unknown): string {
     });
 }
 
+/** Solo la hora de una fecha ("06:53 p.m."), sin segundos: para tablas apretadas. */
+export function formatHora(value: unknown): string {
+    if (!value) return '';
+    const d = parseFecha(value);
+    if (Number.isNaN(d.getTime())) return '';
+    return d.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+}
+
 /**
  * Días completos de calendario entre una fecha y hoy. Se comparan días, no
  * bloques de 24 horas: una venta de anoche debe decir "Ayer", no "Hoy".

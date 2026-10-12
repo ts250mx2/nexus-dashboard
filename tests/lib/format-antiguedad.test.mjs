@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { diasDesde, formatAntiguedad } from '../../src/lib/format.ts';
+import { diasDesde, formatAntiguedad, formatHora } from '../../src/lib/format.ts';
 
 const HOY = new Date(2026, 9, 12, 15, 0, 0); // 12 de octubre de 2026, 3 de la tarde
 
@@ -41,5 +41,21 @@ describe('formatAntiguedad', () => {
 
     it('marca con raya una sucursal sin ventas', () => {
         assert.equal(formatAntiguedad(null, HOY), '—');
+    });
+});
+
+describe('formatHora', () => {
+    it('da la hora sin segundos', () => {
+        // Arrange / Act
+        const hora = formatHora(new Date(2026, 9, 12, 18, 53, 57));
+
+        // Assert: el formato de am/pm depende del ICU, pero la hora y el minuto no.
+        assert.match(hora, /6:53|18:53/);
+        assert.doesNotMatch(hora, /57/);
+    });
+
+    it('devuelve vacío cuando no hay fecha', () => {
+        assert.equal(formatHora(null), '');
+        assert.equal(formatHora('no es fecha'), '');
     });
 });
