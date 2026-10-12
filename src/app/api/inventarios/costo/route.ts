@@ -13,13 +13,23 @@ export async function GET(req: NextRequest) {
                 SUM(CASE WHEN A.Exi = 0 THEN 1 ELSE 0 END) AS ProductosCero,
                 SUM(CASE WHEN A.Exi < 0 THEN A.Exi * A.PrecioBase ELSE 0 END) AS CostoNegativo,
                 SUM(CASE WHEN A.Exi < 0 THEN 1 ELSE 0 END) AS ProductosNegativo,
-                SUM(CASE WHEN A.Exi < C.ExiMinRes AND C.ExiMinRes > 0 THEN 1 ELSE 0 END) AS EnAlerta
+                SUM(CASE WHEN A.Exi < C.ExiMinRes AND C.ExiMinRes > 0 THEN 1 ELSE 0 END) AS EnAlerta,
+                V.UltimaVenta
             FROM tblCostoInventario A
             INNER JOIN tblSucursales B ON A.IdSucursal = B.IdSucursal
             LEFT JOIN tblConfiguracionResurtido C ON A.IdArticulo = C.IdArticulo AND A.IdSucursal = C.IdSucursal
+            LEFT JOIN (
+                -- Se topa con NOW() porque la base tiene tickets con fecha futura
+                -- (hay uno de 2029 en Monterrey): sin el tope, esa sucursal
+                -- reportaría su última venta dentro de tres años.
+                SELECT IdSucursal, MAX(FechaVenta) AS UltimaVenta
+                FROM tblVentas
+                WHERE Status = 0 AND FechaVenta <= NOW()
+                GROUP BY IdSucursal
+            ) V ON V.IdSucursal = B.IdSucursal
             WHERE LOWER(B.Sucursal) NOT LIKE '%fiscal%'
               AND LOWER(B.Sucursal) NOT LIKE '%prueba%'
-            GROUP BY B.IdSucursal, B.Sucursal
+            GROUP BY B.IdSucursal, B.Sucursal, V.UltimaVenta
             ORDER BY B.IdSucursal
         `;
 

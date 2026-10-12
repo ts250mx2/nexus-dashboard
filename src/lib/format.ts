@@ -70,6 +70,28 @@ export function formatDateTime(value: unknown): string {
     });
 }
 
+/**
+ * Días completos de calendario entre una fecha y hoy. Se comparan días, no
+ * bloques de 24 horas: una venta de anoche debe decir "Ayer", no "Hoy".
+ * Devuelve null cuando no hay fecha.
+ */
+export function diasDesde(value: unknown, hoy = new Date()): number | null {
+    if (!value) return null;
+    const fecha = new Date(String(value));
+    if (Number.isNaN(fecha.getTime())) return null;
+    const soloDia = (d: Date) => Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
+    return Math.round((soloDia(hoy) - soloDia(fecha)) / 86_400_000);
+}
+
+/** "Hoy", "Ayer" o "Hace N días", para leer de un vistazo qué tan vieja es una fecha. */
+export function formatAntiguedad(value: unknown, hoy = new Date()): string {
+    const dias = diasDesde(value, hoy);
+    if (dias === null) return '—';
+    if (dias <= 0) return 'Hoy';
+    if (dias === 1) return 'Ayer';
+    return `Hace ${formatInt(dias)} días`;
+}
+
 export function formatTime(date = new Date()): string {
     return date.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 }

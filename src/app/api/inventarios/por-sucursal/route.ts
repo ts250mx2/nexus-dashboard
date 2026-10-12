@@ -31,6 +31,7 @@ interface SucursalRow {
     Exceso: number;
     SinRotacion: number;
     CoberturaGlobal: number | null;
+    UltimaVenta: string | null;
     CostoVenta: number;
     VentaPeriodo: number;
     DesdeMovimientos: number;
@@ -68,8 +69,9 @@ clasificado AS (
 
         const resumenSql = `${clasificado}
 SELECT
-    IdSucursal,
+    clasificado.IdSucursal,
     Sucursal,
+    V.UltimaVenta,
     COUNT(*)                                                   AS SkusTotales,
     SUM(CASE WHEN Exi > 0 THEN 1 ELSE 0 END)                   AS SkusConExistencia,
     SUM(CASE WHEN Exi = 0 THEN 1 ELSE 0 END)                   AS SkusEnCero,
@@ -87,7 +89,18 @@ SELECT
     SUM(VentaPeriodo)                                          AS VentaPeriodo,
     SUM(CASE WHEN Fuente = 'movimientos' THEN 1 ELSE 0 END)    AS DesdeMovimientos
 FROM clasificado
-GROUP BY IdSucursal, Sucursal
+LEFT JOIN (
+    -- La última venta sale de tblVentas y no de la demanda del periodo: lo que
+    -- interesa es cuándo vendió por última vez la sucursal, aunque haya sido
+    -- antes de la ventana. Se topa con NOW() porque la base tiene tickets con
+    -- fecha futura (hay uno de 2029) y si no, esa sucursal reportaría una venta
+    -- dentro de tres años.
+    SELECT IdSucursal, MAX(FechaVenta) AS UltimaVenta
+    FROM tblVentas
+    WHERE Status = 0 AND FechaVenta <= NOW()
+    GROUP BY IdSucursal
+) V ON V.IdSucursal = clasificado.IdSucursal
+GROUP BY clasificado.IdSucursal, Sucursal, V.UltimaVenta
 ORDER BY Valorizado DESC`;
 
         const data = (await query(resumenSql, params)) as SucursalRow[];

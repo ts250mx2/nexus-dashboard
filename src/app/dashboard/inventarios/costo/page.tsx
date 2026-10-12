@@ -18,6 +18,7 @@ import {
     Minimize
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { diasDesde, formatAntiguedad, formatDate } from '@/lib/format';
 import * as XLSX from 'xlsx';
 import {
     BarChart,
@@ -42,6 +43,8 @@ interface SucursalCostRow {
     CostoNegativo: number;
     ProductosNegativo: number;
     EnAlerta: number;
+    /** Fecha del último ticket de la sucursal; null en bodegas, que no venden. */
+    UltimaVenta: string | null;
 }
 
 interface GlobalKPIs {
@@ -209,6 +212,9 @@ export default function CostoInventarioPage() {
         return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(num);
     };
 
+    /** Milisegundos de la última venta; las sucursales sin ventas van al final. */
+    const tiempoDeVenta = (valor: string | null) => (valor ? new Date(valor).getTime() : 0);
+
     const formatNumber = (val: any) => {
         const num = Number(val);
         if (isNaN(num)) return '0';
@@ -226,12 +232,16 @@ export default function CostoInventarioPage() {
 
     const sortedSummaryData = useMemo(() => {
         if (!summarySort) return data;
+        const { key, direction } = summarySort;
+        const signo = direction === 'asc' ? 1 : -1;
+
+        // Cada tipo de columna se compara como lo que es. Antes todo pasaba por
+        // Number(), así que ordenar por Sucursal no hacía nada: el texto daba
+        // NaN y las comparaciones salían falsas.
         return [...data].sort((a, b) => {
-            const aVal = Number(a[summarySort.key]);
-            const bVal = Number(b[summarySort.key]);
-            if (aVal < bVal) return summarySort.direction === 'asc' ? -1 : 1;
-            if (aVal > bVal) return summarySort.direction === 'asc' ? 1 : -1;
-            return 0;
+            if (key === 'Sucursal') return signo * String(a.Sucursal).localeCompare(String(b.Sucursal), 'es');
+            if (key === 'UltimaVenta') return signo * (tiempoDeVenta(a.UltimaVenta) - tiempoDeVenta(b.UltimaVenta));
+            return signo * (Number(a[key]) - Number(b[key]));
         });
     }, [data, summarySort]);
 
@@ -543,6 +553,14 @@ export default function CostoInventarioPage() {
                                                 Productos en Alerta <ArrowUpDown size={12} />
                                             </div>
                                         </th>
+                                        <th
+                                            onClick={() => handleSortSummary('UltimaVenta')}
+                                            className="px-6 py-4 text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-slate-100 hover:text-slate-800 transition-colors text-right"
+                                        >
+                                            <div className="flex items-center justify-end gap-1">
+                                                Última Venta <ArrowUpDown size={12} />
+                                            </div>
+                                        </th>
                                         <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-center w-24">Acciones</th>
                                     </tr>
                                 </thead>
@@ -559,6 +577,21 @@ export default function CostoInventarioPage() {
                                             <td className="px-6 py-4 text-right font-bold text-amber-600 text-sm tabular-nums">{formatCurrency(row.CostoNegativo)}</td>
                                             <td className="px-6 py-4 text-right text-slate-500 font-semibold text-sm tabular-nums">{formatNumber(row.ProductosNegativo)}</td>
                                             <td className="px-6 py-4 text-right font-extrabold text-rose-600 text-sm tabular-nums">{formatNumber(row.EnAlerta)}</td>
+                                            <td className="px-6 py-4 text-right text-sm">
+                                                {row.UltimaVenta ? (
+                                                    <div className="flex flex-col items-end leading-tight">
+                                                        <span className="font-semibold text-slate-700 tabular-nums">{formatDate(row.UltimaVenta)}</span>
+                                                        <span className={cn(
+                                                            'text-[10px] font-bold uppercase tracking-wider',
+                                                            (diasDesde(row.UltimaVenta) ?? 0) >= 7 ? 'text-amber-600' : 'text-slate-400'
+                                                        )}>
+                                                            {formatAntiguedad(row.UltimaVenta)}
+                                                        </span>
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-slate-300 font-semibold">Sin ventas</span>
+                                                )}
+                                            </td>
                                             <td className="px-6 py-4 text-center" onClick={(e) => e.stopPropagation()}>
                                                 <button
                                                     onClick={() => fetchDetails(String(row.IdSucursal), row.Sucursal)}

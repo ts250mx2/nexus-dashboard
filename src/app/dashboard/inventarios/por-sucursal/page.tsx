@@ -34,9 +34,12 @@ import {
 import { useInventoryReport } from '@/hooks/use-inventory-report';
 import { getErrorMessage } from '@/lib/errors';
 import {
+    diasDesde,
+    formatAntiguedad,
     formatCobertura,
     formatCurrency,
     formatCurrencyShort,
+    formatDate,
     formatDecimal,
     formatInt,
 } from '@/lib/format';
@@ -56,6 +59,8 @@ interface SucursalRow {
     Exceso: number;
     SinRotacion: number;
     CoberturaGlobal: number | null;
+    /** Fecha del último ticket de la sucursal; null en bodegas, que no venden. */
+    UltimaVenta: string | null;
     CostoVenta: number;
     VentaPeriodo: number;
     DesdeMovimientos: number;
@@ -130,6 +135,7 @@ const COLUMNAS_RESUMEN = [
     colNumero('Exceso', 'Exceso', 12),
     colNumero('Sin rotación', 'SinRotacion', 14),
     colNumero('Cobertura (días)', 'CoberturaRedondeada', 16),
+    colTexto('Última venta', 'UltimaVentaTexto', 16),
 ];
 
 /**
@@ -156,6 +162,7 @@ function filasResumen(filas: SucursalRow[]): Record<string, unknown>[] {
     return filas.map(s => ({
         ...s,
         CoberturaRedondeada: s.CoberturaGlobal === null ? '' : Math.round(Number(s.CoberturaGlobal)),
+        UltimaVentaTexto: s.UltimaVenta ? formatDate(s.UltimaVenta) : 'Sin ventas',
     }));
 }
 
@@ -339,6 +346,25 @@ export default function InventarioPorSucursalPage() {
             align: 'right',
             sortValue: r => (r.CoberturaGlobal === null ? Number.MAX_SAFE_INTEGER : Number(r.CoberturaGlobal)),
             render: r => <span className="font-semibold text-slate-600">{formatCobertura(r.CoberturaGlobal)}</span>,
+        },
+        {
+            key: 'UltimaVenta',
+            label: 'Última venta',
+            align: 'right',
+            // Las sucursales sin ventas se van al fondo en vez de mezclarse con las recientes.
+            sortValue: r => (r.UltimaVenta ? new Date(r.UltimaVenta).getTime() : 0),
+            render: r => {
+                if (!r.UltimaVenta) return <span className="text-slate-300 font-semibold">Sin ventas</span>;
+                const dias = diasDesde(r.UltimaVenta) ?? 0;
+                return (
+                    <div className="flex flex-col items-end leading-tight">
+                        <span className="font-semibold text-slate-700">{formatDate(r.UltimaVenta)}</span>
+                        <span className={`text-[10px] font-bold uppercase tracking-wider ${dias >= 7 ? 'text-amber-600' : 'text-slate-400'}`}>
+                            {formatAntiguedad(r.UltimaVenta)}
+                        </span>
+                    </div>
+                );
+            },
         },
         {
             key: 'Fuente',
