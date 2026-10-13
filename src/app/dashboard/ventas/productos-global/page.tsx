@@ -92,72 +92,72 @@ function getPastDate(monthsAgo: number) {
 const CARD_THEMES = [
     {
         bg: "bg-gradient-to-br from-blue-500/[0.03] to-indigo-500/[0.03] hover:from-blue-500/[0.08] hover:to-indigo-500/[0.08]",
-        border: "border-slate-200/80 hover:border-blue-500/50",
+        border: "border-slate-200/80 dark:border-slate-700/80 hover:border-blue-500/50",
         selectedBg: "bg-gradient-to-br from-blue-500/15 via-indigo-500/10 to-transparent border-blue-600 shadow-md shadow-blue-500/10",
-        accentText: "text-blue-700",
+        accentText: "text-blue-700 dark:text-blue-400",
         iconContainer: "bg-gradient-to-tr from-blue-600 to-indigo-500 text-white shadow-lg shadow-blue-500/20",
-        arrowColor: "text-blue-500",
-        pillBg: "bg-blue-50 text-blue-700 border border-blue-100",
+        arrowColor: "text-blue-500 dark:text-blue-400",
+        pillBg: "bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border border-blue-100 dark:border-blue-900/60",
         badgeGlow: "shadow-blue-500/30"
     },
     {
         bg: "bg-gradient-to-br from-purple-500/[0.03] to-fuchsia-500/[0.03] hover:from-purple-500/[0.08] hover:to-fuchsia-500/[0.08]",
-        border: "border-slate-200/80 hover:border-purple-500/50",
+        border: "border-slate-200/80 dark:border-slate-700/80 hover:border-purple-500/50",
         selectedBg: "bg-gradient-to-br from-purple-500/15 via-fuchsia-500/10 to-transparent border-purple-600 shadow-md shadow-purple-500/10",
-        accentText: "text-purple-700",
+        accentText: "text-purple-700 dark:text-purple-400",
         iconContainer: "bg-gradient-to-tr from-purple-600 to-fuchsia-500 text-white shadow-lg shadow-purple-500/20",
-        arrowColor: "text-purple-500",
-        pillBg: "bg-purple-50 text-purple-700 border border-purple-100",
+        arrowColor: "text-purple-500 dark:text-purple-400",
+        pillBg: "bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-400 border border-purple-100 dark:border-purple-900/60",
         badgeGlow: "shadow-purple-500/30"
     },
     {
         bg: "bg-gradient-to-br from-emerald-500/[0.03] to-teal-500/[0.03] hover:from-emerald-500/[0.08] hover:to-teal-500/[0.08]",
-        border: "border-slate-200/80 hover:border-emerald-500/50",
+        border: "border-slate-200/80 dark:border-slate-700/80 hover:border-emerald-500/50",
         selectedBg: "bg-gradient-to-br from-emerald-500/15 via-teal-500/10 to-transparent border-emerald-600 shadow-md shadow-emerald-500/10",
-        accentText: "text-emerald-700",
+        accentText: "text-emerald-700 dark:text-emerald-400",
         iconContainer: "bg-gradient-to-tr from-emerald-600 to-teal-500 text-white shadow-lg shadow-emerald-500/20",
-        arrowColor: "text-emerald-500",
-        pillBg: "bg-emerald-50 text-emerald-700 border border-emerald-100",
+        arrowColor: "text-emerald-500 dark:text-emerald-400",
+        pillBg: "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/60",
         badgeGlow: "shadow-emerald-500/30"
     },
     {
         bg: "bg-gradient-to-br from-amber-500/[0.03] to-orange-500/[0.03] hover:from-amber-500/[0.08] hover:to-orange-500/[0.08]",
-        border: "border-slate-200/80 hover:border-amber-500/50",
+        border: "border-slate-200/80 dark:border-slate-700/80 hover:border-amber-500/50",
         selectedBg: "bg-gradient-to-br from-amber-500/15 via-orange-500/10 to-transparent border-amber-600 shadow-md shadow-amber-500/10",
         accentText: "text-amber-850",
         iconContainer: "bg-gradient-to-tr from-amber-600 to-orange-500 text-white shadow-lg shadow-amber-500/20",
-        arrowColor: "text-amber-600",
-        pillBg: "bg-amber-50 text-amber-700 border border-amber-100",
+        arrowColor: "text-amber-600 dark:text-amber-400",
+        pillBg: "bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-100 dark:border-amber-900/60",
         badgeGlow: "shadow-amber-500/30"
     },
     {
         bg: "bg-gradient-to-br from-rose-500/[0.03] to-pink-500/[0.03] hover:from-rose-500/[0.08] hover:to-pink-500/[0.08]",
-        border: "border-slate-200/80 hover:border-rose-500/50",
+        border: "border-slate-200/80 dark:border-slate-700/80 hover:border-rose-500/50",
         selectedBg: "bg-gradient-to-br from-rose-500/15 via-pink-500/10 to-transparent border-rose-600 shadow-md shadow-rose-500/10",
-        accentText: "text-rose-700",
+        accentText: "text-rose-700 dark:text-rose-400",
         iconContainer: "bg-gradient-to-tr from-rose-600 to-pink-500 text-white shadow-lg shadow-rose-500/20",
-        arrowColor: "text-rose-500",
-        pillBg: "bg-rose-50 text-rose-700 border border-rose-100",
+        arrowColor: "text-rose-500 dark:text-rose-400",
+        pillBg: "bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-100 dark:border-rose-900/60",
         badgeGlow: "shadow-rose-500/30"
     },
     {
         bg: "bg-gradient-to-br from-indigo-500/[0.03] to-blue-500/[0.03] hover:from-indigo-500/[0.08] hover:to-blue-500/[0.08]",
-        border: "border-slate-200/80 hover:border-indigo-500/50",
+        border: "border-slate-200/80 dark:border-slate-700/80 hover:border-indigo-500/50",
         selectedBg: "bg-gradient-to-br from-indigo-500/15 via-blue-500/10 to-transparent border-indigo-600 shadow-md shadow-indigo-500/10",
-        accentText: "text-indigo-700",
+        accentText: "text-indigo-700 dark:text-indigo-400",
         iconContainer: "bg-gradient-to-tr from-indigo-600 to-blue-500 text-white shadow-lg shadow-indigo-500/20",
-        arrowColor: "text-indigo-500",
-        pillBg: "bg-indigo-50 text-indigo-700 border border-indigo-100",
+        arrowColor: "text-indigo-500 dark:text-indigo-400",
+        pillBg: "bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900/60",
         badgeGlow: "shadow-indigo-500/30"
     },
     {
         bg: "bg-gradient-to-br from-cyan-500/[0.03] to-sky-500/[0.03] hover:from-cyan-500/[0.08] hover:to-sky-500/[0.08]",
-        border: "border-slate-200/80 hover:border-cyan-500/50",
+        border: "border-slate-200/80 dark:border-slate-700/80 hover:border-cyan-500/50",
         selectedBg: "bg-gradient-to-br from-cyan-500/15 via-sky-500/10 to-transparent border-cyan-600 shadow-md shadow-cyan-500/10",
-        accentText: "text-cyan-700",
+        accentText: "text-cyan-700 dark:text-cyan-400",
         iconContainer: "bg-gradient-to-tr from-cyan-600 to-sky-500 text-white shadow-lg shadow-cyan-500/20",
-        arrowColor: "text-cyan-500",
-        pillBg: "bg-cyan-50 text-cyan-700 border border-cyan-100",
+        arrowColor: "text-cyan-500 dark:text-cyan-400",
+        pillBg: "bg-cyan-50 dark:bg-cyan-950/40 text-cyan-700 dark:text-cyan-400 border border-cyan-100 dark:border-cyan-900/60",
         badgeGlow: "shadow-cyan-500/30"
     }
 ];
@@ -332,26 +332,26 @@ export default function ProductosGlobalPage() {
         if (active && payload && payload.length) {
             const dateStr = formatDateTick(label, trendsGroupBy);
             return (
-                <div className="bg-white/95 backdrop-blur-md p-4 rounded-xl shadow-xl border border-slate-200/60 max-w-xs space-y-2.5">
-                    <p className="text-xs font-black text-slate-800 tracking-tight uppercase border-b border-slate-100 pb-1.5">{dateStr}</p>
+                <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md p-4 rounded-xl shadow-xl border border-slate-200/60 dark:border-slate-700/60 max-w-xs space-y-2.5">
+                    <p className="text-xs font-black text-slate-800 dark:text-slate-100 tracking-tight uppercase border-b border-slate-100 dark:border-slate-800 pb-1.5">{dateStr}</p>
                     <div className="space-y-1 text-xs">
                         <div className="flex items-center justify-between gap-6">
-                            <span className="flex items-center gap-1.5 text-slate-500 font-semibold">
+                            <span className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 font-semibold">
                                 <span className="w-2 h-2 rounded-full bg-blue-600"></span>
                                 Venta total:
                             </span>
-                            <span className="font-extrabold text-blue-700">{formatCurrency(payload[0].value)}</span>
+                            <span className="font-extrabold text-blue-700 dark:text-blue-400">{formatCurrency(payload[0].value)}</span>
                         </div>
                         <div className="flex items-center justify-between gap-6">
-                            <span className="flex items-center gap-1.5 text-slate-500 font-semibold">
+                            <span className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 font-semibold">
                                 <span className="w-2 h-2 rounded-full bg-amber-500"></span>
                                 Cantidad:
                             </span>
-                            <span className="font-extrabold text-amber-700">{Number(payload[1]?.value || 0).toLocaleString()} un.</span>
+                            <span className="font-extrabold text-amber-700 dark:text-amber-400">{Number(payload[1]?.value || 0).toLocaleString()} un.</span>
                         </div>
                         {payload[0]?.payload?.NumeroTickets !== undefined && (
-                            <div className="flex items-center justify-between gap-6 border-t border-slate-100/80 pt-1 mt-1 text-[11px]">
-                                <span className="flex items-center gap-1.5 text-slate-400 font-medium">
+                            <div className="flex items-center justify-between gap-6 border-t border-slate-100/80 dark:border-slate-800/80 pt-1 mt-1 text-[11px]">
+                                <span className="flex items-center gap-1.5 text-slate-400 dark:text-slate-500 font-medium">
                                     Tickets:
                                 </span>
                                 <span className="font-bold text-slate-650">{payload[0].payload.NumeroTickets} tkt</span>
@@ -707,10 +707,10 @@ export default function ProductosGlobalPage() {
     return (
         <div className="space-y-6 pb-12">
             {/* Header with Filters & Periods */}
-            <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white py-4 px-6 rounded-2xl shadow-sm border border-slate-100 animate-in fade-in duration-500">
+            <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white dark:bg-slate-900 py-4 px-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 animate-in fade-in duration-500">
                 <div className="flex flex-col md:flex-row md:items-center gap-6">
-                    <h1 className="text-2xl font-black text-slate-800 tracking-tight uppercase flex items-center gap-3 select-none">
-                        <Package className="text-blue-600" />
+                    <h1 className="text-2xl font-black text-slate-800 dark:text-slate-100 tracking-tight uppercase flex items-center gap-3 select-none">
+                        <Package className="text-blue-600 dark:text-blue-400" />
                         Productos Global
                     </h1>
 
@@ -718,31 +718,31 @@ export default function ProductosGlobalPage() {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3">
-                    <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
-                        <Calendar size={16} className="text-blue-500" />
-                        <span className="text-[10px] font-bold text-slate-400 uppercase">Del</span>
+                    <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2">
+                        <Calendar size={16} className="text-blue-500 dark:text-blue-400" />
+                        <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">Del</span>
                         <input
                             type="date"
                             value={startDate}
                             onChange={(e) => handleParamChange('startDate', e.target.value)}
-                            className="bg-transparent text-xs font-bold text-slate-700 outline-none p-0 border-none h-auto w-28 cursor-pointer"
+                            className="bg-transparent text-xs font-bold text-slate-700 dark:text-slate-200 outline-none p-0 border-none h-auto w-28 cursor-pointer"
                         />
                     </div>
-                    <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
-                        <Calendar size={16} className="text-blue-500" />
-                        <span className="text-[10px] font-bold text-slate-400 uppercase">Al</span>
+                    <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2">
+                        <Calendar size={16} className="text-blue-500 dark:text-blue-400" />
+                        <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">Al</span>
                         <input
                             type="date"
                             value={endDate}
                             onChange={(e) => handleParamChange('endDate', e.target.value)}
-                            className="bg-transparent text-xs font-bold text-slate-700 outline-none p-0 border-none h-auto w-28 cursor-pointer"
+                            className="bg-transparent text-xs font-bold text-slate-700 dark:text-slate-200 outline-none p-0 border-none h-auto w-28 cursor-pointer"
                         />
                     </div>
                     <button
                         onClick={() => {
                             handleParamChange('startDate', startDate);
                         }}
-                        className="p-2.5 bg-slate-50 border border-slate-200 text-blue-600 hover:bg-slate-100 hover:border-slate-300 transition-all rounded-xl shadow-sm"
+                        className="p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-blue-600 dark:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600 transition-all rounded-xl shadow-sm"
                         disabled={loadingBranches || loadingArticulos}
                         title="Actualizar Datos"
                     >
@@ -751,7 +751,7 @@ export default function ProductosGlobalPage() {
                     <button
                         onClick={handleExportPDF}
                         disabled={exporting}
-                        className="flex items-center gap-2 px-4 py-2.5 bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-100 hover:border-rose-300 transition-all rounded-xl shadow-sm text-xs font-bold disabled:opacity-50"
+                        className="flex items-center gap-2 px-4 py-2.5 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/60 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/40 hover:border-rose-300 dark:hover:border-rose-700/60 transition-all rounded-xl shadow-sm text-xs font-bold disabled:opacity-50"
                         title="Exportar Reporte a PDF"
                     >
                         <FileText size={16} className={cn(exporting && "animate-pulse")} />
@@ -759,7 +759,7 @@ export default function ProductosGlobalPage() {
                     </button>
                     <button
                         onClick={handleExportExcel}
-                        className="flex items-center gap-2 px-4 py-2.5 bg-emerald-50 border border-emerald-200 text-emerald-700 hover:bg-emerald-100 hover:border-emerald-300 transition-all rounded-xl shadow-sm text-xs font-bold"
+                        className="flex items-center gap-2 px-4 py-2.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 hover:border-emerald-300 dark:hover:border-emerald-700/60 transition-all rounded-xl shadow-sm text-xs font-bold"
                         title="Exportar a Excel lo que se está viendo"
                     >
                         <Sheet size={16} />
@@ -770,25 +770,25 @@ export default function ProductosGlobalPage() {
 
             {!selectedSucursal && (
                 <section className="space-y-4 animate-in fade-in duration-300">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200/60 shadow-xs">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/60 dark:border-slate-700/60 shadow-xs">
                         <div>
-                            <h2 className="text-xl font-semibold text-slate-900">Sucursales</h2>
-                            <p className="text-sm text-slate-500">Haz clic en una sucursal para ver los artículos vendidos en ella.</p>
+                            <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-50">Sucursales</h2>
+                            <p className="text-sm text-slate-500 dark:text-slate-400">Haz clic en una sucursal para ver los artículos vendidos en ella.</p>
                         </div>
                         {/* Search Bar */}
-                        <div className="relative flex items-center bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 focus-within:ring-2 focus-within:ring-blue-500/10 focus-within:border-blue-500 transition-all w-full sm:w-64 max-w-sm">
-                            <Search size={16} className="text-slate-400 mr-2 shrink-0" />
+                        <div className="relative flex items-center bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 focus-within:ring-2 focus-within:ring-blue-500/10 focus-within:border-blue-500 transition-all w-full sm:w-64 max-w-sm">
+                            <Search size={16} className="text-slate-400 dark:text-slate-500 mr-2 shrink-0" />
                             <input
                                 type="text"
                                 placeholder="Buscar sucursal..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="bg-transparent text-xs font-semibold text-slate-700 outline-none p-0 border-none h-auto w-full"
+                                className="bg-transparent text-xs font-semibold text-slate-700 dark:text-slate-200 outline-none p-0 border-none h-auto w-full"
                             />
                             {searchTerm && (
                                 <button
                                     onClick={() => setSearchTerm('')}
-                                    className="p-1 hover:bg-slate-200/60 rounded-full transition-colors text-slate-400 hover:text-slate-650"
+                                    className="p-1 hover:bg-slate-200/60 dark:hover:bg-slate-800/60 rounded-full transition-colors text-slate-400 dark:text-slate-500 hover:text-slate-650"
                                 >
                                     <X size={12} />
                                 </button>
@@ -797,13 +797,13 @@ export default function ProductosGlobalPage() {
                     </div>
 
                     {loadingBranches ? (
-                        <div className="flex items-center justify-center h-48 rounded-3xl bg-white border border-slate-200">
-                            <Loader2 className="animate-spin text-blue-600" size={28} />
+                        <div className="flex items-center justify-center h-48 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+                            <Loader2 className="animate-spin text-blue-600 dark:text-blue-400" size={28} />
                         </div>
                     ) : errorBranches ? (
-                        <div className="rounded-3xl bg-red-50 border border-red-200 text-red-700 p-6">{errorBranches}</div>
+                        <div className="rounded-3xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 text-red-700 dark:text-red-400 p-6">{errorBranches}</div>
                     ) : filteredBranches.length === 0 && !showAllBranchesCard ? (
-                        <div className="rounded-3xl bg-slate-50 border border-slate-200 text-slate-500 p-8 text-center">No se encontraron sucursales que coincidan con su búsqueda.</div>
+                        <div className="rounded-3xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 p-8 text-center">No se encontraron sucursales que coincidan con su búsqueda.</div>
                     ) : (
                         <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                             {showAllBranchesCard && allBranchesTotal && (() => {
@@ -814,11 +814,11 @@ export default function ProductosGlobalPage() {
                                         onClick={() => handleSucursalSelect(allBranchesTotal)}
                                         className={cn(
                                             'cursor-pointer rounded-xl border p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg relative overflow-hidden group select-none flex flex-col justify-between min-h-[140px]',
-                                            isSelected ? theme.selectedBg : `bg-white ${theme.border} ${theme.bg}`
+                                            isSelected ? theme.selectedBg : `bg-white dark:bg-slate-900 ${theme.border} ${theme.bg}`
                                         )}
                                     >
                                         <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-indigo-500/10 to-transparent rounded-bl-full pointer-events-none transition-transform duration-500 group-hover:scale-110"></div>
-                                        <div className={cn("absolute left-0 top-0 bottom-0 w-1 transition-colors duration-300", isSelected ? "bg-gradient-to-b from-indigo-600 to-purple-600" : "bg-slate-200 group-hover:bg-indigo-500")}></div>
+                                        <div className={cn("absolute left-0 top-0 bottom-0 w-1 transition-colors duration-300", isSelected ? "bg-gradient-to-b from-indigo-600 to-purple-600" : "bg-slate-200 dark:bg-slate-800 group-hover:bg-indigo-500")}></div>
 
                                         <div>
                                             <div className="flex items-center justify-between gap-2 mb-3">
@@ -827,8 +827,8 @@ export default function ProductosGlobalPage() {
                                                         <LayoutGrid size={16} />
                                                     </div>
                                                     <div>
-                                                        <h3 className="text-sm font-extrabold text-slate-800 truncate max-w-[120px] tracking-tight">{allBranchesTotal.Nombre}</h3>
-                                                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Global</p>
+                                                        <h3 className="text-sm font-extrabold text-slate-800 dark:text-slate-100 truncate max-w-[120px] tracking-tight">{allBranchesTotal.Nombre}</h3>
+                                                        <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Global</p>
                                                     </div>
                                                 </div>
                                                 <div className={cn("transition-all duration-300 transform group-hover:translate-x-0.5", theme.arrowColor)}>
@@ -837,15 +837,15 @@ export default function ProductosGlobalPage() {
                                             </div>
                                         </div>
 
-                                        <div className="space-y-2 mt-auto pt-2 border-t border-slate-100/80">
+                                        <div className="space-y-2 mt-auto pt-2 border-t border-slate-100/80 dark:border-slate-800/80">
                                             <div className="flex items-baseline justify-between gap-1">
-                                                <span className="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Venta Global</span>
+                                                <span className="text-[9px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Venta Global</span>
                                                 <span className={cn("text-base font-black tracking-tight", theme.accentText)}>
                                                     {formatCurrency(allBranchesTotal.TotalVenta)}
                                                 </span>
                                             </div>
                                             <div className="flex items-center justify-between text-[11px]">
-                                                <span className="text-slate-400 font-semibold">Artículos Distintos</span>
+                                                <span className="text-slate-400 dark:text-slate-500 font-semibold">Artículos Distintos</span>
                                                 <span className={cn("font-bold text-[10px] px-2 py-0.25 rounded-full", theme.pillBg)}>
                                                     {allBranchesTotal.TotalProductos}
                                                 </span>
@@ -864,11 +864,11 @@ export default function ProductosGlobalPage() {
                                         onClick={() => handleSucursalSelect(branch)}
                                         className={cn(
                                             'cursor-pointer rounded-xl border p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg relative overflow-hidden group select-none flex flex-col justify-between min-h-[140px]',
-                                            isSelected ? theme.selectedBg : `bg-white ${theme.border} ${theme.bg}`
+                                            isSelected ? theme.selectedBg : `bg-white dark:bg-slate-900 ${theme.border} ${theme.bg}`
                                         )}
                                     >
                                         <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-current opacity-[0.04] rounded-bl-full pointer-events-none transition-transform duration-500 group-hover:scale-110"></div>
-                                        <div className={cn("absolute left-0 top-0 bottom-0 w-1 transition-colors duration-300", isSelected ? "bg-gradient-to-b from-blue-600 to-indigo-600" : "bg-slate-200 group-hover:bg-blue-500")}></div>
+                                        <div className={cn("absolute left-0 top-0 bottom-0 w-1 transition-colors duration-300", isSelected ? "bg-gradient-to-b from-blue-600 to-indigo-600" : "bg-slate-200 dark:bg-slate-800 group-hover:bg-blue-500")}></div>
 
                                         <div>
                                             <div className="flex items-center justify-between gap-2 mb-3">
@@ -877,8 +877,8 @@ export default function ProductosGlobalPage() {
                                                         <Store size={16} />
                                                     </div>
                                                     <div>
-                                                        <h3 className="text-sm font-extrabold text-slate-800 truncate max-w-[120px] tracking-tight">{branch.Nombre}</h3>
-                                                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Sucursal</p>
+                                                        <h3 className="text-sm font-extrabold text-slate-800 dark:text-slate-100 truncate max-w-[120px] tracking-tight">{branch.Nombre}</h3>
+                                                        <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Sucursal</p>
                                                     </div>
                                                 </div>
                                                 <div className={cn("transition-all duration-300 transform group-hover:translate-x-0.5", theme.arrowColor)}>
@@ -887,15 +887,15 @@ export default function ProductosGlobalPage() {
                                             </div>
                                         </div>
 
-                                        <div className="space-y-2 mt-auto pt-2 border-t border-slate-100/80">
+                                        <div className="space-y-2 mt-auto pt-2 border-t border-slate-100/80 dark:border-slate-800/80">
                                             <div className="flex items-baseline justify-between gap-1">
-                                                <span className="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Venta Total</span>
+                                                <span className="text-[9px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Venta Total</span>
                                                 <span className={cn("text-base font-black tracking-tight", theme.accentText)}>
                                                     {formatCurrency(branch.TotalVenta)}
                                                 </span>
                                             </div>
                                             <div className="flex items-center justify-between text-[11px]">
-                                                <span className="text-slate-400 font-semibold">Artículos Distintos</span>
+                                                <span className="text-slate-400 dark:text-slate-500 font-semibold">Artículos Distintos</span>
                                                 <span className={cn("font-bold text-[10px] px-2 py-0.25 rounded-full", theme.pillBg)}>
                                                     {branch.TotalProductos}
                                                 </span>
@@ -911,50 +911,50 @@ export default function ProductosGlobalPage() {
 
             {selectedSucursal && (
                 <section className="space-y-4">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200/60 shadow-xs animate-in fade-in duration-250">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/60 dark:border-slate-700/60 shadow-xs animate-in fade-in duration-250">
                         <div className="flex flex-col gap-1">
                             {/* Breadcrumbs */}
-                            <div className="flex items-center flex-wrap gap-1.5 text-xs font-bold text-slate-400 select-none">
+                            <div className="flex items-center flex-wrap gap-1.5 text-xs font-bold text-slate-400 dark:text-slate-500 select-none">
                                 <button
                                     onClick={clearSucursalSelection}
-                                    className="hover:text-blue-600 hover:underline transition-colors duration-150"
+                                    className="hover:text-blue-600 dark:hover:text-blue-400 hover:underline transition-colors duration-150"
                                 >
                                     Sucursales
                                 </button>
-                                <ChevronRight size={12} className="text-slate-300" />
-                                <span className="text-slate-800 font-extrabold">{selectedSucursal.Nombre}</span>
+                                <ChevronRight size={12} className="text-slate-300 dark:text-slate-700" />
+                                <span className="text-slate-800 dark:text-slate-100 font-extrabold">{selectedSucursal.Nombre}</span>
                             </div>
-                            <h2 className="text-lg font-black text-slate-800 tracking-tight uppercase mt-0.5">Artículos en {selectedSucursal.Nombre}</h2>
+                            <h2 className="text-lg font-black text-slate-800 dark:text-slate-100 tracking-tight uppercase mt-0.5">Artículos en {selectedSucursal.Nombre}</h2>
                         </div>
 
                         {/* Buscador + selector de vista */}
                         <div className="flex items-center gap-2 w-full md:w-auto">
-                            <div className="relative flex items-center bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 focus-within:ring-2 focus-within:ring-blue-500/10 focus-within:border-blue-500 transition-all w-full md:w-64 max-w-sm">
-                                <Search size={16} className="text-slate-400 mr-2 shrink-0" />
+                            <div className="relative flex items-center bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 focus-within:ring-2 focus-within:ring-blue-500/10 focus-within:border-blue-500 transition-all w-full md:w-64 max-w-sm">
+                                <Search size={16} className="text-slate-400 dark:text-slate-500 mr-2 shrink-0" />
                                 <input
                                     type="text"
                                     placeholder="Buscar artículo..."
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="bg-transparent text-xs font-semibold text-slate-700 outline-none p-0 border-none h-auto w-full"
+                                    className="bg-transparent text-xs font-semibold text-slate-700 dark:text-slate-200 outline-none p-0 border-none h-auto w-full"
                                 />
                                 {searchTerm && (
                                     <button
                                         onClick={() => setSearchTerm('')}
-                                        className="p-1 hover:bg-slate-200/60 rounded-full transition-colors text-slate-400 hover:text-slate-650"
+                                        className="p-1 hover:bg-slate-200/60 dark:hover:bg-slate-800/60 rounded-full transition-colors text-slate-400 dark:text-slate-500 hover:text-slate-650"
                                     >
                                         <X size={12} />
                                     </button>
                                 )}
                             </div>
 
-                            <div className="flex items-center gap-1 bg-slate-100 border border-slate-200 rounded-xl p-1 shrink-0">
+                            <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-1 shrink-0">
                                 <button
                                     onClick={() => setVistaArticulos('filas')}
                                     title="Ver como filas"
                                     className={cn(
                                         'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all',
-                                        vistaArticulos === 'filas' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'
+                                        vistaArticulos === 'filas' ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-50 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100'
                                     )}
                                 >
                                     <Rows3 size={12} /> Filas
@@ -964,7 +964,7 @@ export default function ProductosGlobalPage() {
                                     title="Ver como tarjetas"
                                     className={cn(
                                         'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all',
-                                        vistaArticulos === 'tarjetas' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'
+                                        vistaArticulos === 'tarjetas' ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-50 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100'
                                     )}
                                 >
                                     <LayoutGrid size={12} /> Tarjetas
@@ -974,19 +974,19 @@ export default function ProductosGlobalPage() {
                     </div>
 
                     {loadingArticulos ? (
-                        <div className="flex items-center justify-center h-48 rounded-3xl bg-white border border-slate-200">
-                            <Loader2 className="animate-spin text-blue-600" size={28} />
+                        <div className="flex items-center justify-center h-48 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+                            <Loader2 className="animate-spin text-blue-600 dark:text-blue-400" size={28} />
                         </div>
                     ) : errorArticulos ? (
-                        <div className="rounded-3xl bg-red-50 border border-red-200 text-red-700 p-6">{errorArticulos}</div>
+                        <div className="rounded-3xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 text-red-700 dark:text-red-400 p-6">{errorArticulos}</div>
                     ) : filteredArticulos.length === 0 ? (
-                        <div className="rounded-3xl bg-slate-50 border border-slate-200 text-slate-500 p-6">No se encontraron artículos vendidos para su búsqueda.</div>
+                        <div className="rounded-3xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 p-6">No se encontraron artículos vendidos para su búsqueda.</div>
                     ) : vistaArticulos === 'filas' ? (
-                        <div className="bg-white rounded-2xl border border-slate-200/60 shadow-xs overflow-hidden animate-in fade-in duration-300">
+                        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/60 dark:border-slate-700/60 shadow-xs overflow-hidden animate-in fade-in duration-300">
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left border-collapse">
                                     <thead>
-                                        <tr className="bg-slate-50 text-slate-500 border-b border-slate-100">
+                                        <tr className="bg-slate-50 dark:bg-slate-900 text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-slate-800">
                                             <th className="px-5 py-3.5 text-[10px] font-black uppercase tracking-widest">Código</th>
                                             <th className="px-5 py-3.5 text-[10px] font-black uppercase tracking-widest">Artículo</th>
                                             <th className="px-5 py-3.5 text-[10px] font-black uppercase tracking-widest text-right">Cantidad</th>
@@ -996,7 +996,7 @@ export default function ProductosGlobalPage() {
                                             <th className="px-5 py-3.5 text-[10px] font-black uppercase tracking-widest text-center w-20">Tendencia</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-slate-100">
+                                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                                         {filteredArticulos.map((art) => {
                                             const isSelected = selectedArticleForSales?.IdArticulo === art.IdArticulo;
                                             return (
@@ -1005,19 +1005,19 @@ export default function ProductosGlobalPage() {
                                                     onClick={() => handleArticleSelect(art)}
                                                     className={cn(
                                                         'cursor-pointer transition-colors',
-                                                        isSelected ? 'bg-amber-50/40' : 'hover:bg-slate-50/70'
+                                                        isSelected ? 'bg-amber-50/40 dark:bg-amber-950/40' : 'hover:bg-slate-50/70 dark:hover:bg-slate-900/70'
                                                     )}
                                                 >
-                                                    <td className="px-5 py-3 text-xs font-bold text-slate-500 tabular-nums whitespace-nowrap">{art.Codigo || art.IdArticulo}</td>
-                                                    <td className="px-5 py-3 text-sm font-semibold text-slate-800">{art.Articulo}</td>
-                                                    <td className="px-5 py-3 text-right text-sm font-bold text-slate-700 tabular-nums">{art.Cantidad}</td>
-                                                    <td className="px-5 py-3 text-right text-sm font-extrabold text-slate-900 tabular-nums">{formatCurrency(art.Total)}</td>
-                                                    <td className="px-5 py-3 text-right text-sm text-slate-500 font-semibold tabular-nums">{art.NumeroTickets}</td>
-                                                    <td className="px-5 py-3 text-right text-sm text-slate-500 font-semibold tabular-nums">{formatCurrency(art.TicketPromedio)}</td>
+                                                    <td className="px-5 py-3 text-xs font-bold text-slate-500 dark:text-slate-400 tabular-nums whitespace-nowrap">{art.Codigo || art.IdArticulo}</td>
+                                                    <td className="px-5 py-3 text-sm font-semibold text-slate-800 dark:text-slate-100">{art.Articulo}</td>
+                                                    <td className="px-5 py-3 text-right text-sm font-bold text-slate-700 dark:text-slate-200 tabular-nums">{art.Cantidad}</td>
+                                                    <td className="px-5 py-3 text-right text-sm font-extrabold text-slate-900 dark:text-slate-50 tabular-nums">{formatCurrency(art.Total)}</td>
+                                                    <td className="px-5 py-3 text-right text-sm text-slate-500 dark:text-slate-400 font-semibold tabular-nums">{art.NumeroTickets}</td>
+                                                    <td className="px-5 py-3 text-right text-sm text-slate-500 dark:text-slate-400 font-semibold tabular-nums">{formatCurrency(art.TicketPromedio)}</td>
                                                     <td className="px-5 py-3 text-center" onClick={(e) => e.stopPropagation()}>
                                                         <button
                                                             onClick={(e) => handleTrendsSelect(e, art)}
-                                                            className="p-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-700 rounded-lg transition-all border border-blue-100 hover:border-blue-200 cursor-pointer"
+                                                            className="p-1.5 bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/40 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-400 rounded-lg transition-all border border-blue-100 dark:border-blue-900/60 hover:border-blue-200 dark:hover:border-blue-800/60 cursor-pointer"
                                                             title="Ver tendencias de ventas"
                                                         >
                                                             <TrendingUp size={13} />
@@ -1039,41 +1039,41 @@ export default function ProductosGlobalPage() {
                                         key={art.IdArticulo}
                                         onClick={() => handleArticleSelect(art)}
                                         className={cn(
-                                            'cursor-pointer rounded-xl border border-slate-200/60 p-3.5 shadow-xs border-l-[3px] hover-premium transition-all duration-200 bg-white flex flex-col justify-between min-h-[135px]',
-                                            isSelected ? 'bg-amber-50/20 border-l-amber-600' : 'border-l-amber-500 hover:border-l-amber-600'
+                                            'cursor-pointer rounded-xl border border-slate-200/60 dark:border-slate-700/60 p-3.5 shadow-xs border-l-[3px] hover-premium transition-all duration-200 bg-white dark:bg-slate-900 flex flex-col justify-between min-h-[135px]',
+                                            isSelected ? 'bg-amber-50/20 dark:bg-amber-950/40 border-l-amber-600' : 'border-l-amber-500 hover:border-l-amber-600'
                                         )}
                                     >
                                         <div>
                                             <div className="flex items-start justify-between gap-2 mb-2">
                                                 <div className="flex items-start gap-1.5 min-w-0">
-                                                    <div className="bg-amber-500/10 w-7 h-7 rounded-md flex items-center justify-center text-amber-600 border border-amber-500/20 shrink-0 mt-0.5">
+                                                    <div className="bg-amber-500/10 w-7 h-7 rounded-md flex items-center justify-center text-amber-600 dark:text-amber-400 border border-amber-500/20 shrink-0 mt-0.5">
                                                         <FileText size={14} />
                                                     </div>
                                                     <div className="min-w-0 flex flex-col">
-                                                        <h3 className="text-xs font-extrabold text-slate-800 truncate tracking-tight min-w-0" title={art.Articulo}>{art.Articulo}</h3>
-                                                        <span className="text-[10px] text-slate-400 font-bold select-none tracking-wider mt-0.5">Código: #{art.Codigo || art.IdArticulo}</span>
+                                                        <h3 className="text-xs font-extrabold text-slate-800 dark:text-slate-100 truncate tracking-tight min-w-0" title={art.Articulo}>{art.Articulo}</h3>
+                                                        <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold select-none tracking-wider mt-0.5">Código: #{art.Codigo || art.IdArticulo}</span>
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-2 shrink-0">
                                                     <button
                                                         onClick={(e) => handleTrendsSelect(e, art)}
-                                                        className="p-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-700 rounded-lg transition-all border border-blue-100 hover:border-blue-200"
+                                                        className="p-1.5 bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/40 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-400 rounded-lg transition-all border border-blue-100 dark:border-blue-900/60 hover:border-blue-200 dark:hover:border-blue-800/60"
                                                         title="Ver tendencias de ventas"
                                                     >
                                                         <TrendingUp size={13} />
                                                     </button>
-                                                    <div className="text-slate-400 group-hover:translate-x-0.5 transition-transform"><ArrowRight size={14} /></div>
+                                                    <div className="text-slate-400 dark:text-slate-500 group-hover:translate-x-0.5 transition-transform"><ArrowRight size={14} /></div>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div className="space-y-1.5 text-[11px] text-slate-500 pt-2 border-t border-slate-100 mt-auto">
+                                        <div className="space-y-1.5 text-[11px] text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800 mt-auto">
                                             <div className="flex items-center justify-between">
-                                                <span className="font-semibold text-slate-400">Cantidad / Total</span>
-                                                <span className="font-bold text-slate-800">{art.Cantidad} · {formatCurrency(art.Total)}</span>
+                                                <span className="font-semibold text-slate-400 dark:text-slate-500">Cantidad / Total</span>
+                                                <span className="font-bold text-slate-800 dark:text-slate-100">{art.Cantidad} · {formatCurrency(art.Total)}</span>
                                             </div>
                                             <div className="flex items-center justify-between">
-                                                <span className="font-semibold text-slate-400">Tickets / Promedio</span>
+                                                <span className="font-semibold text-slate-400 dark:text-slate-500">Tickets / Promedio</span>
                                                 <span className="font-bold text-slate-850">{art.NumeroTickets} · {formatCurrency(art.TicketPromedio)}</span>
                                             </div>
                                         </div>
@@ -1086,12 +1086,12 @@ export default function ProductosGlobalPage() {
             )}
 
             {isArticleSalesModalOpen && selectedArticleForSales && (
-                <div className="fixed inset-0 z-[110] flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm">
-                    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden flex flex-col animate-in scale-in duration-200">
-                        <div className="flex items-center justify-between gap-4 border-b border-slate-200 px-6 py-5 bg-slate-50">
+                <div className="fixed inset-0 z-[110] flex items-center justify-center bg-slate-900/60 dark:bg-slate-50/60 p-4 backdrop-blur-sm">
+                    <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden flex flex-col animate-in scale-in duration-200">
+                        <div className="flex items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-700 px-6 py-5 bg-slate-50 dark:bg-slate-900">
                             <div>
-                                <h2 className="text-lg font-bold text-slate-900">Ventas del artículo</h2>
-                                <p className="text-sm text-slate-500">{selectedArticleForSales.Articulo} · {selectedSucursal?.Nombre || 'Todas las sucursales'}</p>
+                                <h2 className="text-lg font-bold text-slate-900 dark:text-slate-50">Ventas del artículo</h2>
+                                <p className="text-sm text-slate-500 dark:text-slate-400">{selectedArticleForSales.Articulo} · {selectedSucursal?.Nombre || 'Todas las sucursales'}</p>
                             </div>
                             <button
                                 onClick={() => {
@@ -1099,25 +1099,25 @@ export default function ProductosGlobalPage() {
                                     setSelectedArticleForSales(null);
                                     updateQueryParams({ articuloId: null });
                                 }}
-                                className="text-slate-550 hover:text-slate-900 transition-colors font-bold text-sm bg-slate-100 hover:bg-slate-200/80 px-4 py-2 rounded-xl"
+                                className="text-slate-550 hover:text-slate-900 dark:hover:text-slate-50 transition-colors font-bold text-sm bg-slate-100 dark:bg-slate-800 hover:bg-slate-200/80 dark:hover:bg-slate-800/80 px-4 py-2 rounded-xl"
                             >
                                 Cerrar
                             </button>
                         </div>
                         <div className="flex-1 overflow-auto p-6">
                             {loadingArticleSales ? (
-                                <div className="flex flex-col items-center justify-center h-64 text-slate-500">
-                                    <Loader2 className="animate-spin mb-4 text-blue-600" size={28} />
+                                <div className="flex flex-col items-center justify-center h-64 text-slate-500 dark:text-slate-400">
+                                    <Loader2 className="animate-spin mb-4 text-blue-600 dark:text-blue-400" size={28} />
                                     <p className="font-semibold text-sm">Cargando ventas del artículo...</p>
                                 </div>
                             ) : errorArticleSales ? (
-                                <div className="rounded-3xl bg-red-50 border border-red-200 text-red-700 p-6">{errorArticleSales}</div>
+                                <div className="rounded-3xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 text-red-700 dark:text-red-400 p-6">{errorArticleSales}</div>
                             ) : articleSales.length === 0 ? (
-                                <div className="rounded-3xl bg-slate-50 border border-slate-200 text-slate-500 p-6">No se encontraron ventas para este artículo.</div>
+                                <div className="rounded-3xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 p-6">No se encontraron ventas para este artículo.</div>
                             ) : (
-                                <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+                                <div className="overflow-hidden rounded-3xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm">
                                     <table className="min-w-full text-left text-sm">
-                                        <thead className="bg-slate-50 text-slate-500 uppercase tracking-[0.2em] text-[11px] border-b border-slate-200">
+                                        <thead className="bg-slate-50 dark:bg-slate-900 text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] text-[11px] border-b border-slate-200 dark:border-slate-700">
                                             <tr>
                                                 <th className="px-5 py-4">Folio</th>
                                                 <th className="px-5 py-4">Fecha</th>
@@ -1128,22 +1128,22 @@ export default function ProductosGlobalPage() {
                                                 <th className="px-5 py-4 text-right">Total Venta</th>
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-slate-200">
+                                        <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
                                             {articleSales.map((venta) => (
                                                 <tr
                                                     key={`${venta.IdVenta}-${venta.IdSucursal}`}
-                                                    className="cursor-pointer hover:bg-slate-50 transition-colors"
+                                                    className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors"
                                                     onClick={() => {
                                                         setSelectedVenta(venta);
                                                     }}
                                                 >
-                                                    <td className="px-5 py-4 font-medium text-slate-900">{venta.Folio}</td>
+                                                    <td className="px-5 py-4 font-medium text-slate-900 dark:text-slate-50">{venta.Folio}</td>
                                                     <td className="px-5 py-4 text-slate-650">{venta.Fecha}</td>
                                                     <td className="px-5 py-4 text-slate-650">{venta.Sucursal}</td>
                                                     <td className="px-5 py-4 text-slate-650">{venta.Cajero || '—'}</td>
-                                                    <td className="px-5 py-4 text-right text-slate-900 font-semibold">{venta.CantidadArticulo}</td>
-                                                    <td className="px-5 py-4 text-right text-slate-900 font-semibold">{formatCurrency(venta.TotalArticulo)}</td>
-                                                    <td className="px-5 py-4 text-right text-slate-900 font-semibold">{formatCurrency(venta.TotalVenta)}</td>
+                                                    <td className="px-5 py-4 text-right text-slate-900 dark:text-slate-50 font-semibold">{venta.CantidadArticulo}</td>
+                                                    <td className="px-5 py-4 text-right text-slate-900 dark:text-slate-50 font-semibold">{formatCurrency(venta.TotalArticulo)}</td>
+                                                    <td className="px-5 py-4 text-right text-slate-900 dark:text-slate-50 font-semibold">{formatCurrency(venta.TotalVenta)}</td>
                                                 </tr>
                                             ))}
                                         </tbody>
@@ -1156,17 +1156,17 @@ export default function ProductosGlobalPage() {
             )}
 
             {isTrendsModalOpen && selectedArticleForTrends && (
-                <div className="fixed inset-0 z-[110] flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm">
-                    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-5xl max-h-[95vh] overflow-hidden flex flex-col animate-in scale-in duration-200">
+                <div className="fixed inset-0 z-[110] flex items-center justify-center bg-slate-900/60 dark:bg-slate-50/60 p-4 backdrop-blur-sm">
+                    <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-5xl max-h-[95vh] overflow-hidden flex flex-col animate-in scale-in duration-200">
                         {/* Header */}
-                        <div className="flex items-center justify-between gap-4 border-b border-slate-200 px-6 py-4 bg-slate-50">
+                        <div className="flex items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-700 px-6 py-4 bg-slate-50 dark:bg-slate-900">
                             <div>
-                                <h2 className="text-lg font-extrabold text-slate-900 tracking-tight uppercase flex items-center gap-2 select-none">
-                                    <TrendingUp size={20} className="text-blue-600" />
+                                <h2 className="text-lg font-extrabold text-slate-900 dark:text-slate-50 tracking-tight uppercase flex items-center gap-2 select-none">
+                                    <TrendingUp size={20} className="text-blue-600 dark:text-blue-400" />
                                     Tendencias de venta de artículo
                                 </h2>
-                                <p className="text-xs font-semibold text-slate-500">
-                                    {selectedArticleForTrends.Articulo} · <span className="font-bold text-blue-600">{selectedSucursal?.Nombre || 'Todas las sucursales'}</span>
+                                <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                                    {selectedArticleForTrends.Articulo} · <span className="font-bold text-blue-600 dark:text-blue-400">{selectedSucursal?.Nombre || 'Todas las sucursales'}</span>
                                 </p>
                             </div>
                             <button
@@ -1175,7 +1175,7 @@ export default function ProductosGlobalPage() {
                                     setSelectedArticleForTrends(null);
                                     setTrendsData([]);
                                 }}
-                                className="p-2 hover:bg-slate-200/80 rounded-full transition-all text-slate-400 hover:text-slate-700"
+                                className="p-2 hover:bg-slate-200/80 dark:hover:bg-slate-800/80 rounded-full transition-all text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-200"
                                 title="Cerrar modal"
                             >
                                 <X size={20} />
@@ -1185,10 +1185,10 @@ export default function ProductosGlobalPage() {
                         {/* Content Scrollable */}
                         <div className="flex-1 overflow-auto p-6 space-y-6">
                             {/* Controls Row */}
-                            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200/60 shadow-xs">
+                            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200/60 dark:border-slate-700/60 shadow-xs">
                                 {/* Periodo selectors */}
                                 <div className="flex flex-wrap items-center gap-2">
-                                    <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mr-1">Periodo:</span>
+                                    <span className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider mr-1">Periodo:</span>
                                     {(['1m', '3m', '6m', '1y', 'custom'] as const).map((p) => {
                                         const labels = { '1m': '1 Mes', '3m': '3 Meses', '6m': '6 Meses', '1y': '1 Año', 'custom': 'Personalizado' };
                                         const active = trendsPeriod === p;
@@ -1200,7 +1200,7 @@ export default function ProductosGlobalPage() {
                                                     "px-3 py-1.5 text-xs font-bold rounded-xl border transition-all duration-200",
                                                     active
                                                         ? "bg-blue-600 border-blue-600 text-white shadow-xs"
-                                                        : "bg-white border-slate-200 text-slate-650 hover:bg-slate-50"
+                                                        : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-650 hover:bg-slate-50 dark:hover:bg-slate-900"
                                                 )}
                                             >
                                                 {labels[p]}
@@ -1212,31 +1212,31 @@ export default function ProductosGlobalPage() {
                                 {/* Date pickers for custom period */}
                                 {trendsPeriod === 'custom' && (
                                     <div className="flex flex-wrap items-center gap-2 animate-in fade-in slide-in-from-left-2 duration-200">
-                                        <div className="flex items-center gap-1.5 bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 shadow-2xs">
-                                            <span className="text-[9px] font-bold text-slate-400 uppercase">Del:</span>
+                                        <div className="flex items-center gap-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-2.5 py-1.5 shadow-2xs">
+                                            <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase">Del:</span>
                                             <input
                                                 type="date"
                                                 value={trendsStartDate}
                                                 onChange={(e) => setTrendsStartDate(e.target.value)}
-                                                className="bg-transparent text-xs font-bold text-slate-700 outline-none p-0 border-none h-auto w-24 cursor-pointer"
+                                                className="bg-transparent text-xs font-bold text-slate-700 dark:text-slate-200 outline-none p-0 border-none h-auto w-24 cursor-pointer"
                                             />
                                         </div>
-                                        <div className="flex items-center gap-1.5 bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 shadow-2xs">
-                                            <span className="text-[9px] font-bold text-slate-400 uppercase">Al:</span>
+                                        <div className="flex items-center gap-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-2.5 py-1.5 shadow-2xs">
+                                            <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase">Al:</span>
                                             <input
                                                 type="date"
                                                 value={trendsEndDate}
                                                 onChange={(e) => setTrendsEndDate(e.target.value)}
-                                                className="bg-transparent text-xs font-bold text-slate-700 outline-none p-0 border-none h-auto w-24 cursor-pointer"
+                                                className="bg-transparent text-xs font-bold text-slate-700 dark:text-slate-200 outline-none p-0 border-none h-auto w-24 cursor-pointer"
                                             />
                                         </div>
                                     </div>
                                 )}
 
                                 {/* Group by: Dia, Semana, Mes */}
-                                <div className="flex items-center gap-2 border-t lg:border-t-0 pt-3 lg:pt-0 border-slate-200/80">
-                                    <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mr-1">Agrupar por:</span>
-                                    <div className="bg-white border border-slate-200 rounded-xl p-0.5 flex shadow-2xs">
+                                <div className="flex items-center gap-2 border-t lg:border-t-0 pt-3 lg:pt-0 border-slate-200/80 dark:border-slate-700/80">
+                                    <span className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider mr-1">Agrupar por:</span>
+                                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-0.5 flex shadow-2xs">
                                         {(['dia', 'semana', 'mes'] as const).map((g) => {
                                             const labels = { dia: 'Día', semana: 'Semana', mes: 'Mes' };
                                             const active = trendsGroupBy === g;
@@ -1247,8 +1247,8 @@ export default function ProductosGlobalPage() {
                                                     className={cn(
                                                         "px-3 py-1.5 text-xs font-bold rounded-lg transition-all duration-200",
                                                         active
-                                                            ? "bg-slate-900 text-white shadow-xs"
-                                                            : "bg-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-50"
+                                                            ? "bg-slate-900 dark:bg-slate-50 text-white shadow-xs"
+                                                            : "bg-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-900"
                                                     )}
                                                 >
                                                     {labels[g]}
@@ -1262,46 +1262,46 @@ export default function ProductosGlobalPage() {
                             {/* Aggregate Metrics Row */}
                             <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
                                 {/* Venta Total */}
-                                <div className="bg-gradient-to-br from-blue-500/[0.02] to-indigo-500/[0.02] border border-slate-200/60 rounded-2xl p-4 flex flex-col justify-between shadow-xs select-none">
-                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Venta Total ($)</span>
-                                    <span className="text-xl font-black text-blue-700 tracking-tight mt-1">{formatCurrency(aggregateTrends.totalSales)}</span>
+                                <div className="bg-gradient-to-br from-blue-500/[0.02] to-indigo-500/[0.02] border border-slate-200/60 dark:border-slate-700/60 rounded-2xl p-4 flex flex-col justify-between shadow-xs select-none">
+                                    <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Venta Total ($)</span>
+                                    <span className="text-xl font-black text-blue-700 dark:text-blue-400 tracking-tight mt-1">{formatCurrency(aggregateTrends.totalSales)}</span>
                                 </div>
                                 {/* Unidades Vendidas */}
-                                <div className="bg-gradient-to-br from-amber-500/[0.02] to-orange-500/[0.02] border border-slate-200/60 rounded-2xl p-4 flex flex-col justify-between shadow-xs select-none">
-                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Unidades Vendidas</span>
-                                    <span className="text-xl font-black text-amber-700 tracking-tight mt-1">{Number(aggregateTrends.totalQuantity).toLocaleString()} un.</span>
+                                <div className="bg-gradient-to-br from-amber-500/[0.02] to-orange-500/[0.02] border border-slate-200/60 dark:border-slate-700/60 rounded-2xl p-4 flex flex-col justify-between shadow-xs select-none">
+                                    <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Unidades Vendidas</span>
+                                    <span className="text-xl font-black text-amber-700 dark:text-amber-400 tracking-tight mt-1">{Number(aggregateTrends.totalQuantity).toLocaleString()} un.</span>
                                 </div>
                                 {/* Tickets */}
-                                <div className="bg-gradient-to-br from-emerald-500/[0.02] to-teal-500/[0.02] border border-slate-200/60 rounded-2xl p-4 flex flex-col justify-between shadow-xs select-none">
-                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Tickets</span>
-                                    <span className="text-xl font-black text-emerald-700 tracking-tight mt-1">{Number(aggregateTrends.totalTickets).toLocaleString()} tkts.</span>
+                                <div className="bg-gradient-to-br from-emerald-500/[0.02] to-teal-500/[0.02] border border-slate-200/60 dark:border-slate-700/60 rounded-2xl p-4 flex flex-col justify-between shadow-xs select-none">
+                                    <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Total Tickets</span>
+                                    <span className="text-xl font-black text-emerald-700 dark:text-emerald-400 tracking-tight mt-1">{Number(aggregateTrends.totalTickets).toLocaleString()} tkts.</span>
                                 </div>
                                 {/* Ticket Promedio */}
-                                <div className="bg-gradient-to-br from-purple-500/[0.02] to-fuchsia-500/[0.02] border border-slate-200/60 rounded-2xl p-4 flex flex-col justify-between shadow-xs select-none">
-                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Ticket Promedio</span>
-                                    <span className="text-xl font-black text-purple-700 tracking-tight mt-1">{formatCurrency(aggregateTrends.averageTicket)}</span>
+                                <div className="bg-gradient-to-br from-purple-500/[0.02] to-fuchsia-500/[0.02] border border-slate-200/60 dark:border-slate-700/60 rounded-2xl p-4 flex flex-col justify-between shadow-xs select-none">
+                                    <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Ticket Promedio</span>
+                                    <span className="text-xl font-black text-purple-700 dark:text-purple-400 tracking-tight mt-1">{formatCurrency(aggregateTrends.averageTicket)}</span>
                                 </div>
                             </div>
 
                             {/* Chart Area */}
-                            <div className="bg-white rounded-3xl border border-slate-200 p-5 min-h-[400px] flex flex-col justify-center relative overflow-hidden shadow-xs">
+                            <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-700 p-5 min-h-[400px] flex flex-col justify-center relative overflow-hidden shadow-xs">
                                 {loadingTrends ? (
                                     <div className="flex flex-col items-center justify-center space-y-3">
-                                        <Loader2 className="animate-spin text-blue-600" size={36} />
-                                        <p className="text-sm font-semibold text-slate-500">Cargando datos de tendencias...</p>
+                                        <Loader2 className="animate-spin text-blue-600 dark:text-blue-400" size={36} />
+                                        <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">Cargando datos de tendencias...</p>
                                     </div>
                                 ) : errorTrends ? (
-                                    <div className="rounded-2xl bg-red-50 border border-red-200 text-red-700 p-6 max-w-lg mx-auto text-center">
+                                    <div className="rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 text-red-700 dark:text-red-400 p-6 max-w-lg mx-auto text-center">
                                         <p className="font-bold text-sm">Error al cargar datos</p>
-                                        <p className="text-xs text-red-600/90 mt-1">{errorTrends}</p>
+                                        <p className="text-xs text-red-600/90 dark:text-red-400/90 mt-1">{errorTrends}</p>
                                     </div>
                                 ) : trendsData.length === 0 ? (
                                     <div className="text-center py-12 max-w-sm mx-auto space-y-2 select-none">
-                                        <div className="w-12 h-12 bg-slate-50 text-slate-400 border border-slate-200/60 rounded-2xl flex items-center justify-center mx-auto shadow-2xs">
+                                        <div className="w-12 h-12 bg-slate-50 dark:bg-slate-900 text-slate-400 dark:text-slate-500 border border-slate-200/60 dark:border-slate-700/60 rounded-2xl flex items-center justify-center mx-auto shadow-2xs">
                                             <TrendingUp size={22} className="stroke-[1.5]" />
                                         </div>
-                                        <h3 className="font-extrabold text-slate-800 text-sm tracking-tight">Sin datos para graficar</h3>
-                                        <p className="text-xs text-slate-400 font-semibold leading-relaxed">No se registraron ventas de este producto en el periodo y sucursal seleccionados.</p>
+                                        <h3 className="font-extrabold text-slate-800 dark:text-slate-100 text-sm tracking-tight">Sin datos para graficar</h3>
+                                        <p className="text-xs text-slate-400 dark:text-slate-500 font-semibold leading-relaxed">No se registraron ventas de este producto en el periodo y sucursal seleccionados.</p>
                                     </div>
                                 ) : (
                                     <div className="w-full flex-1">
@@ -1313,11 +1313,11 @@ export default function ProductosGlobalPage() {
                                                         <stop offset="95%" stopColor="#2563eb" stopOpacity={0.01}/>
                                                     </linearGradient>
                                                 </defs>
-                                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--grafica-rejilla)" />
                                                 <XAxis
                                                     dataKey="Fecha"
                                                     tickFormatter={(str) => formatDateTick(str, trendsGroupBy)}
-                                                    stroke="#94a3b8"
+                                                    stroke="var(--grafica-eje)"
                                                     fontSize={10}
                                                     tickLine={false}
                                                     axisLine={false}
@@ -1346,7 +1346,7 @@ export default function ProductosGlobalPage() {
                                                     height={36}
                                                     iconType="circle"
                                                     iconSize={8}
-                                                    formatter={(value) => <span className="text-xs font-bold text-slate-600 select-none">{value}</span>}
+                                                    formatter={(value) => <span className="text-xs font-bold text-slate-600 dark:text-slate-300 select-none">{value}</span>}
                                                 />
                                                 <Area
                                                     yAxisId="left"
@@ -1376,14 +1376,14 @@ export default function ProductosGlobalPage() {
                         </div>
 
                         {/* Footer */}
-                        <div className="flex items-center justify-end gap-3 border-t border-slate-200 px-6 py-4 bg-slate-50">
+                        <div className="flex items-center justify-end gap-3 border-t border-slate-200 dark:border-slate-700 px-6 py-4 bg-slate-50 dark:bg-slate-900">
                             <button
                                 onClick={() => {
                                     setIsTrendsModalOpen(false);
                                     setSelectedArticleForTrends(null);
                                     setTrendsData([]);
                                 }}
-                                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-sm transition-all border border-slate-200"
+                                className="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-xl font-bold text-sm transition-all border border-slate-200 dark:border-slate-700"
                             >
                                 Cerrar Ventana
                             </button>

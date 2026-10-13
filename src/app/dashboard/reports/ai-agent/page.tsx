@@ -9,7 +9,7 @@ import { ChatAgent } from '@/components/chat-agent';
  */
 export default function AgentPage() {
     return (
-        <div className="fixed inset-0 lg:left-64 top-0 bg-slate-50">
+        <div className="fixed inset-0 lg:left-64 top-0 bg-slate-50 dark:bg-slate-900">
             <ChatAgent mode="embedded" />
         </div>
     );

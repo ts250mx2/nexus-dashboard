@@ -102,26 +102,26 @@ export default function HeatmapPage() {
     }, [fetchData]);
 
     const getIntensityColor = (value: number, max: number) => {
-        if (value === 0) return 'bg-slate-50 hover:bg-slate-100/80';
+        if (value === 0) return 'bg-slate-50 dark:bg-slate-900 hover:bg-slate-100/80 dark:hover:bg-slate-800/80';
         const ratio = value / max;
         
         if (selectedMetric === 'ventas') {
-            if (ratio < 0.2) return 'bg-blue-500/10 text-blue-700 hover:bg-blue-500/20';
-            if (ratio < 0.4) return 'bg-blue-500/30 text-blue-800 hover:bg-blue-500/40';
-            if (ratio < 0.6) return 'bg-blue-500/50 text-blue-900 hover:bg-blue-500/60';
+            if (ratio < 0.2) return 'bg-blue-500/10 text-blue-700 dark:text-blue-400 hover:bg-blue-500/20';
+            if (ratio < 0.4) return 'bg-blue-500/30 text-blue-800 dark:text-blue-300 hover:bg-blue-500/40';
+            if (ratio < 0.6) return 'bg-blue-500/50 text-blue-900 dark:text-blue-300 hover:bg-blue-500/60';
             if (ratio < 0.8) return 'bg-blue-500/70 text-white hover:bg-blue-500/80';
             return 'bg-blue-600 text-white hover:bg-blue-700';
         } else if (selectedMetric === 'operaciones') {
-            if (ratio < 0.2) return 'bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/20';
-            if (ratio < 0.4) return 'bg-emerald-500/30 text-emerald-800 hover:bg-emerald-500/40';
-            if (ratio < 0.6) return 'bg-emerald-500/50 text-emerald-900 hover:bg-emerald-500/60';
+            if (ratio < 0.2) return 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/20';
+            if (ratio < 0.4) return 'bg-emerald-500/30 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-500/40';
+            if (ratio < 0.6) return 'bg-emerald-500/50 text-emerald-900 dark:text-emerald-300 hover:bg-emerald-500/60';
             if (ratio < 0.8) return 'bg-emerald-500/70 text-white hover:bg-emerald-500/80';
             return 'bg-emerald-600 text-white hover:bg-emerald-700';
         } else {
             // Ticket Promedio - Amber
-            if (ratio < 0.2) return 'bg-amber-500/10 text-amber-700 hover:bg-amber-500/20';
-            if (ratio < 0.4) return 'bg-amber-500/30 text-amber-800 hover:bg-amber-500/40';
-            if (ratio < 0.6) return 'bg-amber-500/50 text-amber-900 hover:bg-amber-500/60';
+            if (ratio < 0.2) return 'bg-amber-500/10 text-amber-700 dark:text-amber-400 hover:bg-amber-500/20';
+            if (ratio < 0.4) return 'bg-amber-500/30 text-amber-800 dark:text-amber-300 hover:bg-amber-500/40';
+            if (ratio < 0.6) return 'bg-amber-500/50 text-amber-900 dark:text-amber-300 hover:bg-amber-500/60';
             if (ratio < 0.8) return 'bg-amber-500/70 text-white hover:bg-amber-500/80';
             return 'bg-amber-600 text-white hover:bg-amber-700';
         }
@@ -206,7 +206,7 @@ export default function HeatmapPage() {
                     const canvas = await html2canvas(heatmapRef.current, {
                         scale: 2,
                         useCORS: true,
-                        backgroundColor: '#ffffff',
+                        backgroundColor: 'var(--grafica-globo-fondo)',
                         logging: false
                     });
                     heatmapImgData = canvas.toDataURL('image/png');
@@ -279,14 +279,14 @@ export default function HeatmapPage() {
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {/* Header with Filters & Periods */}
-            <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white py-4 px-6 rounded-2xl shadow-sm border border-slate-100">
+            <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white dark:bg-slate-900 py-4 px-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
                 <div className="flex flex-col md:flex-row md:items-center gap-6">
-                    <h1 className="text-2xl font-black text-slate-800 tracking-tight uppercase flex items-center gap-3">
+                    <h1 className="text-2xl font-black text-slate-800 dark:text-slate-100 tracking-tight uppercase flex items-center gap-3">
                         <Flame 
                             className={cn(
                                 "transition-colors duration-300", 
-                                selectedMetric === 'ventas' ? "text-blue-500" : 
-                                selectedMetric === 'operaciones' ? "text-emerald-500" : "text-amber-500"
+                                selectedMetric === 'ventas' ? "text-blue-500 dark:text-blue-400" : 
+                                selectedMetric === 'operaciones' ? "text-emerald-500 dark:text-emerald-400" : "text-amber-500 dark:text-amber-400"
                             )} 
                             fill="currentColor" 
                         />
@@ -296,7 +296,7 @@ export default function HeatmapPage() {
 
                 <div className="flex flex-wrap items-center gap-3">
                     {/* Quick Date Period Buttons */}
-                    <div className="flex items-center gap-1 bg-slate-100 border border-slate-200 rounded-xl p-1 overflow-x-auto no-scrollbar">
+                    <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-1 overflow-x-auto no-scrollbar">
                         {periods.map(({ label, start, end }) => {
                             const isActive = fechaInicio === start && fechaFin === end;
                             return (
@@ -305,7 +305,7 @@ export default function HeatmapPage() {
                                     onClick={() => { setFechaInicio(start); setFechaFin(end); }}
                                     className={cn(
                                         'px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap',
-                                        isActive ? 'bg-blue-600 text-white shadow-sm font-black' : 'text-slate-500 hover:text-slate-800 hover:bg-white/50'
+                                        isActive ? 'bg-blue-600 text-white shadow-sm font-black' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-white/50 dark:hover:bg-slate-900/50'
                                     )}
                                 >
                                     {label}
@@ -315,28 +315,28 @@ export default function HeatmapPage() {
                     </div>
 
                     <div className="flex items-center gap-3">
-                        <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
-                            <Calendar size={16} className="text-blue-500" />
+                        <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2">
+                            <Calendar size={16} className="text-blue-500 dark:text-blue-400" />
                             <input
                                 type="date"
                                 value={fechaInicio}
                                 onChange={(e) => setFechaInicio(e.target.value)}
-                                className="bg-transparent text-xs font-bold text-slate-700 outline-none p-0 border-none h-auto w-28"
+                                className="bg-transparent text-xs font-bold text-slate-700 dark:text-slate-200 outline-none p-0 border-none h-auto w-28"
                             />
                         </div>
-                        <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
-                            <Calendar size={16} className="text-blue-500" />
+                        <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2">
+                            <Calendar size={16} className="text-blue-500 dark:text-blue-400" />
                             <input
                                 type="date"
                                 value={fechaFin}
                                 onChange={(e) => setFechaFin(e.target.value)}
-                                className="bg-transparent text-xs font-bold text-slate-700 outline-none p-0 border-none h-auto w-28"
+                                className="bg-transparent text-xs font-bold text-slate-700 dark:text-slate-200 outline-none p-0 border-none h-auto w-28"
                             />
                         </div>
                         <button
                             onClick={handleExportPDF}
                             disabled={exporting}
-                            className="flex items-center gap-2 px-4 py-2.5 bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-100 hover:border-rose-300 transition-all rounded-xl shadow-sm text-xs font-bold disabled:opacity-50"
+                            className="flex items-center gap-2 px-4 py-2.5 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/60 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/40 hover:border-rose-300 dark:hover:border-rose-700/60 transition-all rounded-xl shadow-sm text-xs font-bold disabled:opacity-50"
                             title="Exportar Reporte a PDF"
                         >
                             <FileText size={16} className={cn(exporting && "animate-pulse")} />
@@ -344,7 +344,7 @@ export default function HeatmapPage() {
                         </button>
                         <button
                             onClick={fetchData}
-                            className="p-2.5 bg-slate-50 border border-slate-200 text-blue-600 hover:bg-slate-100 hover:border-slate-300 transition-all rounded-xl shadow-sm"
+                            className="p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-blue-600 dark:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600 transition-all rounded-xl shadow-sm"
                             title="Actualizar Datos"
                         >
                             <RefreshCcw size={16} className={cn(loading && "animate-spin")} />
@@ -357,27 +357,27 @@ export default function HeatmapPage() {
             <div className="flex flex-col lg:flex-row gap-6">
                 {/* Branch selector list card */}
                 <div className="lg:w-72 shrink-0">
-                    <div className="bg-white border border-slate-100 shadow-sm overflow-hidden flex flex-col h-[580px] rounded-2xl">
-                        <div className="p-4 bg-slate-50 border-b border-slate-100">
-                             <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                    <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col h-[580px] rounded-2xl">
+                        <div className="p-4 bg-slate-50 dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800">
+                             <h2 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest flex items-center gap-2">
                                 <Store size={14} />
                                 Seleccionar Sucursal
                              </h2>
                         </div>
-                        <div className="flex-1 overflow-y-auto no-scrollbar p-3 space-y-1 bg-white">
+                        <div className="flex-1 overflow-y-auto no-scrollbar p-3 space-y-1 bg-white dark:bg-slate-900">
                             <button
                                 onClick={() => setSelectedStoreId('all')}
                                 className={cn(
                                     "w-full flex items-center justify-between p-3.5 transition-all border-l-4 rounded-xl group mb-2",
                                     selectedStoreId === 'all' 
-                                        ? "bg-slate-900 text-white border-slate-900 shadow-md shadow-slate-900/10"
-                                        : "bg-white text-slate-600 border-transparent hover:bg-slate-50 hover:border-slate-200"
+                                        ? "bg-slate-900 dark:bg-slate-50 text-white border-slate-900 dark:border-slate-100 shadow-md shadow-slate-900/10"
+                                        : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-transparent hover:bg-slate-50 dark:hover:bg-slate-900 hover:border-slate-200 dark:hover:border-slate-700"
                                 )}
                             >
                                 <div className="flex items-center gap-3">
                                     <div className={cn(
                                         "w-8 h-8 rounded-lg flex items-center justify-center text-xs font-black transition-all",
-                                        selectedStoreId === 'all' ? "bg-white/20 text-white" : "bg-slate-100 text-slate-400 group-hover:bg-slate-200"
+                                        selectedStoreId === 'all' ? "bg-white/20 dark:bg-slate-900/20 text-white" : "bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 group-hover:bg-slate-200 dark:group-hover:bg-slate-800"
                                     )}>
                                         AZ
                                     </div>
@@ -399,8 +399,8 @@ export default function HeatmapPage() {
                                         className={cn(
                                             "w-full flex items-center justify-between p-3.5 transition-all border-l-4 rounded-xl group",
                                             isActive 
-                                                ? "bg-white text-slate-900 shadow-sm ring-1 ring-slate-100 border-l-4"
-                                                : "bg-white text-slate-600 border-transparent hover:bg-slate-50"
+                                                ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-50 shadow-sm ring-1 ring-slate-100 border-l-4"
+                                                : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-transparent hover:bg-slate-50 dark:hover:bg-slate-900"
                                         )}
                                         style={{ borderLeftColor: isActive ? color : 'transparent' }}
                                     >
@@ -413,11 +413,11 @@ export default function HeatmapPage() {
                                             </div>
                                             <span className={cn(
                                                 "text-xs font-black tracking-tight uppercase",
-                                                isActive ? "text-slate-900" : "text-slate-500 group-hover:text-slate-800"
+                                                isActive ? "text-slate-900 dark:text-slate-50" : "text-slate-500 dark:text-slate-400 group-hover:text-slate-800 dark:group-hover:text-slate-100"
                                             )}>{store.Tienda}</span>
                                         </div>
                                         <ChevronRight size={14} className={cn(
-                                            "transition-transform text-slate-400",
+                                            "transition-transform text-slate-400 dark:text-slate-500",
                                             isActive ? "translate-x-0" : "-translate-x-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-0"
                                         )} />
                                     </button>
@@ -429,35 +429,35 @@ export default function HeatmapPage() {
 
                 {/* Heatmap Grid Area */}
                 <div className="flex-1 min-w-0">
-                    <div ref={heatmapRef} className="bg-white border border-slate-100 shadow-sm relative p-5 h-[580px] rounded-2xl flex flex-col">
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 pb-4 border-b border-slate-100">
+                    <div ref={heatmapRef} className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm relative p-5 h-[580px] rounded-2xl flex flex-col">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 pb-4 border-b border-slate-100 dark:border-slate-800">
                             <div className="flex items-center gap-2">
                                 <span className={cn(
                                     "w-2.5 h-2.5 rounded-full shrink-0",
                                     selectedMetric === 'ventas' ? "bg-blue-500 animate-ping" : 
                                     selectedMetric === 'operaciones' ? "bg-emerald-500 animate-ping" : "bg-amber-500 animate-ping"
                                 )} />
-                                <h2 className="text-base font-black text-slate-800 uppercase tracking-tight flex items-center gap-2">
+                                <h2 className="text-base font-black text-slate-800 dark:text-slate-100 uppercase tracking-tight flex items-center gap-2">
                                     {selectedMetric === 'ventas' ? 'Distribución de Ventas' : selectedMetric === 'operaciones' ? 'Distribución de Operaciones' : 'Distribución de Ticket Promedio'}
-                                    <span className="text-slate-300 font-light">/</span>
+                                    <span className="text-slate-300 dark:text-slate-700 font-light">/</span>
                                     <span className={cn(
                                         "text-xs font-bold uppercase tracking-wider",
-                                        selectedMetric === 'ventas' ? "text-blue-600" : 
-                                        selectedMetric === 'operaciones' ? "text-emerald-600" : "text-amber-600"
+                                        selectedMetric === 'ventas' ? "text-blue-600 dark:text-blue-400" : 
+                                        selectedMetric === 'operaciones' ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"
                                     )}>
                                         {selectedStoreId === 'all' ? 'Todas las sucursales' : stores.find(s => s.IdSucursal.toString() === selectedStoreId)?.Tienda}
                                     </span>
                                 </h2>
                             </div>
 
-                            <div className="flex items-center gap-1 bg-slate-100 border border-slate-200 rounded-xl p-1 shrink-0 select-none">
+                            <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-1 shrink-0 select-none">
                                 <button
                                     onClick={() => setSelectedMetric('ventas')}
                                     className={cn(
                                         'px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap',
                                         selectedMetric === 'ventas' 
                                             ? 'bg-blue-600 text-white shadow-sm font-black' 
-                                            : 'text-slate-500 hover:text-slate-800 hover:bg-white/50'
+                                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-white/50 dark:hover:bg-slate-900/50'
                                     )}
                                 >
                                     Venta
@@ -468,7 +468,7 @@ export default function HeatmapPage() {
                                         'px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap',
                                         selectedMetric === 'operaciones' 
                                             ? 'bg-emerald-600 text-white shadow-sm font-black' 
-                                            : 'text-slate-500 hover:text-slate-800 hover:bg-white/50'
+                                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-white/50 dark:hover:bg-slate-900/50'
                                     )}
                                 >
                                     Operaciones
@@ -479,7 +479,7 @@ export default function HeatmapPage() {
                                         'px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap',
                                         selectedMetric === 'ticket_promedio' 
                                             ? 'bg-amber-600 text-white shadow-sm font-black' 
-                                            : 'text-slate-500 hover:text-slate-800 hover:bg-white/50'
+                                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-white/50 dark:hover:bg-slate-900/50'
                                     )}
                                 >
                                     Ticket Promedio
@@ -488,9 +488,9 @@ export default function HeatmapPage() {
                         </div>
 
                         {loading && (
-                            <div className="absolute inset-0 z-50 bg-white/70 backdrop-blur-[1px] flex flex-col items-center justify-center gap-3 rounded-2xl">
-                                <RefreshCcw size={32} className="animate-spin text-blue-500" />
-                                <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest animate-pulse">Generando Mapa...</p>
+                            <div className="absolute inset-0 z-50 bg-white/70 dark:bg-slate-900/70 backdrop-blur-[1px] flex flex-col items-center justify-center gap-3 rounded-2xl">
+                                <RefreshCcw size={32} className="animate-spin text-blue-500 dark:text-blue-400" />
+                                <p className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-widest animate-pulse">Generando Mapa...</p>
                             </div>
                         )}
 
@@ -502,7 +502,7 @@ export default function HeatmapPage() {
                                     <div className="flex-1 flex">
                                         {HOURS.map(hour => (
                                             <div key={hour} className="flex-1 text-center relative h-6">
-                                                <span className="text-[9px] font-black text-slate-400 text-center block absolute left-1/2 -translate-x-1/2 rotate-[-45deg] origin-center -translate-y-4 whitespace-nowrap">
+                                                <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 text-center block absolute left-1/2 -translate-x-1/2 rotate-[-45deg] origin-center -translate-y-4 whitespace-nowrap">
                                                     {hour}
                                                 </span>
                                             </div>
@@ -518,7 +518,7 @@ export default function HeatmapPage() {
                                         return (
                                             <div key={day} className="flex items-center">
                                                 <div className="w-24 shrink-0 pr-4">
-                                                    <span className="text-[11px] font-black text-slate-500 uppercase tracking-tighter text-right block">
+                                                    <span className="text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-tighter text-right block">
                                                         {day}
                                                     </span>
                                                 </div>
@@ -537,21 +537,21 @@ export default function HeatmapPage() {
                                                             >
                                                                 {val > 0 && (
                                                                     <div className={cn(
-                                                                        "absolute left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 bg-slate-900 text-white z-50 transition-all pointer-events-none p-3 rounded-xl shadow-2xl border border-slate-800 w-44 leading-relaxed",
+                                                                        "absolute left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 bg-slate-900 dark:bg-slate-50 text-white z-50 transition-all pointer-events-none p-3 rounded-xl shadow-2xl border border-slate-800 dark:border-slate-200 w-44 leading-relaxed",
                                                                         dIdx < 3 ? "top-full mt-2" : "bottom-full mb-2"
                                                                     )}>
-                                                                        <p className="text-[9px] font-black uppercase text-slate-400 mb-1.5 text-center tracking-wider">{day} @ {h}:00</p>
+                                                                        <p className="text-[9px] font-black uppercase text-slate-400 dark:text-slate-500 mb-1.5 text-center tracking-wider">{day} @ {h}:00</p>
                                                                         <div className="space-y-1 text-xs">
                                                                             <div className="flex justify-between items-center gap-4">
-                                                                                <span className="text-slate-400 font-medium">Monto Venta:</span>
+                                                                                <span className="text-slate-400 dark:text-slate-500 font-medium">Monto Venta:</span>
                                                                                 <span className="font-black text-white">{formatValue(matrix[`${diaId}-${h}-sales`] || 0)}</span>
                                                                             </div>
                                                                             <div className="flex justify-between items-center gap-4">
-                                                                                <span className="text-slate-400 font-medium">Tickets (Ops):</span>
+                                                                                <span className="text-slate-400 dark:text-slate-500 font-medium">Tickets (Ops):</span>
                                                                                 <span className="font-black text-emerald-400">{matrix[`${diaId}-${h}-tickets`] || 0}</span>
                                                                             </div>
-                                                                            <div className="flex justify-between items-center gap-4 pt-1 border-t border-slate-800 mt-1">
-                                                                                <span className="text-slate-400 font-medium">Ticket Prom:</span>
+                                                                            <div className="flex justify-between items-center gap-4 pt-1 border-t border-slate-800 dark:border-slate-200 mt-1">
+                                                                                <span className="text-slate-400 dark:text-slate-500 font-medium">Ticket Prom:</span>
                                                                                 <span className="font-black text-amber-400">
                                                                                     {formatValue((matrix[`${diaId}-${h}-sales`] || 0) / (matrix[`${diaId}-${h}-tickets`] || 1))}
                                                                                 </span>
@@ -571,13 +571,13 @@ export default function HeatmapPage() {
                         </div>
 
                         {/* Legend */}
-                        <div className="mt-auto flex items-center justify-end gap-4 border-t border-slate-100 pt-4">
-                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">
+                        <div className="mt-auto flex items-center justify-end gap-4 border-t border-slate-100 dark:border-slate-800 pt-4">
+                            <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest leading-none">
                                 Intensidad ({selectedMetric === 'ventas' ? 'Venta' : selectedMetric === 'operaciones' ? 'Operaciones' : 'Ticket Promedio'}):
                             </span>
                             <div className="flex items-center gap-1">
-                                <span className="text-[9px] font-bold text-slate-400 mr-1">Menor</span>
-                                <div className="w-5 h-5 rounded bg-slate-100 border border-slate-200/50" />
+                                <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 mr-1">Menor</span>
+                                <div className="w-5 h-5 rounded bg-slate-100 dark:bg-slate-800 border border-slate-200/50 dark:border-slate-700/50" />
                                 <div className={cn("w-5 h-5 rounded", 
                                     selectedMetric === 'ventas' ? "bg-blue-500/10" : 
                                     selectedMetric === 'operaciones' ? "bg-emerald-500/10" : "bg-amber-500/10"
@@ -598,7 +598,7 @@ export default function HeatmapPage() {
                                     selectedMetric === 'ventas' ? "bg-blue-600" : 
                                     selectedMetric === 'operaciones' ? "bg-emerald-600" : "bg-amber-600"
                                 )} />
-                                <span className="text-[9px] font-bold text-slate-400 ml-1">Mayor</span>
+                                <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 ml-1">Mayor</span>
                             </div>
                         </div>
                     </div>

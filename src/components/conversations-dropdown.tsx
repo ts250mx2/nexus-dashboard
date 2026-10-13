@@ -97,7 +97,7 @@ export function ConversationsDropdown({ activeId, onSelect, onNew, refreshKey }:
         <div ref={containerRef} className="relative">
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl hover:bg-slate-100 transition-colors text-slate-500"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-500 dark:text-slate-400"
                 title="Historial de conversaciones"
             >
                 <History className="w-4 h-4" />
@@ -105,9 +105,9 @@ export function ConversationsDropdown({ activeId, onSelect, onNew, refreshKey }:
             </button>
 
             {isOpen && (
-                <div className="absolute right-0 top-full mt-2 w-[340px] max-h-[500px] bg-white border border-slate-200 rounded-2xl shadow-xl z-50 overflow-hidden flex flex-col animate-in fade-in slide-in-from-top-2 duration-200">
-                    <div className="p-3 border-b border-slate-100 flex items-center justify-between">
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+                <div className="absolute right-0 top-full mt-2 w-[340px] max-h-[500px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl z-50 overflow-hidden flex flex-col animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="p-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
                             Tus conversaciones
                         </span>
                         <button
@@ -124,17 +124,17 @@ export function ConversationsDropdown({ activeId, onSelect, onNew, refreshKey }:
 
                     <div className="flex-1 overflow-y-auto">
                         {loading && conversations.length === 0 ? (
-                            <div className="p-8 flex flex-col items-center gap-2 text-slate-400">
+                            <div className="p-8 flex flex-col items-center gap-2 text-slate-400 dark:text-slate-500">
                                 <Loader2 className="w-5 h-5 animate-spin" />
                                 <span className="text-[11px] font-medium">Cargando...</span>
                             </div>
                         ) : conversations.length === 0 ? (
-                            <div className="p-8 flex flex-col items-center gap-2 text-slate-400 text-center">
+                            <div className="p-8 flex flex-col items-center gap-2 text-slate-400 dark:text-slate-500 text-center">
                                 <MessageSquare className="w-8 h-8 opacity-40" />
                                 <span className="text-[12px] font-medium">
                                     No tienes conversaciones guardadas todavía.
                                 </span>
-                                <span className="text-[10px] text-slate-400">
+                                <span className="text-[10px] text-slate-400 dark:text-slate-500">
                                     Empieza una nueva pregunta y se guardará automáticamente.
                                 </span>
                             </div>
@@ -153,22 +153,22 @@ export function ConversationsDropdown({ activeId, onSelect, onNew, refreshKey }:
                                             disabled={isDeleting}
                                             className={cn(
                                                 "w-full text-left px-3 py-2.5 flex items-center gap-3 group transition-colors",
-                                                isActive ? "bg-blue-50" : "hover:bg-slate-50",
+                                                isActive ? "bg-blue-50 dark:bg-blue-950/40" : "hover:bg-slate-50 dark:hover:bg-slate-900",
                                                 isDeleting && "opacity-50"
                                             )}
                                         >
                                             <div className={cn(
                                                 "flex-shrink-0 w-1 h-8 rounded-full transition-colors",
-                                                isActive ? "bg-blue-500" : "bg-transparent group-hover:bg-slate-200"
+                                                isActive ? "bg-blue-500" : "bg-transparent group-hover:bg-slate-200 dark:group-hover:bg-slate-800"
                                             )} />
                                             <div className="flex-1 min-w-0">
                                                 <p className={cn(
                                                     "text-[13px] font-bold truncate leading-snug",
-                                                    isActive ? "text-blue-700" : "text-slate-700"
+                                                    isActive ? "text-blue-700 dark:text-blue-400" : "text-slate-700 dark:text-slate-200"
                                                 )}>
                                                     {c.title}
                                                 </p>
-                                                <p className="text-[10px] text-slate-400 mt-0.5 font-medium">
+                                                <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 font-medium">
                                                     {formatRelativeDate(c.updated_at)}
                                                 </p>
                                             </div>
@@ -181,13 +181,13 @@ export function ConversationsDropdown({ activeId, onSelect, onNew, refreshKey }:
                                                         handleDelete(e, c.id);
                                                     }
                                                 }}
-                                                className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-rose-100 rounded-lg transition-all flex-shrink-0 cursor-pointer"
+                                                className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-rose-100 dark:hover:bg-rose-900/40 rounded-lg transition-all flex-shrink-0 cursor-pointer"
                                                 title="Eliminar"
                                             >
                                                 {isDeleting ? (
                                                     <Loader2 className="w-3.5 h-3.5 text-rose-400 animate-spin" />
                                                 ) : (
-                                                    <Trash2 className="w-3.5 h-3.5 text-rose-500" />
+                                                    <Trash2 className="w-3.5 h-3.5 text-rose-500 dark:text-rose-400" />
                                                 )}
                                             </span>
                                         </button>

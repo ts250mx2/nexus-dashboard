@@ -170,7 +170,7 @@ export function SalesTrendsChart({
               </linearGradient>
             ))}
           </defs>
-          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
+          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--grafica-rejilla)" />
           <XAxis
             dataKey="Fecha"
             tickFormatter={formatDate}
@@ -210,7 +210,7 @@ export function SalesTrendsChart({
               if (!lineas.length) return null;
 
               return (
-                <div className="bg-slate-900 text-white p-3 rounded-xl shadow-2xl border border-white/10 min-w-[200px]">
+                <div className="bg-slate-900 dark:bg-slate-50 text-white p-3 rounded-xl shadow-2xl border border-white/10 min-w-[200px]">
                   <p className="text-[10px] font-bold text-white/50 uppercase mb-2 border-b border-white/10 pb-1">
                     {formatDate(label as string)}
                   </p>
@@ -249,7 +249,7 @@ export function SalesTrendsChart({
                 {payload?.map((entry: any, index: number) => (
                   <div key={`item-${index}`} className="flex items-center gap-2">
                     <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: entry.color }} />
-                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-tighter">{entry.value}</span>
+                    <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-tighter">{entry.value}</span>
                   </div>
                 ))}
               </div>
@@ -275,7 +275,7 @@ export function SalesTrendsChart({
       </ResponsiveContainer>
 
       {soloIncompletos && (
-        <p className="text-[9px] font-bold uppercase tracking-wider text-amber-600/70 text-center pt-1">
+        <p className="text-[9px] font-bold uppercase tracking-wider text-amber-600/70 dark:text-amber-400/70 text-center pt-1">
           El rango no cubre ningún periodo completo: lo que se muestra va a medias
         </p>
       )}

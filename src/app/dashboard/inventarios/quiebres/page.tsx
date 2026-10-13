@@ -155,27 +155,27 @@ export default function QuiebresStockPage() {
                     ? <StatusPill tone="rose">Quiebre</StatusPill>
                     : <StatusPill tone="amber">Bajo mínimo</StatusPill>,
         },
-        { key: 'Sucursal', label: 'Sucursal', render: r => <span className="font-semibold text-slate-700">{r.Sucursal}</span> },
+        { key: 'Sucursal', label: 'Sucursal', render: r => <span className="font-semibold text-slate-700 dark:text-slate-200">{r.Sucursal}</span> },
         {
             key: 'Producto',
             label: 'Producto',
             render: r => (
                 <div className="min-w-[180px]">
-                    <p className="font-bold text-slate-800 leading-tight">{r.Producto}</p>
-                    <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">
+                    <p className="font-bold text-slate-800 dark:text-slate-100 leading-tight">{r.Producto}</p>
+                    <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider">
                         {r.Codigo} · {r.Marca}
                     </p>
                 </div>
             ),
         },
-        { key: 'Exi', label: 'Existencia', align: 'right', render: r => <span className={Number(r.Exi) <= 0 ? 'text-rose-600 font-black' : 'font-semibold'}>{formatDecimal(r.Exi, 0)}</span> },
+        { key: 'Exi', label: 'Existencia', align: 'right', render: r => <span className={Number(r.Exi) <= 0 ? 'text-rose-600 dark:text-rose-400 font-black' : 'font-semibold'}>{formatDecimal(r.Exi, 0)}</span> },
         { key: 'Minimo', label: 'Mínimo', align: 'right', render: r => formatDecimal(r.Minimo, 0) },
-        { key: 'UnidadesFaltantes', label: 'Faltan', align: 'right', render: r => <span className="font-bold text-slate-800">{formatDecimal(r.UnidadesFaltantes, 0)}</span> },
+        { key: 'UnidadesFaltantes', label: 'Faltan', align: 'right', render: r => <span className="font-bold text-slate-800 dark:text-slate-100">{formatDecimal(r.UnidadesFaltantes, 0)}</span> },
         { key: 'DemandaDiaria', label: 'Venta/día', align: 'right', render: r => formatDecimal(r.DemandaDiaria, 2) },
         { key: 'DiasSinStock', label: 'Días sin stock', align: 'right', render: r => (Number(r.DiasSinStock) > 0 ? formatInt(r.DiasSinStock) : '—') },
-        { key: 'VentaPerdida', label: 'Venta perdida', align: 'right', render: r => <span className="font-black text-rose-600">{formatCurrency(r.VentaPerdida)}</span> },
+        { key: 'VentaPerdida', label: 'Venta perdida', align: 'right', render: r => <span className="font-black text-rose-600 dark:text-rose-400">{formatCurrency(r.VentaPerdida)}</span> },
         { key: 'CostoReposicion', label: 'Costo reposición', align: 'right', render: r => formatCurrency(r.CostoReposicion) },
-        { key: 'UltimaVenta', label: 'Última venta', align: 'right', render: r => <span className="text-xs text-slate-500">{formatDate(r.UltimaVenta)}</span> },
+        { key: 'UltimaVenta', label: 'Última venta', align: 'right', render: r => <span className="text-xs text-slate-500 dark:text-slate-400">{formatDate(r.UltimaVenta)}</span> },
     ];
 
     return (
@@ -201,13 +201,13 @@ export default function QuiebresStockPage() {
                 exportDisabled={!data || filteredRows.length === 0}
             >
                 <div className="w-full lg:w-44">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 block">
+                    <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5 block">
                         Estado
                     </label>
                     <select
                         value={estado}
                         onChange={e => setEstado(e.target.value as EstadoFiltro)}
-                        className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                         <option value="todos">Todos</option>
                         <option value="quiebre">Solo quiebres</option>
@@ -262,10 +262,10 @@ export default function QuiebresStockPage() {
                         <div className="h-72 w-full">
                             <ResponsiveContainer width="100%" height="100%">
                                 <BarChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 20 }}>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                                    <CartesianGrid strokeDasharray="3 3" stroke="var(--grafica-rejilla)" vertical={false} />
                                     <XAxis
                                         dataKey="name"
-                                        tick={{ fill: '#64748B', fontSize: 10, fontWeight: 700 }}
+                                        tick={{ fill: 'var(--grafica-eje)', fontSize: 10, fontWeight: 700 }}
                                         tickLine={false}
                                         axisLine={false}
                                         dy={8}
@@ -276,14 +276,14 @@ export default function QuiebresStockPage() {
                                     />
                                     <YAxis
                                         tickFormatter={(v) => formatCurrencyShort(v)}
-                                        tick={{ fill: '#64748B', fontSize: 10, fontWeight: 700 }}
+                                        tick={{ fill: 'var(--grafica-eje)', fontSize: 10, fontWeight: 700 }}
                                         tickLine={false}
                                         axisLine={false}
                                         width={92}
                                     />
                                     <Tooltip
                                         formatter={(value) => formatCurrency(value)}
-                                        contentStyle={{ backgroundColor: '#fff', borderRadius: 12, border: '1px solid #E2E8F0' }}
+                                        contentStyle={{ backgroundColor: 'var(--grafica-globo-fondo)', borderRadius: 12, border: '1px solid var(--grafica-globo-borde)' }}
                                     />
                                     <Bar dataKey="Venta perdida" radius={[4, 4, 0, 0]}>
                                         {chartData.map((entry, i) => (
@@ -301,11 +301,11 @@ export default function QuiebresStockPage() {
                     >
                         <DataTable
                             columns={[
-                                { key: 'Sucursal', label: 'Sucursal', render: r => <span className="font-bold text-slate-800">{r.Sucursal}</span> },
-                                { key: 'Quiebres', label: 'Quiebres', align: 'right', render: r => <span className="font-black text-rose-600">{formatInt(r.Quiebres)}</span> },
-                                { key: 'BajoMinimo', label: 'Bajo mínimo', align: 'right', render: r => <span className="font-bold text-amber-600">{formatInt(r.BajoMinimo)}</span> },
+                                { key: 'Sucursal', label: 'Sucursal', render: r => <span className="font-bold text-slate-800 dark:text-slate-100">{r.Sucursal}</span> },
+                                { key: 'Quiebres', label: 'Quiebres', align: 'right', render: r => <span className="font-black text-rose-600 dark:text-rose-400">{formatInt(r.Quiebres)}</span> },
+                                { key: 'BajoMinimo', label: 'Bajo mínimo', align: 'right', render: r => <span className="font-bold text-amber-600 dark:text-amber-400">{formatInt(r.BajoMinimo)}</span> },
                                 { key: 'UnidadesFaltantes', label: 'Unidades faltantes', align: 'right', render: r => formatInt(r.UnidadesFaltantes) },
-                                { key: 'VentaPerdida', label: 'Venta perdida', align: 'right', render: r => <span className="font-bold text-slate-800">{formatCurrency(r.VentaPerdida)}</span> },
+                                { key: 'VentaPerdida', label: 'Venta perdida', align: 'right', render: r => <span className="font-bold text-slate-800 dark:text-slate-100">{formatCurrency(r.VentaPerdida)}</span> },
                             ]}
                             rows={data.porSucursal}
                             rowKey={r => String(r.IdSucursal)}
@@ -319,7 +319,7 @@ export default function QuiebresStockPage() {
                         subtitle={`${formatInt(filteredRows.length)} de ${formatInt(data.meta.filasTotales)} registros`}
                         action={
                             data.meta.truncado ? (
-                                <span className="text-[10px] font-bold text-amber-600 uppercase tracking-wider">
+                                <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
                                     Resultado acotado — refina los filtros
                                 </span>
                             ) : undefined
@@ -330,7 +330,7 @@ export default function QuiebresStockPage() {
                             rows={filteredRows}
                             rowKey={r => `${r.IdSucursal}-${r.IdArticulo}`}
                             initialSort={{ key: 'VentaPerdida', direction: 'desc' }}
-                            rowClassName={r => (r.Estado === 'quiebre' ? 'bg-rose-50/30' : '')}
+                            rowClassName={r => (r.Estado === 'quiebre' ? 'bg-rose-50/30 dark:bg-rose-950/40' : '')}
                             emptyMessage="Ninguna sucursal tiene faltantes con los filtros seleccionados."
                         />
                     </Panel>

@@ -328,27 +328,27 @@ export default function InventarioPorSucursalPage() {
                 <button
                     type="button"
                     onClick={() => setDetalle({ id: r.IdSucursal, nombre: r.Sucursal })}
-                    className="font-bold text-slate-800 hover:text-blue-600 transition-colors cursor-pointer text-left"
+                    className="font-bold text-slate-800 dark:text-slate-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer text-left"
                 >
                     {r.Sucursal}
                 </button>
             ),
         },
-        { key: 'Valorizado', label: 'Valorizado', align: 'right', render: r => <span className="font-black text-slate-900">{formatCurrency(r.Valorizado)}</span> },
+        { key: 'Valorizado', label: 'Valorizado', align: 'right', render: r => <span className="font-black text-slate-900 dark:text-slate-50">{formatCurrency(r.Valorizado)}</span> },
         { key: 'Unidades', label: 'Unidades', align: 'right', render: r => formatInt(r.Unidades) },
         { key: 'SkusConExistencia', label: 'Con stock', align: 'right', render: r => formatInt(r.SkusConExistencia) },
-        { key: 'SkusEnCero', label: 'En cero', align: 'right', render: r => <span className="text-slate-500">{formatInt(r.SkusEnCero)}</span> },
-        { key: 'SkusNegativos', label: 'Negativos', align: 'right', render: r => <span className={Number(r.SkusNegativos) > 0 ? 'font-bold text-rose-600' : 'text-slate-400'}>{formatInt(r.SkusNegativos)}</span> },
-        { key: 'Quiebres', label: 'Quiebres', align: 'right', render: r => <span className="font-bold text-rose-600">{formatInt(r.Quiebres)}</span> },
-        { key: 'BajoMinimo', label: 'Bajo mín.', align: 'right', render: r => <span className="font-bold text-amber-600">{formatInt(r.BajoMinimo)}</span> },
-        { key: 'Exceso', label: 'Exceso', align: 'right', render: r => <span className="text-amber-700">{formatInt(r.Exceso)}</span> },
-        { key: 'SinRotacion', label: 'Sin rotación', align: 'right', render: r => <span className="text-violet-600">{formatInt(r.SinRotacion)}</span> },
+        { key: 'SkusEnCero', label: 'En cero', align: 'right', render: r => <span className="text-slate-500 dark:text-slate-400">{formatInt(r.SkusEnCero)}</span> },
+        { key: 'SkusNegativos', label: 'Negativos', align: 'right', render: r => <span className={Number(r.SkusNegativos) > 0 ? 'font-bold text-rose-600 dark:text-rose-400' : 'text-slate-400 dark:text-slate-500'}>{formatInt(r.SkusNegativos)}</span> },
+        { key: 'Quiebres', label: 'Quiebres', align: 'right', render: r => <span className="font-bold text-rose-600 dark:text-rose-400">{formatInt(r.Quiebres)}</span> },
+        { key: 'BajoMinimo', label: 'Bajo mín.', align: 'right', render: r => <span className="font-bold text-amber-600 dark:text-amber-400">{formatInt(r.BajoMinimo)}</span> },
+        { key: 'Exceso', label: 'Exceso', align: 'right', render: r => <span className="text-amber-700 dark:text-amber-400">{formatInt(r.Exceso)}</span> },
+        { key: 'SinRotacion', label: 'Sin rotación', align: 'right', render: r => <span className="text-violet-600 dark:text-violet-400">{formatInt(r.SinRotacion)}</span> },
         {
             key: 'CoberturaGlobal',
             label: 'Cobertura',
             align: 'right',
             sortValue: r => (r.CoberturaGlobal === null ? Number.MAX_SAFE_INTEGER : Number(r.CoberturaGlobal)),
-            render: r => <span className="font-semibold text-slate-600">{formatCobertura(r.CoberturaGlobal)}</span>,
+            render: r => <span className="font-semibold text-slate-600 dark:text-slate-300">{formatCobertura(r.CoberturaGlobal)}</span>,
         },
         {
             key: 'UltimaVenta',
@@ -357,12 +357,12 @@ export default function InventarioPorSucursalPage() {
             // Las sucursales sin ventas se van al fondo en vez de mezclarse con las recientes.
             sortValue: r => (r.UltimaVenta ? new Date(r.UltimaVenta).getTime() : 0),
             render: r => {
-                if (!r.UltimaVenta) return <span className="text-slate-300 font-semibold">Sin ventas</span>;
+                if (!r.UltimaVenta) return <span className="text-slate-300 dark:text-slate-700 font-semibold">Sin ventas</span>;
                 const dias = diasDesde(r.UltimaVenta) ?? 0;
                 return (
                     <div className="flex flex-col items-end leading-tight">
-                        <span className="font-semibold text-slate-700">{formatDate(r.UltimaVenta)}</span>
-                        <span className={`text-[10px] font-bold uppercase tracking-wider ${dias >= 7 ? 'text-amber-600' : 'text-slate-400'}`}>
+                        <span className="font-semibold text-slate-700 dark:text-slate-200">{formatDate(r.UltimaVenta)}</span>
+                        <span className={`text-[10px] font-bold uppercase tracking-wider ${dias >= 7 ? 'text-amber-600 dark:text-amber-400' : 'text-slate-400 dark:text-slate-500'}`}>
                             {formatHora(r.UltimaVenta)} · {formatAntiguedad(r.UltimaVenta)}
                         </span>
                     </div>
@@ -391,8 +391,8 @@ export default function InventarioPorSucursalPage() {
             label: 'Producto',
             render: r => (
                 <div className="min-w-[180px]">
-                    <p className="font-bold text-slate-800 leading-tight">{r.Producto}</p>
-                    <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">{r.Codigo} · {r.Depto}</p>
+                    <p className="font-bold text-slate-800 dark:text-slate-100 leading-tight">{r.Producto}</p>
+                    <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider">{r.Codigo} · {r.Depto}</p>
                 </div>
             ),
         },
@@ -413,12 +413,12 @@ export default function InventarioPorSucursalPage() {
             // Lo nunca vendido se va al fondo, en vez de mezclarse con lo reciente.
             sortValue: r => (r.UltimaVenta ? new Date(r.UltimaVenta).getTime() : 0),
             render: r => {
-                if (!r.UltimaVenta) return <span className="text-slate-300 font-semibold">Nunca</span>;
+                if (!r.UltimaVenta) return <span className="text-slate-300 dark:text-slate-700 font-semibold">Nunca</span>;
                 const dias = diasDesde(r.UltimaVenta) ?? 0;
                 return (
                     <div className="flex flex-col items-end leading-tight">
-                        <span className="font-semibold text-slate-700">{formatDate(r.UltimaVenta)}</span>
-                        <span className={`text-[10px] font-bold uppercase tracking-wider ${dias >= 30 ? 'text-amber-600' : 'text-slate-400'}`}>
+                        <span className="font-semibold text-slate-700 dark:text-slate-200">{formatDate(r.UltimaVenta)}</span>
+                        <span className={`text-[10px] font-bold uppercase tracking-wider ${dias >= 30 ? 'text-amber-600 dark:text-amber-400' : 'text-slate-400 dark:text-slate-500'}`}>
                             {formatHora(r.UltimaVenta)} · {formatAntiguedad(r.UltimaVenta)}
                         </span>
                     </div>
@@ -426,7 +426,7 @@ export default function InventarioPorSucursalPage() {
             },
         },
         { key: 'CostoUnitario', label: 'Costo unit.', align: 'right', render: r => formatCurrency(r.CostoUnitario) },
-        { key: 'ValorInventario', label: 'Valor', align: 'right', render: r => <span className="font-bold text-slate-800">{formatCurrency(r.ValorInventario)}</span> },
+        { key: 'ValorInventario', label: 'Valor', align: 'right', render: r => <span className="font-bold text-slate-800 dark:text-slate-100">{formatCurrency(r.ValorInventario)}</span> },
     ];
 
     return (
@@ -458,12 +458,12 @@ export default function InventarioPorSucursalPage() {
             </InventoryFilters>
 
             {errorExport && (
-                <div className="flex items-start gap-2 px-4 py-3 bg-amber-50 border border-amber-200 rounded-xl text-xs font-semibold text-amber-800">
+                <div className="flex items-start gap-2 px-4 py-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 rounded-xl text-xs font-semibold text-amber-800 dark:text-amber-300">
                     <span className="flex-1">{errorExport}</span>
                     <button
                         type="button"
                         onClick={() => setErrorExport(null)}
-                        className="text-amber-600 hover:text-amber-800 cursor-pointer"
+                        className="text-amber-600 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-300 cursor-pointer"
                     >
                         <X size={14} />
                     </button>
@@ -511,10 +511,10 @@ export default function InventarioPorSucursalPage() {
                         <div className="h-80 w-full">
                             <ResponsiveContainer width="100%" height="100%">
                                 <BarChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 24 }}>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                                    <CartesianGrid strokeDasharray="3 3" stroke="var(--grafica-rejilla)" vertical={false} />
                                     <XAxis
                                         dataKey="name"
-                                        tick={{ fill: '#64748B', fontSize: 10, fontWeight: 700 }}
+                                        tick={{ fill: 'var(--grafica-eje)', fontSize: 10, fontWeight: 700 }}
                                         tickLine={false}
                                         axisLine={false}
                                         interval={0}
@@ -524,14 +524,14 @@ export default function InventarioPorSucursalPage() {
                                     />
                                     <YAxis
                                         tickFormatter={(v) => formatCurrencyShort(v)}
-                                        tick={{ fill: '#64748B', fontSize: 10, fontWeight: 700 }}
+                                        tick={{ fill: 'var(--grafica-eje)', fontSize: 10, fontWeight: 700 }}
                                         tickLine={false}
                                         axisLine={false}
                                         width={96}
                                     />
                                     <Tooltip
                                         formatter={(value) => formatCurrency(value)}
-                                        contentStyle={{ backgroundColor: '#fff', borderRadius: 12, border: '1px solid #E2E8F0' }}
+                                        contentStyle={{ backgroundColor: 'var(--grafica-globo-fondo)', borderRadius: 12, border: '1px solid var(--grafica-globo-borde)' }}
                                     />
                                     <Legend verticalAlign="top" height={34} />
                                     <Bar dataKey="Valorizado" fill="#2563EB" radius={[4, 4, 0, 0]} />
@@ -566,7 +566,7 @@ export default function InventarioPorSucursalPage() {
                                 <button
                                     type="button"
                                     onClick={() => setDetalle(null)}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100 cursor-pointer"
+                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
                                 >
                                     <X size={13} />
                                     Cerrar

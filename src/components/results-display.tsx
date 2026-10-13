@@ -120,17 +120,17 @@ export function ResultsDisplay({ data, sql, question, visualization: initialViz,
         };
 
         return (
-            <div className="w-full h-full bg-white/50 backdrop-blur-sm rounded-xl p-4 border border-slate-200 shadow-inner">
+            <div className="w-full h-full bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm rounded-xl p-4 border border-slate-200 dark:border-slate-700 shadow-inner">
                 <ResponsiveContainer width="100%" height="100%">
                     {(() => {
                         switch (chartType) {
                             case 'line':
                                 return (
                                     <LineChart {...CommonProps}>
-                                        <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+                                        <CartesianGrid strokeDasharray="3 3" stroke="var(--grafica-rejilla)" vertical={false} />
                                         <XAxis
                                             dataKey={xKey}
-                                            stroke="#64748b"
+                                            stroke="var(--grafica-eje)"
                                             fontSize={11}
                                             tickLine={false}
                                             axisLine={false}
@@ -147,9 +147,9 @@ export function ResultsDisplay({ data, sql, question, visualization: initialViz,
                                                 );
                                             }}
                                         />
-                                        <YAxis stroke="#64748b" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(v) => typeof v === 'number' ? new Intl.NumberFormat('es-MX', { notation: 'compact' }).format(v) : v} />
+                                        <YAxis stroke="var(--grafica-eje)" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(v) => typeof v === 'number' ? new Intl.NumberFormat('es-MX', { notation: 'compact' }).format(v) : v} />
                                         <Tooltip
-                                            contentStyle={{ backgroundColor: 'white', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                                            contentStyle={{ backgroundColor: 'white', borderRadius: '12px', border: '1px solid var(--grafica-globo-borde)', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
                                             itemStyle={{ fontWeight: 'bold' }}
                                         />
                                         <Legend verticalAlign="top" height={36} />
@@ -192,10 +192,10 @@ export function ResultsDisplay({ data, sql, question, visualization: initialViz,
                                                 </linearGradient>
                                             ))}
                                         </defs>
-                                        <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+                                        <CartesianGrid strokeDasharray="3 3" stroke="var(--grafica-rejilla)" vertical={false} />
                                         <XAxis
                                             dataKey={xKey}
-                                            stroke="#64748b"
+                                            stroke="var(--grafica-eje)"
                                             fontSize={11}
                                             interval={0}
                                             height={100}
@@ -210,7 +210,7 @@ export function ResultsDisplay({ data, sql, question, visualization: initialViz,
                                                 );
                                             }}
                                         />
-                                        <YAxis stroke="#64748b" fontSize={11} />
+                                        <YAxis stroke="var(--grafica-eje)" fontSize={11} />
                                         <Tooltip />
                                         <Legend verticalAlign="top" />
                                         {dataKeys.map((key, index) => (
@@ -222,10 +222,10 @@ export function ResultsDisplay({ data, sql, question, visualization: initialViz,
                             default:
                                 return (
                                     <BarChart {...CommonProps} barCategoryGap="15%">
-                                        <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+                                        <CartesianGrid strokeDasharray="3 3" stroke="var(--grafica-rejilla)" vertical={false} />
                                         <XAxis
                                             dataKey={xKey}
-                                            stroke="#64748b"
+                                            stroke="var(--grafica-eje)"
                                             fontSize={11}
                                             axisLine={false}
                                             tickLine={false}
@@ -242,8 +242,8 @@ export function ResultsDisplay({ data, sql, question, visualization: initialViz,
                                                 );
                                             }}
                                         />
-                                        <YAxis stroke="#64748b" fontSize={11} axisLine={false} tickLine={false} />
-                                        <Tooltip cursor={{ fill: '#f8fafc' }} />
+                                        <YAxis stroke="var(--grafica-eje)" fontSize={11} axisLine={false} tickLine={false} />
+                                        <Tooltip cursor={{ fill: 'var(--grafica-superficie)' }} />
                                         <Legend verticalAlign="top" />
                                         {dataKeys.map((key, index) => (
                                             <Bar key={key} dataKey={key} fill={COLORS[index % COLORS.length]} radius={[6, 6, 0, 0]} />
@@ -305,31 +305,31 @@ export function ResultsDisplay({ data, sql, question, visualization: initialViz,
     const renderTable = (isMaximized = false) => {
         if (!hasData) {
             return (
-                <div className="flex flex-col items-center justify-center py-20 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
-                    <div className="p-4 bg-white rounded-full shadow-sm mb-4">
-                        <Search className="w-8 h-8 text-slate-400" />
+                <div className="flex flex-col items-center justify-center py-20 bg-slate-50 dark:bg-slate-900 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-700">
+                    <div className="p-4 bg-white dark:bg-slate-900 rounded-full shadow-sm mb-4">
+                        <Search className="w-8 h-8 text-slate-400 dark:text-slate-500" />
                     </div>
                     <h3 className="text-lg font-bold">Sin resultados</h3>
-                    <p className="text-sm text-slate-500 text-center px-8">No hemos encontrado registros para los filtros aplicados.</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 text-center px-8">No hemos encontrado registros para los filtros aplicados.</p>
                 </div>
             );
         }
 
         return (
             <div className={cn(
-                "relative overflow-x-auto rounded-xl border border-slate-200 shadow-sm",
+                "relative overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm",
                 data.length > 20 && "max-h-[600px] overflow-y-auto"
             )}>
                 <table className="w-full text-left text-sm border-collapse">
-                    <thead className="bg-slate-50 border-b border-slate-200 sticky top-0 z-10 shadow-sm">
+                    <thead className="bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-10 shadow-sm">
                         <tr>
                             {keys.map((key) => (
-                                <th key={key} className="px-4 py-4 min-w-[150px] group transition-colors hover:bg-slate-100">
+                                <th key={key} className="px-4 py-4 min-w-[150px] group transition-colors hover:bg-slate-100 dark:hover:bg-slate-800">
                                     <div className="flex flex-col space-y-2">
                                         <div className="flex items-center justify-between cursor-pointer" onClick={() => handleSort(key)}>
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">{key}</span>
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">{key}</span>
                                             {sortConfig?.key === key ? (
-                                                sortConfig.direction === 'asc' ? <ArrowUp className="w-3 h-3 text-blue-600" /> : <ArrowDown className="w-3 h-3 text-blue-600" />
+                                                sortConfig.direction === 'asc' ? <ArrowUp className="w-3 h-3 text-blue-600 dark:text-blue-400" /> : <ArrowDown className="w-3 h-3 text-blue-600 dark:text-blue-400" />
                                             ) : (
                                                 <ArrowUpDown className="w-3 h-3 opacity-0 group-hover:opacity-40 transition-opacity" />
                                             )}
@@ -338,12 +338,12 @@ export function ResultsDisplay({ data, sql, question, visualization: initialViz,
                                             <input
                                                 type="text"
                                                 placeholder="Filtrar..."
-                                                className="w-full pl-2 pr-6 py-1 text-[11px] bg-white border border-slate-200 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none shadow-sm"
+                                                className="w-full pl-2 pr-6 py-1 text-[11px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none shadow-sm"
                                                 value={filters[key] || ''}
                                                 onChange={(e) => handleFilterChange(key, e.target.value)}
                                             />
                                             {filters[key] && (
-                                                <button onClick={() => handleFilterChange(key, '')} className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                                                <button onClick={() => handleFilterChange(key, '')} className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300">
                                                     <X className="w-3 h-3" />
                                                 </button>
                                             )}
@@ -353,11 +353,11 @@ export function ResultsDisplay({ data, sql, question, visualization: initialViz,
                             ))}
                         </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-slate-100">
+                    <tbody className="bg-white dark:bg-slate-900 divide-y divide-slate-100 dark:divide-slate-800">
                         {sortedAndFilteredData.map((row, i) => (
-                            <tr key={i} className="hover:bg-blue-50/40 transition-colors group">
+                            <tr key={i} className="hover:bg-blue-50/40 dark:hover:bg-blue-950/40 transition-colors group">
                                 {keys.map((key) => (
-                                    <td key={key} className="px-4 py-3 font-medium text-slate-700 whitespace-nowrap">
+                                    <td key={key} className="px-4 py-3 font-medium text-slate-700 dark:text-slate-200 whitespace-nowrap">
                                         {formatValue(key, row[key])}
                                     </td>
                                 ))}
@@ -371,11 +371,11 @@ export function ResultsDisplay({ data, sql, question, visualization: initialViz,
 
     return (
         <div className="flex flex-col space-y-4">
-            <div className="flex items-center justify-between bg-white p-2 rounded-2xl border border-slate-200 shadow-sm">
-                <div className="flex p-1 bg-slate-100 rounded-xl space-x-1">
+            <div className="flex items-center justify-between bg-white dark:bg-slate-900 p-2 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl space-x-1">
                     <button
                         onClick={() => handleViewChange('table')}
-                        className={cn("px-4 py-1.5 rounded-lg text-xs font-bold transition-all", view === 'table' ? "bg-white text-blue-600 shadow-sm" : "text-slate-500 hover:bg-white/50")}
+                        className={cn("px-4 py-1.5 rounded-lg text-xs font-bold transition-all", view === 'table' ? "bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm" : "text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-slate-900/50")}
                     >
                         <div className="flex items-center space-x-2">
                             <Table className="w-4 h-4" />
@@ -385,7 +385,7 @@ export function ResultsDisplay({ data, sql, question, visualization: initialViz,
                     {data.length <= 50 && (
                         <button
                             onClick={() => handleViewChange('chart')}
-                            className={cn("px-4 py-1.5 rounded-lg text-xs font-bold transition-all", view === 'chart' ? "bg-white text-blue-600 shadow-sm" : "text-slate-500 hover:bg-white/50")}
+                            className={cn("px-4 py-1.5 rounded-lg text-xs font-bold transition-all", view === 'chart' ? "bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm" : "text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-slate-900/50")}
                         >
                             <div className="flex items-center space-x-2">
                                 <BarChart3 className="w-4 h-4" />
@@ -397,27 +397,27 @@ export function ResultsDisplay({ data, sql, question, visualization: initialViz,
 
                 <div className="flex items-center space-x-2 px-2">
                     {view === 'chart' && (
-                        <div className="flex bg-slate-100 rounded-lg p-1 mr-4">
+                        <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-1 mr-4">
                             {['bar', 'line', 'pie', 'area'].map((t) => (
                                 <button
                                     key={t}
                                     onClick={() => handleChartTypeChange(t as any)}
-                                    className={cn("px-2 py-1 rounded-md text-[10px] uppercase font-black transition-all", chartType === t ? "bg-blue-600 text-white" : "text-slate-400 hover:text-slate-600")}
+                                    className={cn("px-2 py-1 rounded-md text-[10px] uppercase font-black transition-all", chartType === t ? "bg-blue-600 text-white" : "text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300")}
                                 >
                                     {t}
                                 </button>
                             ))}
                         </div>
                     )}
-                    <button onClick={handleExportExcel} className="p-2 hover:bg-emerald-50 text-emerald-600 rounded-xl transition-colors" title="Descargar Excel">
+                    <button onClick={handleExportExcel} className="p-2 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 rounded-xl transition-colors" title="Descargar Excel">
                         <Download className="w-5 h-5" />
                     </button>
-                    <button onClick={handleExportPDF} className="p-2 hover:bg-rose-50 text-rose-600 rounded-xl transition-colors" title="Descargar PDF">
+                    <button onClick={handleExportPDF} className="p-2 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400 rounded-xl transition-colors" title="Descargar PDF">
                         <FileText className="w-5 h-5" />
                     </button>
-                    <div className="w-px h-6 bg-slate-200 mx-1" />
-                    <button onClick={() => setIsMaximized(true)} className="p-2 hover:bg-slate-100 rounded-xl transition-colors">
-                        <Maximize2 className="w-5 h-5 text-slate-400" />
+                    <div className="w-px h-6 bg-slate-200 dark:bg-slate-800 mx-1" />
+                    <button onClick={() => setIsMaximized(true)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
+                        <Maximize2 className="w-5 h-5 text-slate-400 dark:text-slate-500" />
                     </button>
                 </div>
             </div>
@@ -430,7 +430,7 @@ export function ResultsDisplay({ data, sql, question, visualization: initialViz,
                     </div>
                 )}
                 {view === 'sql' && (
-                    <div className="p-4 bg-slate-900 rounded-2xl border-l-4 border-blue-500 shadow-xl overflow-hidden group">
+                    <div className="p-4 bg-slate-900 dark:bg-slate-50 rounded-2xl border-l-4 border-blue-500 shadow-xl overflow-hidden group">
                         <div className="flex justify-between items-center mb-2">
                             <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Consulta Generada</span>
                             <FileCode className="w-4 h-4 text-blue-400" />
@@ -443,23 +443,23 @@ export function ResultsDisplay({ data, sql, question, visualization: initialViz,
             </div>
 
             {isMaximized && (
-                <div className="fixed inset-0 z-[10000] bg-slate-950/40 backdrop-blur-xl flex items-center justify-center p-4 md:p-10 animate-in fade-in duration-300">
-                    <div className="bg-white w-full h-full max-w-7xl rounded-[32px] shadow-2xl overflow-hidden flex flex-col border border-white/20">
-                        <div className="px-8 py-6 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                <div className="fixed inset-0 z-[10000] bg-slate-950/40 dark:bg-slate-50/40 backdrop-blur-xl flex items-center justify-center p-4 md:p-10 animate-in fade-in duration-300">
+                    <div className="bg-white dark:bg-slate-900 w-full h-full max-w-7xl rounded-[32px] shadow-2xl overflow-hidden flex flex-col border border-white/20">
+                        <div className="px-8 py-6 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
                             <div className="flex items-center space-x-4">
                                 <div className="p-1">
-                                    <BarChart3 className="w-8 h-8 text-blue-500" />
+                                    <BarChart3 className="w-8 h-8 text-blue-500 dark:text-blue-400" />
                                 </div>
                                 <div>
-                                    <h3 className="text-xl font-black text-slate-800 tracking-tight leading-none">Análisis Detallado</h3>
-                                    <p className="text-sm text-slate-500 mt-1 font-medium truncate max-w-md italic opacity-60">"{question}"</p>
+                                    <h3 className="text-xl font-black text-slate-800 dark:text-slate-100 tracking-tight leading-none">Análisis Detallado</h3>
+                                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 font-medium truncate max-w-md italic opacity-60">"{question}"</p>
                                 </div>
                             </div>
-                            <button onClick={() => setIsMaximized(false)} className="p-4 hover:bg-rose-50 hover:text-rose-600 rounded-2xl transition-all text-slate-400">
+                            <button onClick={() => setIsMaximized(false)} className="p-4 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-600 dark:hover:text-rose-400 rounded-2xl transition-all text-slate-400 dark:text-slate-500">
                                 <X className="w-8 h-8" />
                             </button>
                         </div>
-                        <div className="flex-1 overflow-auto p-10 bg-gradient-to-br from-white to-slate-50/50">
+                        <div className="flex-1 overflow-auto p-10 bg-gradient-to-br from-white dark:from-slate-900 to-slate-50/50 dark:to-slate-900/50">
                             {view === 'table' && renderTable(true)}
                             {view === 'chart' && (
                                 <div className="h-[70vh]">
@@ -467,27 +467,27 @@ export function ResultsDisplay({ data, sql, question, visualization: initialViz,
                                 </div>
                             )}
                         </div>
-                        <div className="px-8 py-6 border-t border-slate-200 bg-slate-50 flex items-center justify-between">
+                        <div className="px-8 py-6 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 flex items-center justify-between">
                             <div className="flex items-center space-x-6">
                                 <div className="flex flex-col">
-                                    <span className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">Registros</span>
-                                    <span className="text-lg font-black text-slate-900">{data.length}</span>
+                                    <span className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-[0.2em]">Registros</span>
+                                    <span className="text-lg font-black text-slate-900 dark:text-slate-50">{data.length}</span>
                                 </div>
-                                <div className="h-8 w-px bg-slate-200" />
+                                <div className="h-8 w-px bg-slate-200 dark:bg-slate-800" />
                                 <div className="flex space-x-2">
-                                    <button onClick={handleExportExcel} className="flex items-center space-x-2 px-4 py-2 bg-emerald-50 text-emerald-700 rounded-xl text-xs font-bold hover:bg-emerald-100 transition-colors">
+                                    <button onClick={handleExportExcel} className="flex items-center space-x-2 px-4 py-2 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 rounded-xl text-xs font-bold hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors">
                                         <Download className="w-4 h-4" />
                                         <span>Excel</span>
                                     </button>
-                                    <button onClick={handleExportPDF} className="flex items-center space-x-2 px-4 py-2 bg-rose-50 text-rose-700 rounded-xl text-xs font-bold hover:bg-rose-100 transition-colors">
+                                    <button onClick={handleExportPDF} className="flex items-center space-x-2 px-4 py-2 bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 rounded-xl text-xs font-bold hover:bg-rose-100 dark:hover:bg-rose-900/40 transition-colors">
                                         <FileText className="w-4 h-4" />
                                         <span>PDF</span>
                                     </button>
                                 </div>
                             </div>
                             <div className="flex space-x-2">
-                                <button onClick={() => setView('table')} className={cn("px-6 py-2.5 rounded-2xl text-xs font-black uppercase transition-all", view === 'table' ? "bg-slate-900 text-white shadow-xl" : "bg-white border border-slate-200 text-slate-600")}>Tabla de Datos</button>
-                                <button onClick={() => setView('chart')} className={cn("px-6 py-2.5 rounded-2xl text-xs font-black uppercase transition-all", view === 'chart' ? "bg-slate-900 text-white shadow-xl" : "bg-white border border-slate-200 text-slate-600")}>Gráfica Dinámica</button>
+                                <button onClick={() => setView('table')} className={cn("px-6 py-2.5 rounded-2xl text-xs font-black uppercase transition-all", view === 'table' ? "bg-slate-900 dark:bg-slate-50 text-white shadow-xl" : "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300")}>Tabla de Datos</button>
+                                <button onClick={() => setView('chart')} className={cn("px-6 py-2.5 rounded-2xl text-xs font-black uppercase transition-all", view === 'chart' ? "bg-slate-900 dark:bg-slate-50 text-white shadow-xl" : "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300")}>Gráfica Dinámica</button>
                             </div>
                         </div>
                     </div>

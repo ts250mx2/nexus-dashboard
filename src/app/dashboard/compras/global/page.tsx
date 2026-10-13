@@ -345,39 +345,39 @@ function ComprasGlobalContent() {
     return (
         <div className="space-y-6 pb-12">
             {/* Header with Filters & Periods */}
-            <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white py-4 px-6 rounded-2xl shadow-sm border border-slate-100 animate-in fade-in duration-500">
+            <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white dark:bg-slate-900 py-4 px-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 animate-in fade-in duration-500">
                 <div className="flex flex-col md:flex-row md:items-center gap-6">
-                    <h1 className="text-2xl font-black text-slate-800 tracking-tight uppercase flex items-center gap-3 select-none">
-                        <ShoppingBag className="text-blue-600" />
+                    <h1 className="text-2xl font-black text-slate-800 dark:text-slate-100 tracking-tight uppercase flex items-center gap-3 select-none">
+                        <ShoppingBag className="text-blue-600 dark:text-blue-400" />
                         Compras Global
                     </h1>
                     <DatePresetsProfesores />
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3">
-                    <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
-                        <Calendar size={16} className="text-blue-500" />
-                        <span className="text-[10px] font-bold text-slate-400 uppercase">Del</span>
+                    <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2">
+                        <Calendar size={16} className="text-blue-500 dark:text-blue-400" />
+                        <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">Del</span>
                         <input
                             type="date"
                             value={startDate}
                             onChange={(e) => handleDateChange('startDate', e.target.value)}
-                            className="bg-transparent text-xs font-bold text-slate-700 outline-none p-0 border-none h-auto w-28 cursor-pointer"
+                            className="bg-transparent text-xs font-bold text-slate-700 dark:text-slate-200 outline-none p-0 border-none h-auto w-28 cursor-pointer"
                         />
                     </div>
-                    <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
-                        <Calendar size={16} className="text-blue-500" />
-                        <span className="text-[10px] font-bold text-slate-400 uppercase">Al</span>
+                    <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2">
+                        <Calendar size={16} className="text-blue-500 dark:text-blue-400" />
+                        <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">Al</span>
                         <input
                             type="date"
                             value={endDate}
                             onChange={(e) => handleDateChange('endDate', e.target.value)}
-                            className="bg-transparent text-xs font-bold text-slate-700 outline-none p-0 border-none h-auto w-28 cursor-pointer"
+                            className="bg-transparent text-xs font-bold text-slate-700 dark:text-slate-200 outline-none p-0 border-none h-auto w-28 cursor-pointer"
                         />
                     </div>
                     <button
                         onClick={() => handleDateChange('startDate', startDate)}
-                        className="p-2.5 bg-slate-50 border border-slate-200 text-blue-600 hover:bg-slate-100 hover:border-slate-300 transition-all rounded-xl shadow-sm"
+                        className="p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-blue-600 dark:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600 transition-all rounded-xl shadow-sm"
                         disabled={loadingBranches || loadingArticulos}
                         title="Actualizar Datos"
                     >
@@ -389,24 +389,24 @@ function ComprasGlobalContent() {
             {/* SUCURSALES (default view) */}
             {!selectedSucursal && (
                 <section className="space-y-4 animate-in fade-in duration-300">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200/60 shadow-xs">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/60 dark:border-slate-700/60 shadow-xs">
                         <div>
-                            <h2 className="text-xl font-semibold text-slate-900">Sucursales</h2>
-                            <p className="text-sm text-slate-500">Haz clic en una sucursal para ver los artículos abastecidos por compras y traspasos en el periodo.</p>
+                            <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-50">Sucursales</h2>
+                            <p className="text-sm text-slate-500 dark:text-slate-400">Haz clic en una sucursal para ver los artículos abastecidos por compras y traspasos en el periodo.</p>
                         </div>
-                        <div className="relative flex items-center bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 focus-within:ring-2 focus-within:ring-blue-500/10 focus-within:border-blue-500 transition-all w-full sm:w-64 max-w-sm">
-                            <Search size={16} className="text-slate-400 mr-2 shrink-0" />
+                        <div className="relative flex items-center bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 focus-within:ring-2 focus-within:ring-blue-500/10 focus-within:border-blue-500 transition-all w-full sm:w-64 max-w-sm">
+                            <Search size={16} className="text-slate-400 dark:text-slate-500 mr-2 shrink-0" />
                             <input
                                 type="text"
                                 placeholder="Buscar sucursal..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="bg-transparent text-xs font-semibold text-slate-700 outline-none p-0 border-none h-auto w-full"
+                                className="bg-transparent text-xs font-semibold text-slate-700 dark:text-slate-200 outline-none p-0 border-none h-auto w-full"
                             />
                             {searchTerm && (
                                 <button
                                     onClick={() => setSearchTerm('')}
-                                    className="p-1 hover:bg-slate-200/60 rounded-full transition-colors text-slate-400 hover:text-slate-700"
+                                    className="p-1 hover:bg-slate-200/60 dark:hover:bg-slate-800/60 rounded-full transition-colors text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-200"
                                 >
                                     <X size={12} />
                                 </button>
@@ -415,13 +415,13 @@ function ComprasGlobalContent() {
                     </div>
 
                     {loadingBranches ? (
-                        <div className="flex items-center justify-center h-48 rounded-3xl bg-white border border-slate-200">
-                            <Loader2 className="animate-spin text-blue-600" size={28} />
+                        <div className="flex items-center justify-center h-48 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+                            <Loader2 className="animate-spin text-blue-600 dark:text-blue-400" size={28} />
                         </div>
                     ) : errorBranches ? (
-                        <div className="rounded-3xl bg-red-50 border border-red-200 text-red-700 p-6">{errorBranches}</div>
+                        <div className="rounded-3xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 text-red-700 dark:text-red-400 p-6">{errorBranches}</div>
                     ) : filteredBranches.length === 0 && !showAllBranchesCard ? (
-                        <div className="rounded-3xl bg-slate-50 border border-slate-200 text-slate-500 p-8 text-center">No se encontraron sucursales.</div>
+                        <div className="rounded-3xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 p-8 text-center">No se encontraron sucursales.</div>
                     ) : (
                         <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                             {showAllBranchesCard && globalKPI && (
@@ -438,35 +438,35 @@ function ComprasGlobalContent() {
             {/* ARTICULOS por sucursal */}
             {selectedSucursal && !selectedArticulo && (
                 <section className="space-y-4 animate-in fade-in duration-300">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200/60 shadow-xs">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/60 dark:border-slate-700/60 shadow-xs">
                         <div className="flex flex-col gap-1">
-                            <div className="flex items-center flex-wrap gap-1.5 text-xs font-bold text-slate-400 select-none">
+                            <div className="flex items-center flex-wrap gap-1.5 text-xs font-bold text-slate-400 dark:text-slate-500 select-none">
                                 <button
                                     onClick={clearSucursal}
-                                    className="hover:text-blue-600 hover:underline transition-colors duration-150"
+                                    className="hover:text-blue-600 dark:hover:text-blue-400 hover:underline transition-colors duration-150"
                                 >
                                     Sucursales
                                 </button>
-                                <ChevronRight size={12} className="text-slate-300" />
-                                <span className="text-slate-800 font-extrabold">{selectedSucursal.Nombre}</span>
+                                <ChevronRight size={12} className="text-slate-300 dark:text-slate-700" />
+                                <span className="text-slate-800 dark:text-slate-100 font-extrabold">{selectedSucursal.Nombre}</span>
                             </div>
-                            <h2 className="text-lg font-black text-slate-800 tracking-tight uppercase mt-0.5">
+                            <h2 className="text-lg font-black text-slate-800 dark:text-slate-100 tracking-tight uppercase mt-0.5">
                                 Artículos abastecidos en {selectedSucursal.Nombre}
                             </h2>
                         </div>
-                        <div className="relative flex items-center bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 focus-within:ring-2 focus-within:ring-blue-500/10 focus-within:border-blue-500 transition-all w-full md:w-64 max-w-sm">
-                            <Search size={16} className="text-slate-400 mr-2 shrink-0" />
+                        <div className="relative flex items-center bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 focus-within:ring-2 focus-within:ring-blue-500/10 focus-within:border-blue-500 transition-all w-full md:w-64 max-w-sm">
+                            <Search size={16} className="text-slate-400 dark:text-slate-500 mr-2 shrink-0" />
                             <input
                                 type="text"
                                 placeholder="Buscar artículo..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="bg-transparent text-xs font-semibold text-slate-700 outline-none p-0 border-none h-auto w-full"
+                                className="bg-transparent text-xs font-semibold text-slate-700 dark:text-slate-200 outline-none p-0 border-none h-auto w-full"
                             />
                             {searchTerm && (
                                 <button
                                     onClick={() => setSearchTerm('')}
-                                    className="p-1 hover:bg-slate-200/60 rounded-full transition-colors text-slate-400 hover:text-slate-700"
+                                    className="p-1 hover:bg-slate-200/60 dark:hover:bg-slate-800/60 rounded-full transition-colors text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-200"
                                 >
                                     <X size={12} />
                                 </button>
@@ -475,13 +475,13 @@ function ComprasGlobalContent() {
                     </div>
 
                     {loadingArticulos ? (
-                        <div className="flex items-center justify-center h-48 rounded-3xl bg-white border border-slate-200">
-                            <Loader2 className="animate-spin text-blue-600" size={28} />
+                        <div className="flex items-center justify-center h-48 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+                            <Loader2 className="animate-spin text-blue-600 dark:text-blue-400" size={28} />
                         </div>
                     ) : errorArticulos ? (
-                        <div className="rounded-3xl bg-red-50 border border-red-200 text-red-700 p-6">{errorArticulos}</div>
+                        <div className="rounded-3xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 text-red-700 dark:text-red-400 p-6">{errorArticulos}</div>
                     ) : filteredArticulos.length === 0 ? (
-                        <div className="rounded-3xl bg-slate-50 border border-slate-200 text-slate-500 p-6">No se encontraron artículos abastecidos en el periodo.</div>
+                        <div className="rounded-3xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 p-6">No se encontraron artículos abastecidos en el periodo.</div>
                     ) : (
                         <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                             {filteredArticulos.map((a) => (
@@ -494,24 +494,24 @@ function ComprasGlobalContent() {
 
             {/* DETALLE por artículo (modal) */}
             {selectedArticulo && selectedSucursal && (
-                <div className="fixed inset-0 z-[110] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 border border-slate-200">
+                <div className="fixed inset-0 z-[110] flex items-center justify-center bg-slate-900/60 dark:bg-slate-50/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+                    <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 border border-slate-200 dark:border-slate-700">
                         {/* Header */}
-                        <div className="px-6 py-5 border-b border-slate-100 flex items-start justify-between bg-slate-50 gap-4">
+                        <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-start justify-between bg-slate-50 dark:bg-slate-900 gap-4">
                             <div className="flex flex-col gap-1 min-w-0">
-                                <div className="flex items-center flex-wrap gap-1.5 text-xs font-bold text-slate-400 select-none">
-                                    <button onClick={clearSucursal} className="hover:text-blue-600 hover:underline transition-colors">Sucursales</button>
-                                    <ChevronRight size={12} className="text-slate-300" />
-                                    <button onClick={closeDetalle} className="hover:text-blue-600 hover:underline transition-colors">{selectedSucursal.Nombre}</button>
-                                    <ChevronRight size={12} className="text-slate-300" />
-                                    <span className="text-slate-800 font-extrabold truncate">{selectedArticulo.Articulo}</span>
+                                <div className="flex items-center flex-wrap gap-1.5 text-xs font-bold text-slate-400 dark:text-slate-500 select-none">
+                                    <button onClick={clearSucursal} className="hover:text-blue-600 dark:hover:text-blue-400 hover:underline transition-colors">Sucursales</button>
+                                    <ChevronRight size={12} className="text-slate-300 dark:text-slate-700" />
+                                    <button onClick={closeDetalle} className="hover:text-blue-600 dark:hover:text-blue-400 hover:underline transition-colors">{selectedSucursal.Nombre}</button>
+                                    <ChevronRight size={12} className="text-slate-300 dark:text-slate-700" />
+                                    <span className="text-slate-800 dark:text-slate-100 font-extrabold truncate">{selectedArticulo.Articulo}</span>
                                 </div>
-                                <h2 className="text-lg font-black text-slate-900 tracking-tight uppercase flex items-center gap-2">
-                                    <Package size={20} className="text-blue-600" />
+                                <h2 className="text-lg font-black text-slate-900 dark:text-slate-50 tracking-tight uppercase flex items-center gap-2">
+                                    <Package size={20} className="text-blue-600 dark:text-blue-400" />
                                     {selectedArticulo.Articulo}
                                 </h2>
-                                <p className="text-xs font-semibold text-slate-500">
-                                    Código: <span className="font-mono font-bold text-slate-700">{selectedArticulo.Codigo || `#${selectedArticulo.IdArticulo}`}</span>
+                                <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                                    Código: <span className="font-mono font-bold text-slate-700 dark:text-slate-200">{selectedArticulo.Codigo || `#${selectedArticulo.IdArticulo}`}</span>
                                     {' · '}Periodo: {startDate} al {endDate}
                                 </p>
                             </div>
@@ -527,7 +527,7 @@ function ComprasGlobalContent() {
                                 </button>
                                 <button
                                     onClick={closeDetalle}
-                                    className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                                    className="p-2 text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-xl transition-all"
                                 >
                                     <X size={20} />
                                 </button>
@@ -535,27 +535,27 @@ function ComprasGlobalContent() {
                         </div>
 
                         {/* Body */}
-                        <div className="flex-1 overflow-auto p-6 space-y-6 bg-slate-50/40">
+                        <div className="flex-1 overflow-auto p-6 space-y-6 bg-slate-50/40 dark:bg-slate-900/40">
                             {loadingDetalle ? (
-                                <div className="flex flex-col items-center justify-center py-20 text-slate-500">
-                                    <Loader2 className="animate-spin mb-3 text-blue-600" size={32} />
+                                <div className="flex flex-col items-center justify-center py-20 text-slate-500 dark:text-slate-400">
+                                    <Loader2 className="animate-spin mb-3 text-blue-600 dark:text-blue-400" size={32} />
                                     <span className="font-semibold text-xs">Cargando detalle...</span>
                                 </div>
                             ) : errorDetalle ? (
-                                <div className="bg-red-50 text-red-700 p-4 rounded-xl text-xs border border-red-100">{errorDetalle}</div>
+                                <div className="bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400 p-4 rounded-xl text-xs border border-red-100 dark:border-red-900/60">{errorDetalle}</div>
                             ) : (
                                 <>
                                     {/* Compras */}
                                     <DetalleTable
                                         title="Compras"
-                                        icon={<ShoppingBag size={16} className="text-blue-600" />}
+                                        icon={<ShoppingBag size={16} className="text-blue-600 dark:text-blue-400" />}
                                         rows={detalle?.compras || []}
                                         showOrigin
                                     />
                                     {/* Traspasos */}
                                     <DetalleTable
                                         title="Traspasos"
-                                        icon={<ArrowRightLeft size={16} className="text-purple-600" />}
+                                        icon={<ArrowRightLeft size={16} className="text-purple-600 dark:text-purple-400" />}
                                         rows={detalle?.traspasos || []}
                                         showOrigin
                                     />
@@ -576,13 +576,13 @@ function SucursalCard({ kpi, isGlobal, onClick }: { kpi: SucursalKPI; isGlobal?:
         <div
             onClick={onClick}
             className={cn(
-                'cursor-pointer rounded-xl border p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg relative overflow-hidden group select-none bg-white',
-                isGlobal ? 'border-indigo-300 bg-gradient-to-br from-indigo-50/60 to-white' : 'border-slate-200/80 hover:border-blue-500/50'
+                'cursor-pointer rounded-xl border p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg relative overflow-hidden group select-none bg-white dark:bg-slate-900',
+                isGlobal ? 'border-indigo-300 dark:border-indigo-700/60 bg-gradient-to-br from-indigo-50/60 to-white dark:to-slate-900' : 'border-slate-200/80 dark:border-slate-700/80 hover:border-blue-500/50'
             )}
         >
             <div className={cn(
                 'absolute left-0 top-0 bottom-0 w-1 transition-colors duration-300',
-                isGlobal ? 'bg-gradient-to-b from-indigo-600 to-purple-600' : 'bg-slate-200 group-hover:bg-blue-500'
+                isGlobal ? 'bg-gradient-to-b from-indigo-600 to-purple-600' : 'bg-slate-200 dark:bg-slate-800 group-hover:bg-blue-500'
             )}></div>
 
             <div className="flex items-center justify-between gap-2 mb-3">
@@ -596,11 +596,11 @@ function SucursalCard({ kpi, isGlobal, onClick }: { kpi: SucursalKPI; isGlobal?:
                         {isGlobal ? <LayoutGrid size={16} /> : <Store size={16} />}
                     </div>
                     <div className="min-w-0">
-                        <h3 className="text-sm font-extrabold text-slate-800 truncate tracking-tight">{kpi.Nombre}</h3>
-                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{isGlobal ? 'Global' : 'Sucursal'}</p>
+                        <h3 className="text-sm font-extrabold text-slate-800 dark:text-slate-100 truncate tracking-tight">{kpi.Nombre}</h3>
+                        <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">{isGlobal ? 'Global' : 'Sucursal'}</p>
                     </div>
                 </div>
-                <ArrowRight size={14} className={cn('shrink-0', isGlobal ? 'text-indigo-500' : 'text-blue-500')} />
+                <ArrowRight size={14} className={cn('shrink-0', isGlobal ? 'text-indigo-500 dark:text-indigo-400' : 'text-blue-500 dark:text-blue-400')} />
             </div>
 
             <div className="grid grid-cols-2 gap-2 mt-3">
@@ -645,10 +645,10 @@ function MiniKPI({ label, value, sub, color, icon }: {
     icon: React.ReactNode;
 }) {
     const colorMap = {
-        emerald: 'bg-emerald-50 text-emerald-700 border-emerald-100',
-        amber: 'bg-amber-50 text-amber-700 border-amber-100',
-        indigo: 'bg-indigo-50 text-indigo-700 border-indigo-100',
-        rose: 'bg-rose-50 text-rose-700 border-rose-100'
+        emerald: 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/60',
+        amber: 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border-amber-100 dark:border-amber-900/60',
+        indigo: 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-400 border-indigo-100 dark:border-indigo-900/60',
+        rose: 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border-rose-100 dark:border-rose-900/60'
     };
     return (
         <div className={cn('rounded-lg border p-2', colorMap[color])}>
@@ -668,42 +668,42 @@ function ArticuloCard({ articulo, onClick }: { articulo: ArticuloRow; onClick: (
     return (
         <div
             onClick={onClick}
-            className="cursor-pointer rounded-xl border border-slate-200/60 p-3.5 shadow-xs border-l-[3px] border-l-amber-500 hover:border-l-amber-600 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 bg-white flex flex-col justify-between min-h-[150px]"
+            className="cursor-pointer rounded-xl border border-slate-200/60 dark:border-slate-700/60 p-3.5 shadow-xs border-l-[3px] border-l-amber-500 hover:border-l-amber-600 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 bg-white dark:bg-slate-900 flex flex-col justify-between min-h-[150px]"
         >
             <div>
                 <div className="flex items-start justify-between gap-2 mb-2">
                     <div className="flex items-start gap-1.5 min-w-0">
-                        <div className="bg-amber-500/10 w-7 h-7 rounded-md flex items-center justify-center text-amber-600 border border-amber-500/20 shrink-0 mt-0.5">
+                        <div className="bg-amber-500/10 w-7 h-7 rounded-md flex items-center justify-center text-amber-600 dark:text-amber-400 border border-amber-500/20 shrink-0 mt-0.5">
                             <FileText size={14} />
                         </div>
                         <div className="min-w-0 flex flex-col">
-                            <h3 className="text-xs font-extrabold text-slate-800 truncate tracking-tight" title={articulo.Articulo}>{articulo.Articulo}</h3>
-                            <span className="text-[10px] text-slate-400 font-bold tracking-wider mt-0.5">Código: #{articulo.Codigo || articulo.IdArticulo}</span>
+                            <h3 className="text-xs font-extrabold text-slate-800 dark:text-slate-100 truncate tracking-tight" title={articulo.Articulo}>{articulo.Articulo}</h3>
+                            <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold tracking-wider mt-0.5">Código: #{articulo.Codigo || articulo.IdArticulo}</span>
                         </div>
                     </div>
-                    <ArrowRight size={14} className="text-slate-400 shrink-0" />
+                    <ArrowRight size={14} className="text-slate-400 dark:text-slate-500 shrink-0" />
                 </div>
             </div>
 
-            <div className="space-y-1.5 text-[11px] text-slate-500 pt-2 border-t border-slate-100 mt-auto">
+            <div className="space-y-1.5 text-[11px] text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800 mt-auto">
                 <div className="flex items-center justify-between">
-                    <span className="font-semibold text-slate-400 flex items-center gap-1">
-                        <ShoppingBag size={10} className="text-blue-500" /> Compras
+                    <span className="font-semibold text-slate-400 dark:text-slate-500 flex items-center gap-1">
+                        <ShoppingBag size={10} className="text-blue-500 dark:text-blue-400" /> Compras
                     </span>
-                    <span className="font-bold text-slate-800 tabular-nums">{articulo.CantCompras} · {formatCurrency(articulo.TotalCompras)}</span>
+                    <span className="font-bold text-slate-800 dark:text-slate-100 tabular-nums">{articulo.CantCompras} · {formatCurrency(articulo.TotalCompras)}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                    <span className="font-semibold text-slate-400 flex items-center gap-1">
-                        <ArrowRightLeft size={10} className="text-purple-500" /> Traspasos
+                    <span className="font-semibold text-slate-400 dark:text-slate-500 flex items-center gap-1">
+                        <ArrowRightLeft size={10} className="text-purple-500 dark:text-purple-400" /> Traspasos
                     </span>
-                    <span className="font-bold text-slate-800 tabular-nums">{articulo.CantTraspasos} · {formatCurrency(articulo.TotalTraspasos)}</span>
+                    <span className="font-bold text-slate-800 dark:text-slate-100 tabular-nums">{articulo.CantTraspasos} · {formatCurrency(articulo.TotalTraspasos)}</span>
                 </div>
-                <div className="flex items-center justify-between pt-1 border-t border-slate-100">
-                    <span className="font-semibold text-slate-400">Recibidos / Pendientes</span>
+                <div className="flex items-center justify-between pt-1 border-t border-slate-100 dark:border-slate-800">
+                    <span className="font-semibold text-slate-400 dark:text-slate-500">Recibidos / Pendientes</span>
                     <span className="font-bold tabular-nums">
-                        <span className="text-emerald-700">{articulo.Recibidos}</span>
-                        <span className="text-slate-300 mx-1">/</span>
-                        <span className="text-amber-700">{articulo.Pendientes}</span>
+                        <span className="text-emerald-700 dark:text-emerald-400">{articulo.Recibidos}</span>
+                        <span className="text-slate-300 dark:text-slate-700 mx-1">/</span>
+                        <span className="text-amber-700 dark:text-amber-400">{articulo.Pendientes}</span>
                     </span>
                 </div>
             </div>
@@ -723,68 +723,68 @@ function DetalleTable({ title, icon, rows, showOrigin }: {
     const totalMonto = rows.reduce((acc, r) => acc + (Number(r.Total) || 0), 0);
 
     return (
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-            <div className="flex items-center justify-between gap-3 px-5 py-3 border-b border-slate-100 bg-slate-50">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+            <div className="flex items-center justify-between gap-3 px-5 py-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900">
                 <div className="flex items-center gap-2">
                     {icon}
-                    <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight">{title}</h3>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">({rows.length})</span>
+                    <h3 className="text-sm font-black text-slate-800 dark:text-slate-100 uppercase tracking-tight">{title}</h3>
+                    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">({rows.length})</span>
                 </div>
-                <div className="text-xs font-bold text-slate-700 tabular-nums">
-                    <span className="text-slate-400 mr-2">Total:</span>
+                <div className="text-xs font-bold text-slate-700 dark:text-slate-200 tabular-nums">
+                    <span className="text-slate-400 dark:text-slate-500 mr-2">Total:</span>
                     {totalCant} · {formatCurrency(totalMonto)}
                 </div>
             </div>
 
             {rows.length === 0 ? (
-                <div className="p-6 text-center text-xs text-slate-400">Sin movimientos en el periodo.</div>
+                <div className="p-6 text-center text-xs text-slate-400 dark:text-slate-500">Sin movimientos en el periodo.</div>
             ) : (
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-xs">
-                        <thead className="bg-slate-50/60 border-b border-slate-200">
+                        <thead className="bg-slate-50/60 dark:bg-slate-900/60 border-b border-slate-200 dark:border-slate-700">
                             <tr>
-                                <th className="px-4 py-2.5 font-bold text-slate-600 uppercase tracking-wider">Folio</th>
-                                <th className="px-4 py-2.5 font-bold text-slate-600 uppercase tracking-wider">Fecha</th>
-                                {showOrigin && <th className="px-4 py-2.5 font-bold text-slate-600 uppercase tracking-wider">Origen</th>}
-                                <th className="px-4 py-2.5 font-bold text-slate-600 uppercase tracking-wider">Sucursal Destino</th>
-                                <th className="px-4 py-2.5 font-bold text-slate-600 uppercase tracking-wider text-right">Cantidad</th>
-                                <th className="px-4 py-2.5 font-bold text-slate-600 uppercase tracking-wider text-right">Costo</th>
-                                <th className="px-4 py-2.5 font-bold text-slate-600 uppercase tracking-wider text-right">Total</th>
-                                <th className="px-4 py-2.5 font-bold text-slate-600 uppercase tracking-wider">Estatus</th>
-                                <th className="px-4 py-2.5 font-bold text-slate-600 uppercase tracking-wider">Recibido</th>
-                                <th className="px-4 py-2.5 font-bold text-slate-600 uppercase tracking-wider">Creador</th>
+                                <th className="px-4 py-2.5 font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Folio</th>
+                                <th className="px-4 py-2.5 font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Fecha</th>
+                                {showOrigin && <th className="px-4 py-2.5 font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Origen</th>}
+                                <th className="px-4 py-2.5 font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Sucursal Destino</th>
+                                <th className="px-4 py-2.5 font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider text-right">Cantidad</th>
+                                <th className="px-4 py-2.5 font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider text-right">Costo</th>
+                                <th className="px-4 py-2.5 font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider text-right">Total</th>
+                                <th className="px-4 py-2.5 font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Estatus</th>
+                                <th className="px-4 py-2.5 font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Recibido</th>
+                                <th className="px-4 py-2.5 font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Creador</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100">
+                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                             {rows.map((r, i) => {
                                 const isReceived = r.Estatus.toLowerCase().startsWith('recib');
                                 const isCancelled = r.Estatus.toLowerCase().startsWith('cancel');
                                 return (
-                                    <tr key={`${r.Tipo}-${r.Id}-${r.Iteracion}-${i}`} className="hover:bg-slate-50/50 transition-colors">
-                                        <td className="px-4 py-2.5 font-mono text-blue-600 font-bold whitespace-nowrap">{r.Folio}</td>
-                                        <td className="px-4 py-2.5 text-slate-600 whitespace-nowrap">{formatDate(r.Fecha)}</td>
-                                        {showOrigin && <td className="px-4 py-2.5 text-slate-700 truncate max-w-[180px]" title={r.Origen}>{r.Origen}</td>}
-                                        <td className="px-4 py-2.5 text-slate-700 truncate max-w-[160px]">{r.SucursalDestino}</td>
-                                        <td className="px-4 py-2.5 text-right text-slate-900 font-bold tabular-nums">{r.Cantidad}</td>
-                                        <td className="px-4 py-2.5 text-right text-slate-600 tabular-nums">{formatCurrency(r.Costo)}</td>
-                                        <td className="px-4 py-2.5 text-right text-slate-900 font-bold tabular-nums">{formatCurrency(r.Total)}</td>
+                                    <tr key={`${r.Tipo}-${r.Id}-${r.Iteracion}-${i}`} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/50 transition-colors">
+                                        <td className="px-4 py-2.5 font-mono text-blue-600 dark:text-blue-400 font-bold whitespace-nowrap">{r.Folio}</td>
+                                        <td className="px-4 py-2.5 text-slate-600 dark:text-slate-300 whitespace-nowrap">{formatDate(r.Fecha)}</td>
+                                        {showOrigin && <td className="px-4 py-2.5 text-slate-700 dark:text-slate-200 truncate max-w-[180px]" title={r.Origen}>{r.Origen}</td>}
+                                        <td className="px-4 py-2.5 text-slate-700 dark:text-slate-200 truncate max-w-[160px]">{r.SucursalDestino}</td>
+                                        <td className="px-4 py-2.5 text-right text-slate-900 dark:text-slate-50 font-bold tabular-nums">{r.Cantidad}</td>
+                                        <td className="px-4 py-2.5 text-right text-slate-600 dark:text-slate-300 tabular-nums">{formatCurrency(r.Costo)}</td>
+                                        <td className="px-4 py-2.5 text-right text-slate-900 dark:text-slate-50 font-bold tabular-nums">{formatCurrency(r.Total)}</td>
                                         <td className="px-4 py-2.5 whitespace-nowrap">
                                             <span className={cn(
                                                 'inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-bold text-[10px] border',
                                                 isCancelled
-                                                    ? 'bg-slate-50 text-slate-500 border-slate-200'
+                                                    ? 'bg-slate-50 dark:bg-slate-900 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700'
                                                     : isReceived
-                                                        ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
-                                                        : 'bg-amber-50 text-amber-700 border-amber-100'
+                                                        ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/60'
+                                                        : 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border-amber-100 dark:border-amber-900/60'
                                             )}>
                                                 <span className={cn('w-1.5 h-1.5 rounded-full shrink-0',
-                                                    isCancelled ? 'bg-slate-400' : isReceived ? 'bg-emerald-500' : 'bg-amber-500'
+                                                    isCancelled ? 'bg-slate-400 dark:bg-slate-500' : isReceived ? 'bg-emerald-500' : 'bg-amber-500'
                                                 )}></span>
                                                 {r.Estatus}
                                             </span>
                                         </td>
-                                        <td className="px-4 py-2.5 text-slate-600 whitespace-nowrap">{formatDate(r.FechaRecibo)}</td>
-                                        <td className="px-4 py-2.5 text-slate-600 truncate max-w-[120px]">{r.Creador}</td>
+                                        <td className="px-4 py-2.5 text-slate-600 dark:text-slate-300 whitespace-nowrap">{formatDate(r.FechaRecibo)}</td>
+                                        <td className="px-4 py-2.5 text-slate-600 dark:text-slate-300 truncate max-w-[120px]">{r.Creador}</td>
                                     </tr>
                                 );
                             })}
@@ -800,7 +800,7 @@ export default function ComprasGlobalPage() {
     return (
         <Suspense fallback={
             <div className="flex items-center justify-center min-h-[400px]">
-                <Loader2 className="animate-spin text-blue-600" size={40} />
+                <Loader2 className="animate-spin text-blue-600 dark:text-blue-400" size={40} />
             </div>
         }>
             <ComprasGlobalContent />

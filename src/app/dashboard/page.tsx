@@ -147,9 +147,9 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ st
             icon: DollarSign, 
             trend: 'stable', 
             color: 'emerald',
-            iconBg: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
+            iconBg: 'bg-emerald-500/10 text-emerald-500 dark:text-emerald-400 border-emerald-500/20',
             glowColor: 'from-emerald-500/5 to-transparent',
-            valueColor: 'text-emerald-600'
+            valueColor: 'text-emerald-600 dark:text-emerald-400'
         },
         { 
             name: 'Operaciones del día', 
@@ -158,9 +158,9 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ st
             icon: ShoppingBag, 
             trend: 'stable', 
             color: 'amber',
-            iconBg: 'bg-amber-500/10 text-amber-500 border-amber-500/20',
+            iconBg: 'bg-amber-500/10 text-amber-500 dark:text-amber-400 border-amber-500/20',
             glowColor: 'from-amber-500/5 to-transparent',
-            valueColor: 'text-amber-600'
+            valueColor: 'text-amber-600 dark:text-amber-400'
         },
         { 
             name: 'Aperturas Activas', 
@@ -169,9 +169,9 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ st
             icon: Store, 
             trend: 'stable', 
             color: 'blue',
-            iconBg: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
+            iconBg: 'bg-blue-500/10 text-blue-500 dark:text-blue-400 border-blue-500/20',
             glowColor: 'from-blue-500/5 to-transparent',
-            valueColor: 'text-blue-600'
+            valueColor: 'text-blue-600 dark:text-blue-400'
         },
         { 
             name: 'Ticket Promedio', 
@@ -180,9 +180,9 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ st
             icon: Receipt, 
             trend: 'stable', 
             color: 'purple',
-            iconBg: 'bg-purple-500/10 text-purple-500 border-purple-500/20',
+            iconBg: 'bg-purple-500/10 text-purple-500 dark:text-purple-400 border-purple-500/20',
             glowColor: 'from-purple-500/5 to-transparent',
-            valueColor: 'text-purple-600'
+            valueColor: 'text-purple-600 dark:text-purple-400'
         },
     ];
 
@@ -190,14 +190,14 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ st
         <div className="space-y-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-900 bg-clip-text text-transparent">Panel Principal</h1>
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mt-1">Resumen de Ventas y Rendimiento</p>
+                    <h1 className="text-3xl font-extrabold text-slate-900 dark:text-slate-50 tracking-tight bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-900 bg-clip-text text-transparent">Panel Principal</h1>
+                    <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mt-1">Resumen de Ventas y Rendimiento</p>
                 </div>
-                <div className="bg-white border border-slate-200/60 px-4 py-2 rounded-xl flex flex-wrap items-center gap-4 shadow-xs">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-700/60 px-4 py-2 rounded-xl flex flex-wrap items-center gap-4 shadow-xs">
                     <DatePresets />
-                    <div className="w-px h-6 bg-slate-200/80 mx-1 hidden md:block"></div>
+                    <div className="w-px h-6 bg-slate-200/80 dark:bg-slate-800/80 mx-1 hidden md:block"></div>
                     <div className="flex items-center gap-3">
-                        <CalendarDays size={18} className="text-slate-400 shrink-0" />
+                        <CalendarDays size={18} className="text-slate-400 dark:text-slate-500 shrink-0" />
                         <DateSelector defaultStartDate={startDate} defaultEndDate={endDate} />
                     </div>
                 </div>
@@ -208,7 +208,7 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ st
                     <div 
                         key={stat.name} 
                         className={cn(
-                            "bg-white border border-slate-200/60 border-l-4 p-5 rounded-xl relative overflow-hidden group hover-premium cursor-pointer transition-all duration-300 shadow-xs",
+                            "bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-700/60 border-l-4 p-5 rounded-xl relative overflow-hidden group hover-premium cursor-pointer transition-all duration-300 shadow-xs",
                             stat.color === 'emerald' ? 'border-l-emerald-500' :
                             stat.color === 'amber' ? 'border-l-amber-500' :
                             stat.color === 'blue' ? 'border-l-blue-500' :
@@ -217,7 +217,7 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ st
                     >
                         <div className="flex items-start justify-between relative z-10">
                             <div>
-                                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">{stat.name}</p>
+                                <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">{stat.name}</p>
                                 <p className={cn("text-3xl font-extrabold tracking-tight mt-2", stat.valueColor)}>{stat.value}</p>
                             </div>
                             <div className={cn(
@@ -228,8 +228,8 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ st
                             </div>
                         </div>
                         <div className="mt-4 flex items-center gap-1.5 relative z-10">
-                            <span className="w-1.5 h-1.5 rounded-full bg-slate-300 group-hover:bg-indigo-500 transition-colors animate-pulse" />
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{stat.change}</span>
+                            <span className="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-700 group-hover:bg-indigo-500 transition-colors animate-pulse" />
+                            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">{stat.change}</span>
                         </div>
                     </div>
                 ))}
@@ -249,6 +249,6 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ st
 }
 
 function Option({ children }: { children: React.ReactNode }) {
-    return <option className="bg-white text-slate-700">{children}</option>;
+    return <option className="bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200">{children}</option>;
 }
 

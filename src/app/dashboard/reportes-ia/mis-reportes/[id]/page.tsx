@@ -84,7 +84,7 @@ const isDeptParam = (p: ReportParam) => /depto|departamento|categor/i.test(p.tok
 /** Renderiza UN bloque del tablero según su tipo (kpis/chart/table/narrative). */
 function ReportBlockView({ block, onDrill }: { block: LoadedBlock; onDrill?: (clicked: string) => void }) {
     const heading = block.title ? (
-        <h3 className="text-sm font-black uppercase tracking-wider text-slate-500 mb-3">{block.title}</h3>
+        <h3 className="text-sm font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">{block.title}</h3>
     ) : null;
 
     // Comentario del analista (estático o generado al crear)
@@ -92,9 +92,9 @@ function ReportBlockView({ block, onDrill }: { block: LoadedBlock; onDrill?: (cl
         const txt = block.narrative?.text?.trim();
         if (!txt) return null;
         return (
-            <div className="bg-white rounded-3xl border border-slate-100 p-5">
+            <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 p-5">
                 {heading}
-                <p className="text-[15px] leading-relaxed text-slate-700 font-medium">{renderBold(txt)}</p>
+                <p className="text-[15px] leading-relaxed text-slate-700 dark:text-slate-200 font-medium">{renderBold(txt)}</p>
             </div>
         );
     }
@@ -102,9 +102,9 @@ function ReportBlockView({ block, onDrill }: { block: LoadedBlock; onDrill?: (cl
     // Un bloque que falló no tumba el tablero: se muestra su error y los demás siguen.
     if (block.error) {
         return (
-            <div className="bg-white rounded-3xl border border-slate-100 p-5">
+            <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 p-5">
                 {heading}
-                <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-3 text-sm font-medium">
+                <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 text-red-700 dark:text-red-400 rounded-xl p-3 text-sm font-medium">
                     No se pudo cargar este bloque: {block.error}
                 </div>
             </div>
@@ -120,9 +120,9 @@ function ReportBlockView({ block, onDrill }: { block: LoadedBlock; onDrill?: (cl
                 {heading}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     {kpis.map((k, i) => (
-                        <div key={i} className="bg-white rounded-2xl border border-slate-100 p-4">
-                            <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 truncate">{k.label}</div>
-                            <div className="text-2xl font-black text-slate-900 tabular-nums mt-1">{fmtKpiVal(computeKpi(block.rows, k), k.format)}</div>
+                        <div key={i} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-4">
+                            <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 truncate">{k.label}</div>
+                            <div className="text-2xl font-black text-slate-900 dark:text-slate-50 tabular-nums mt-1">{fmtKpiVal(computeKpi(block.rows, k), k.format)}</div>
                         </div>
                     ))}
                 </div>
@@ -132,7 +132,7 @@ function ReportBlockView({ block, onDrill }: { block: LoadedBlock; onDrill?: (cl
 
     // chart / table → ReportDataView
     return (
-        <div className="bg-white rounded-3xl border border-slate-100 p-4 md:p-6">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 p-4 md:p-6">
             {heading}
             {block.rows.length > 0 ? (
                 <ReportDataView
@@ -146,7 +146,7 @@ function ReportBlockView({ block, onDrill }: { block: LoadedBlock; onDrill?: (cl
                     onDrill={block.drill ? onDrill : undefined}
                 />
             ) : (
-                <p className="text-slate-400 font-medium py-8 text-center">Sin datos para este bloque con los filtros actuales.</p>
+                <p className="text-slate-400 dark:text-slate-500 font-medium py-8 text-center">Sin datos para este bloque con los filtros actuales.</p>
             )}
         </div>
     );
@@ -168,23 +168,23 @@ function StoreMultiSelect({ stores, value, onChange }: { stores: StoreOption[]; 
     return (
         <div className="relative">
             <button onClick={() => setOpen((o) => !o)}
-                className="min-w-[200px] flex items-center justify-between gap-2 px-3 py-2 rounded-lg border border-slate-200 bg-white text-slate-700 text-sm hover:border-indigo-400">
+                className="min-w-[200px] flex items-center justify-between gap-2 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 text-sm hover:border-indigo-400">
                 <span>{label}</span>
-                <ChevronDown className="w-4 h-4 text-slate-400" />
+                <ChevronDown className="w-4 h-4 text-slate-400 dark:text-slate-500" />
             </button>
             {open && (
                 <>
                     <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-                    <div className="absolute z-20 mt-1 w-64 max-h-72 overflow-auto bg-white border border-slate-200 rounded-xl shadow-xl p-2">
-                        <div className="flex items-center justify-between px-1 pb-1.5 mb-1 border-b border-slate-100">
-                            <button onClick={() => onChange("")} className="text-[11px] font-bold text-indigo-600 hover:text-indigo-700">Todas</button>
-                            {count > 0 && <button onClick={() => onChange("")} className="text-[11px] text-slate-400 hover:text-slate-600">Limpiar</button>}
+                    <div className="absolute z-20 mt-1 w-64 max-h-72 overflow-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl p-2">
+                        <div className="flex items-center justify-between px-1 pb-1.5 mb-1 border-b border-slate-100 dark:border-slate-800">
+                            <button onClick={() => onChange("")} className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-400">Todas</button>
+                            {count > 0 && <button onClick={() => onChange("")} className="text-[11px] text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300">Limpiar</button>}
                         </div>
-                        {stores.length === 0 && <div className="text-xs text-slate-400 px-2 py-3">cargando sucursales…</div>}
+                        {stores.length === 0 && <div className="text-xs text-slate-400 dark:text-slate-500 px-2 py-3">cargando sucursales…</div>}
                         {stores.map((s) => (
-                            <label key={s.id} className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-slate-50 cursor-pointer">
+                            <label key={s.id} className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900 cursor-pointer">
                                 <input type="checkbox" checked={selected.has(String(s.id))} onChange={() => onChange(toggleCsv(value, s.id))} className="accent-indigo-600" />
-                                <span className="text-sm text-slate-700">{s.name}</span>
+                                <span className="text-sm text-slate-700 dark:text-slate-200">{s.name}</span>
                             </label>
                         ))}
                     </div>
@@ -197,15 +197,15 @@ function StoreMultiSelect({ stores, value, onChange }: { stores: StoreOption[]; 
 function ReportSkeleton() {
     return (
         <div className="space-y-4 animate-pulse">
-            <div className="h-7 w-64 bg-slate-200 rounded-lg" />
-            <div className="h-4 w-80 bg-slate-100 rounded" />
-            <div className="bg-white rounded-3xl border border-slate-100 p-6 space-y-4">
+            <div className="h-7 w-64 bg-slate-200 dark:bg-slate-800 rounded-lg" />
+            <div className="h-4 w-80 bg-slate-100 dark:bg-slate-800 rounded" />
+            <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 p-6 space-y-4">
                 <div className="flex gap-2">
-                    {[0, 1, 2, 3].map((i) => <div key={i} className="h-7 w-20 bg-slate-100 rounded-lg" />)}
+                    {[0, 1, 2, 3].map((i) => <div key={i} className="h-7 w-20 bg-slate-100 dark:bg-slate-800 rounded-lg" />)}
                 </div>
-                <div className="h-[280px] bg-gradient-to-b from-slate-100 to-slate-50 rounded-2xl" />
+                <div className="h-[280px] bg-gradient-to-b from-slate-100 dark:from-slate-800 to-slate-50 dark:to-slate-900 rounded-2xl" />
             </div>
-            <p className="text-center text-slate-400 text-sm font-medium">Generando reporte con datos en vivo…</p>
+            <p className="text-center text-slate-400 dark:text-slate-500 text-sm font-medium">Generando reporte con datos en vivo…</p>
         </div>
     );
 }
@@ -380,27 +380,27 @@ export default function ReporteGuardadoPage() {
 
     return (
         <div className="space-y-6">
-            <Link href={REPORTS_PATH} className="inline-flex items-center gap-1.5 text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors">
+            <Link href={REPORTS_PATH} className="inline-flex items-center gap-1.5 text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                 <ArrowLeft className="w-4 h-4" /> Mis Reportes
             </Link>
 
             {error && (
-                <div className="bg-red-50 border border-red-200 text-red-700 rounded-2xl p-4 font-medium">{error}</div>
+                <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 text-red-700 dark:text-red-400 rounded-2xl p-4 font-medium">{error}</div>
             )}
 
             {data && def && (
                 <>
                     <div className="flex items-start justify-between gap-3 flex-wrap">
                         <div>
-                            <h1 className="text-2xl font-black tracking-tight text-slate-900">{data.title}</h1>
-                            {data.descripcion && <p className="text-slate-500 font-medium mt-1">{data.descripcion}</p>}
-                            <p className="text-[11px] text-slate-400 mt-2">
+                            <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-slate-50">{data.title}</h1>
+                            {data.descripcion && <p className="text-slate-500 dark:text-slate-400 font-medium mt-1">{data.descripcion}</p>}
+                            <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-2">
                                 {hasBlocks ? `${data.blocks!.length} bloque(s)` : `${data.rowCount ?? 0} fila(s)`} · creado {new Date(data.fechaCreacion).toLocaleDateString("es-MX", { dateStyle: "medium" })}
                             </p>
                         </div>
                         <div className="flex items-center gap-2">
                             <button onClick={exportPdf}
-                                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-100 transition-colors"
+                                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-bold text-sm hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                                 title="Exportar el reporte a PDF">
                                 <FileDown className="w-4 h-4" /> PDF
                             </button>
@@ -414,16 +414,16 @@ export default function ReporteGuardadoPage() {
 
                     {/* Controles interactivos (período, sucursales, filtros) */}
                     {reportParams.length > 0 && (
-                        <div className="bg-white rounded-3xl border border-slate-100 p-5">
-                            <h3 className="text-sm font-black uppercase tracking-wider text-slate-500 flex items-center gap-2 mb-4">
+                        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 p-5">
+                            <h3 className="text-sm font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-2 mb-4">
                                 <SlidersHorizontal className="w-4 h-4" /> Filtros del reporte
                             </h3>
                             {hasRange && (
                                 <div className="flex flex-wrap gap-1.5 mb-4">
-                                    <span className="text-[11px] text-slate-400 self-center mr-1">Período:</span>
+                                    <span className="text-[11px] text-slate-400 dark:text-slate-500 self-center mr-1">Período:</span>
                                     {periodPresets().map((p) => (
                                         <button key={p.label} onClick={() => applyPreset(p.start, p.end)}
-                                            className="px-3 py-1.5 rounded-full text-[12px] font-medium bg-slate-100 text-slate-600 hover:bg-indigo-100 hover:text-indigo-700 transition-colors">
+                                            className="px-3 py-1.5 rounded-full text-[12px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 hover:text-indigo-700 dark:hover:text-indigo-400 transition-colors">
                                             {p.label}
                                         </button>
                                     ))}
@@ -432,25 +432,25 @@ export default function ReporteGuardadoPage() {
                             <div className="flex flex-wrap gap-4 items-end">
                                 {reportParams.map((p) => (
                                     <div key={p.token} className="min-w-[160px]">
-                                        <label className="block text-[11px] font-bold text-slate-500 mb-1">{p.label}</label>
+                                        <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">{p.label}</label>
                                         {p.kind === "date" && (
                                             <input type="date" value={paramValues[p.token] || ""} onChange={(e) => setPv(p.token, e.target.value)}
-                                                className="px-3 py-2 rounded-lg border border-slate-200 text-slate-700 outline-none focus:border-indigo-400" />
+                                                className="px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 outline-none focus:border-indigo-400" />
                                         )}
                                         {p.kind === "number" && (
                                             <input type="number" value={paramValues[p.token] || ""} onChange={(e) => setPv(p.token, e.target.value)}
-                                                className="w-28 px-3 py-2 rounded-lg border border-slate-200 text-slate-700 outline-none focus:border-indigo-400" />
+                                                className="w-28 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 outline-none focus:border-indigo-400" />
                                         )}
                                         {p.kind === "text" && isDeptParam(p) && departments.length > 0 ? (
                                             <div className="flex flex-wrap gap-1.5 max-w-2xl">
-                                                <button onClick={() => setPv(p.token, "")} className={`px-2.5 py-1 rounded-full text-[12px] border transition-colors ${(paramValues[p.token] || "") === "" ? "bg-indigo-600 text-white border-indigo-600" : "bg-white text-slate-600 border-slate-200 hover:border-indigo-300"}`}>Todos</button>
+                                                <button onClick={() => setPv(p.token, "")} className={`px-2.5 py-1 rounded-full text-[12px] border transition-colors ${(paramValues[p.token] || "") === "" ? "bg-indigo-600 text-white border-indigo-600" : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-700/60"}`}>Todos</button>
                                                 {departments.map((dep) => (
-                                                    <button key={dep} onClick={() => setPv(p.token, dep)} className={`px-2.5 py-1 rounded-full text-[12px] border transition-colors ${paramValues[p.token] === dep ? "bg-indigo-600 text-white border-indigo-600" : "bg-white text-slate-600 border-slate-200 hover:border-indigo-300"}`}>{dep}</button>
+                                                    <button key={dep} onClick={() => setPv(p.token, dep)} className={`px-2.5 py-1 rounded-full text-[12px] border transition-colors ${paramValues[p.token] === dep ? "bg-indigo-600 text-white border-indigo-600" : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-700/60"}`}>{dep}</button>
                                                 ))}
                                             </div>
                                         ) : p.kind === "text" ? (
                                             <input type="text" value={paramValues[p.token] || ""} onChange={(e) => setPv(p.token, e.target.value)} placeholder="(todos)"
-                                                className="px-3 py-2 rounded-lg border border-slate-200 text-slate-700 outline-none focus:border-indigo-400 placeholder:text-slate-300" />
+                                                className="px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 outline-none focus:border-indigo-400 placeholder:text-slate-300" />
                                         ) : null}
                                         {p.kind === "storeList" && (
                                             <StoreMultiSelect stores={stores} value={paramValues[p.token] || ""} onChange={(v) => setPv(p.token, v)} />
@@ -468,7 +468,7 @@ export default function ReporteGuardadoPage() {
                     {hasBlocks ? (
                         /* ── Tablero multi-bloque: un control global de filtros mueve todos los bloques ── */
                         loading ? (
-                            <div className="h-[280px] bg-gradient-to-b from-slate-100 to-slate-50 rounded-2xl animate-pulse" />
+                            <div className="h-[280px] bg-gradient-to-b from-slate-100 dark:from-slate-800 to-slate-50 dark:to-slate-900 rounded-2xl animate-pulse" />
                         ) : (
                             <div className="space-y-6">
                                 {data.blocks!.map((b) => <ReportBlockView key={b.id} block={b} onDrill={(v) => openDrill(b.id, v)} />)}
@@ -480,18 +480,18 @@ export default function ReporteGuardadoPage() {
                             {def.kpis && def.kpis.length > 0 && (data.rows?.length ?? 0) > 0 && !loading && (
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                                     {def.kpis.map((k, i) => (
-                                        <div key={i} className="bg-white rounded-2xl border border-slate-100 p-4">
-                                            <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 truncate">{k.label}</div>
-                                            <div className="text-2xl font-black text-slate-900 tabular-nums mt-1">{fmtKpiVal(computeKpi(data.rows ?? [], k), k.format)}</div>
+                                        <div key={i} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-4">
+                                            <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 truncate">{k.label}</div>
+                                            <div className="text-2xl font-black text-slate-900 dark:text-slate-50 tabular-nums mt-1">{fmtKpiVal(computeKpi(data.rows ?? [], k), k.format)}</div>
                                         </div>
                                     ))}
                                 </div>
                             )}
 
                             {/* Datos + visualización */}
-                            <div className="bg-white rounded-3xl border border-slate-100 p-4 md:p-6">
+                            <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 p-4 md:p-6">
                                 {loading ? (
-                                    <div className="h-[280px] bg-gradient-to-b from-slate-100 to-slate-50 rounded-2xl animate-pulse" />
+                                    <div className="h-[280px] bg-gradient-to-b from-slate-100 dark:from-slate-800 to-slate-50 dark:to-slate-900 rounded-2xl animate-pulse" />
                                 ) : (data.rows?.length ?? 0) > 0 ? (
                                     <ReportDataView
                                         data={data.rows ?? []}
@@ -504,32 +504,32 @@ export default function ReporteGuardadoPage() {
                                         onDrill={def.drill ? (v) => openDrill(null, v) : undefined}
                                     />
                                 ) : (
-                                    <p className="text-slate-400 font-medium py-8 text-center">El reporte no devolvió datos con los filtros actuales.</p>
+                                    <p className="text-slate-400 dark:text-slate-500 font-medium py-8 text-center">El reporte no devolvió datos con los filtros actuales.</p>
                                 )}
                             </div>
                         </>
                     )}
 
                     {/* Modo IA (opcional, toggle, desactivado por defecto) */}
-                    <div className="bg-gradient-to-br from-indigo-50 to-white rounded-3xl border border-indigo-100 p-5">
+                    <div className="bg-gradient-to-br from-indigo-50 to-white dark:to-slate-900 rounded-3xl border border-indigo-100 dark:border-indigo-900/60 p-5">
                         <div className="flex items-center justify-between gap-3 flex-wrap">
                             <div>
-                                <h3 className="text-sm font-black uppercase tracking-wider text-indigo-600 flex items-center gap-2">
+                                <h3 className="text-sm font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
                                     <Sparkles className="w-4 h-4" /> Modo IA
                                 </h3>
-                                <p className="text-xs text-slate-500 mt-1">Opcional. Actívalo para que la IA lea los datos actuales. El reporte por sí solo no usa IA.</p>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Opcional. Actívalo para que la IA lea los datos actuales. El reporte por sí solo no usa IA.</p>
                             </div>
                             {/* Toggle */}
                             <button onClick={toggleIa} role="switch" aria-checked={iaOn}
-                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${iaOn ? "bg-indigo-600" : "bg-slate-300"}`}>
-                                <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${iaOn ? "translate-x-5" : "translate-x-0.5"}`} />
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${iaOn ? "bg-indigo-600" : "bg-slate-300 dark:bg-slate-700"}`}>
+                                <span className={`inline-block h-5 w-5 transform rounded-full bg-white dark:bg-slate-900 shadow transition-transform ${iaOn ? "translate-x-5" : "translate-x-0.5"}`} />
                             </button>
                         </div>
 
                         {iaOn && (
                             <div className="mt-4 flex items-center gap-2 flex-wrap">
                                 <select value={analyzeModel} onChange={(e) => setAnalyzeModel(e.target.value)} disabled={analyzing}
-                                    className="text-sm bg-white border border-slate-200 rounded-lg px-2.5 py-2 text-slate-700 outline-none focus:border-indigo-400 disabled:opacity-50 cursor-pointer">
+                                    className="text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-2 text-slate-700 dark:text-slate-200 outline-none focus:border-indigo-400 disabled:opacity-50 cursor-pointer">
                                     {models.length === 0 && <option value="">(cargando…)</option>}
                                     {models.map((m) => (<option key={m.id} value={m.id}>{m.label}</option>))}
                                 </select>
@@ -539,21 +539,21 @@ export default function ReporteGuardadoPage() {
                                 </button>
                             </div>
                         )}
-                        {iaOn && aiError && <div className="mt-4 bg-red-50 border border-red-200 text-red-700 rounded-xl p-3 text-sm font-medium">{aiError}</div>}
+                        {iaOn && aiError && <div className="mt-4 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 text-red-700 dark:text-red-400 rounded-xl p-3 text-sm font-medium">{aiError}</div>}
                         {iaOn && ai && (
-                            <div className="mt-4 space-y-4 border-t border-indigo-100 pt-4">
-                                <p className="text-[15px] leading-relaxed text-slate-700 font-medium">{renderBold(ai.narrative)}</p>
+                            <div className="mt-4 space-y-4 border-t border-indigo-100 dark:border-indigo-900/60 pt-4">
+                                <p className="text-[15px] leading-relaxed text-slate-700 dark:text-slate-200 font-medium">{renderBold(ai.narrative)}</p>
                                 {ai.insights?.length > 0 && (
                                     <ul className="space-y-1.5">
-                                        {ai.insights.map((it, i) => (<li key={i} className="text-slate-700 text-sm flex gap-2"><span className="text-indigo-400">•</span><span>{renderBold(it)}</span></li>))}
+                                        {ai.insights.map((it, i) => (<li key={i} className="text-slate-700 dark:text-slate-200 text-sm flex gap-2"><span className="text-indigo-400">•</span><span>{renderBold(it)}</span></li>))}
                                     </ul>
                                 )}
                                 {ai.recommendations?.length > 0 && (
                                     <ul className="space-y-1.5">
-                                        {ai.recommendations.map((it, i) => (<li key={i} className="text-slate-700 text-sm flex gap-2"><span className="text-emerald-500">→</span><span>{renderBold(it)}</span></li>))}
+                                        {ai.recommendations.map((it, i) => (<li key={i} className="text-slate-700 dark:text-slate-200 text-sm flex gap-2"><span className="text-emerald-500 dark:text-emerald-400">→</span><span>{renderBold(it)}</span></li>))}
                                     </ul>
                                 )}
-                                <span className="inline-block text-[11px] font-bold text-slate-400 bg-white border border-slate-200 rounded-full px-2.5 py-1">
+                                <span className="inline-block text-[11px] font-bold text-slate-400 dark:text-slate-500 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-full px-2.5 py-1">
                                     Analizado con {ai.modelLabel}
                                 </span>
                             </div>
@@ -562,23 +562,23 @@ export default function ReporteGuardadoPage() {
 
                     {/* Hallazgos guardados al crear el reporte */}
                     {def.insights?.length > 0 && (
-                        <div className="bg-white rounded-3xl border border-slate-100 p-5">
-                            <h3 className="text-sm font-black uppercase tracking-wider text-slate-500 flex items-center gap-2 mb-3">
+                        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 p-5">
+                            <h3 className="text-sm font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-2 mb-3">
                                 <Lightbulb className="w-4 h-4" /> Hallazgos al crear el reporte
                             </h3>
                             <ul className="space-y-2">
-                                {def.insights.map((it, i) => (<li key={i} className="text-slate-700 font-medium flex gap-2"><span className="text-indigo-400">•</span> <span>{renderBold(it)}</span></li>))}
+                                {def.insights.map((it, i) => (<li key={i} className="text-slate-700 dark:text-slate-200 font-medium flex gap-2"><span className="text-indigo-400">•</span> <span>{renderBold(it)}</span></li>))}
                             </ul>
                         </div>
                     )}
 
                     {def.recommendations?.length > 0 && (
-                        <div className="bg-white rounded-3xl border border-slate-100 p-5">
-                            <h3 className="text-sm font-black uppercase tracking-wider text-emerald-600 flex items-center gap-2 mb-3">
+                        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 p-5">
+                            <h3 className="text-sm font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-2 mb-3">
                                 <Target className="w-4 h-4" /> Acciones recomendadas
                             </h3>
                             <ul className="space-y-2">
-                                {def.recommendations.map((it, i) => (<li key={i} className="text-slate-700 font-medium flex gap-2"><span className="text-emerald-400">→</span> <span>{renderBold(it)}</span></li>))}
+                                {def.recommendations.map((it, i) => (<li key={i} className="text-slate-700 dark:text-slate-200 font-medium flex gap-2"><span className="text-emerald-400">→</span> <span>{renderBold(it)}</span></li>))}
                             </ul>
                         </div>
                     )}
@@ -590,20 +590,20 @@ export default function ReporteGuardadoPage() {
             {/* Modal de drill-down (detalle de la categoría clickeada) */}
             {drill && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={() => setDrill(null)}>
-                    <div className="w-full max-w-3xl bg-white rounded-2xl shadow-2xl overflow-hidden max-h-[85vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
-                        <div className="px-5 py-3 border-b border-slate-100 flex items-center justify-between gap-3">
-                            <h4 className="font-black text-slate-800 text-sm tracking-tight">{drill.title}</h4>
-                            <button onClick={() => setDrill(null)} className="text-slate-400 hover:text-slate-700 text-lg leading-none">✕</button>
+                    <div className="w-full max-w-3xl bg-white dark:bg-slate-900 rounded-2xl shadow-2xl overflow-hidden max-h-[85vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+                        <div className="px-5 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
+                            <h4 className="font-black text-slate-800 dark:text-slate-100 text-sm tracking-tight">{drill.title}</h4>
+                            <button onClick={() => setDrill(null)} className="text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 text-lg leading-none">✕</button>
                         </div>
                         <div className="p-5 overflow-auto">
                             {drill.loading ? (
-                                <div className="h-[220px] bg-gradient-to-b from-slate-100 to-slate-50 rounded-2xl animate-pulse" />
+                                <div className="h-[220px] bg-gradient-to-b from-slate-100 dark:from-slate-800 to-slate-50 dark:to-slate-900 rounded-2xl animate-pulse" />
                             ) : drill.error ? (
-                                <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-3 text-sm font-medium">{drill.error}</div>
+                                <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 text-red-700 dark:text-red-400 rounded-xl p-3 text-sm font-medium">{drill.error}</div>
                             ) : drill.rows && drill.rows.length > 0 ? (
                                 <ReportDataView data={drill.rows} suggestedViz={drill.visualization} question={drill.title} />
                             ) : (
-                                <p className="text-slate-400 font-medium py-8 text-center">Sin detalle para este elemento.</p>
+                                <p className="text-slate-400 dark:text-slate-500 font-medium py-8 text-center">Sin detalle para este elemento.</p>
                             )}
                         </div>
                     </div>

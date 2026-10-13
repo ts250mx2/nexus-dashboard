@@ -58,9 +58,9 @@ function AvisoSinMovimientosHoy({ sucursal, generadoEn, calculadoEn }: {
     calculadoEn: string;
 }) {
     return (
-        <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-2xl px-5 py-4">
-            <AlertTriangle size={18} className="text-amber-600 shrink-0 mt-0.5" />
-            <div className="text-xs text-amber-900 space-y-1">
+        <div className="flex items-start gap-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 rounded-2xl px-5 py-4">
+            <AlertTriangle size={18} className="text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+            <div className="text-xs text-amber-900 dark:text-amber-300 space-y-1">
                 <p className="font-bold uppercase tracking-wider">Ningún artículo con movimientos hoy</p>
                 <p>
                     Ventas, recibos, traspasos, devoluciones y consignaciones de {sucursal || 'la sucursal'} se
@@ -76,38 +76,38 @@ function AvisoSinMovimientosHoy({ sucursal, generadoEn, calculadoEn }: {
 /** Cantidad con signo visual: negativos en rojo, ceros atenuados. */
 function Cantidad({ value, strong = false }: { value: number; strong?: boolean }) {
     const n = Number(value || 0);
-    if (n === 0) return <span className="text-slate-300">0</span>;
-    const tone = n < 0 ? 'text-rose-600 font-black' : strong ? 'text-slate-900 font-black' : 'text-slate-700 font-semibold';
+    if (n === 0) return <span className="text-slate-300 dark:text-slate-700">0</span>;
+    const tone = n < 0 ? 'text-rose-600 dark:text-rose-400 font-black' : strong ? 'text-slate-900 dark:text-slate-50 font-black' : 'text-slate-700 dark:text-slate-200 font-semibold';
     return <span className={tone}>{formatDecimal(n, 0)}</span>;
 }
 
 function Movimiento({ value, tone }: { value: number; tone: 'entrada' | 'salida' }) {
     const n = Number(value || 0);
-    if (n <= 0) return <span className="text-slate-300">—</span>;
+    if (n <= 0) return <span className="text-slate-300 dark:text-slate-700">—</span>;
     return tone === 'entrada'
-        ? <span className="font-bold text-emerald-600">+{formatDecimal(n, 0)}</span>
-        : <span className="font-bold text-amber-600">−{formatDecimal(n, 0)}</span>;
+        ? <span className="font-bold text-emerald-600 dark:text-emerald-400">+{formatDecimal(n, 0)}</span>
+        : <span className="font-bold text-amber-600 dark:text-amber-400">−{formatDecimal(n, 0)}</span>;
 }
 
 const COLUMNS: Column<ExistenciaRow>[] = [
     {
         key: 'Codigo',
         label: 'Código',
-        render: r => <span className="font-mono text-xs font-bold text-blue-700 whitespace-nowrap">{r.Codigo}</span>,
+        render: r => <span className="font-mono text-xs font-bold text-blue-700 dark:text-blue-400 whitespace-nowrap">{r.Codigo}</span>,
     },
     {
         key: 'Descripcion',
         label: 'Descripción',
         render: r => (
             <div className="min-w-[240px]">
-                <p className="font-bold text-slate-800 leading-tight">{r.Descripcion}</p>
-                <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider flex flex-wrap items-center gap-x-2">
+                <p className="font-bold text-slate-800 dark:text-slate-100 leading-tight">{r.Descripcion}</p>
+                <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider flex flex-wrap items-center gap-x-2">
                     <span>{r.Marca} · {r.Depto}</span>
                     {tieneMovimientoHoy(r) && (
-                        <span className="inline-flex items-center gap-1 px-1.5 py-px rounded bg-blue-50 text-blue-700 border border-blue-100 normal-case tracking-normal">
+                        <span className="inline-flex items-center gap-1 px-1.5 py-px rounded bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border border-blue-100 dark:border-blue-900/60 normal-case tracking-normal">
                             Hoy
-                            {Number(r.EntradasHoy) > 0 && <span className="text-emerald-600">+{formatDecimal(r.EntradasHoy, 0)}</span>}
-                            {Number(r.SalidasHoy) > 0 && <span className="text-amber-600">−{formatDecimal(r.SalidasHoy, 0)}</span>}
+                            {Number(r.EntradasHoy) > 0 && <span className="text-emerald-600 dark:text-emerald-400">+{formatDecimal(r.EntradasHoy, 0)}</span>}
+                            {Number(r.SalidasHoy) > 0 && <span className="text-amber-600 dark:text-amber-400">−{formatDecimal(r.SalidasHoy, 0)}</span>}
                         </span>
                     )}
                 </p>
@@ -118,24 +118,24 @@ const COLUMNS: Column<ExistenciaRow>[] = [
     { key: 'Entradas', label: 'Entradas', align: 'right', render: r => <Movimiento value={r.Entradas} tone="entrada" /> },
     { key: 'Salidas', label: 'Salidas', align: 'right', render: r => <Movimiento value={r.Salidas} tone="salida" /> },
     { key: 'ExiFinal', label: 'Exi. final', align: 'right', render: r => <Cantidad value={r.ExiFinal} strong /> },
-    { key: 'Costo', label: 'Costo', align: 'right', render: r => <span className="text-slate-600">{formatCurrency(r.Costo)}</span> },
+    { key: 'Costo', label: 'Costo', align: 'right', render: r => <span className="text-slate-600 dark:text-slate-300">{formatCurrency(r.Costo)}</span> },
     {
         key: 'Total',
         label: 'Total',
         align: 'right',
-        render: r => <span className={Number(r.Total) < 0 ? 'font-black text-rose-600' : 'font-bold text-slate-800'}>{formatCurrency(r.Total)}</span>,
+        render: r => <span className={Number(r.Total) < 0 ? 'font-black text-rose-600 dark:text-rose-400' : 'font-bold text-slate-800 dark:text-slate-100'}>{formatCurrency(r.Total)}</span>,
     },
     {
         key: 'Consignacion',
         label: 'Consignación',
         align: 'right',
-        render: r => (Number(r.Consignacion) !== 0 ? <span className="font-semibold text-violet-600">{formatDecimal(r.Consignacion, 0)}</span> : <span className="text-slate-300">—</span>),
+        render: r => (Number(r.Consignacion) !== 0 ? <span className="font-semibold text-violet-600 dark:text-violet-400">{formatDecimal(r.Consignacion, 0)}</span> : <span className="text-slate-300 dark:text-slate-700">—</span>),
     },
     {
         key: 'UltimaActualizacion',
         label: 'Última actualización',
         align: 'right',
-        render: r => <span className="text-xs text-slate-500 whitespace-nowrap">{formatDateTime(r.UltimaActualizacion)}</span>,
+        render: r => <span className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">{formatDateTime(r.UltimaActualizacion)}</span>,
         sortValue: r => (r.UltimaActualizacion ? new Date(r.UltimaActualizacion).getTime() : 0),
     },
 ];
@@ -251,30 +251,30 @@ export default function ExistenciasPage() {
                 exportDisabled={viewRows.length === 0 || refreshing}
             >
                 <div className="flex flex-col gap-1.5 pb-1.5">
-                    <label className="flex items-center gap-2 text-xs font-semibold text-slate-600 cursor-pointer select-none whitespace-nowrap">
+                    <label className="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300 cursor-pointer select-none whitespace-nowrap">
                         <input
                             type="checkbox"
                             checked={soloMovimientosHoy}
                             onChange={e => setSoloMovimientosHoy(e.target.checked)}
-                            className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                            className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 cursor-pointer"
                         />
                         Solo con movimientos hoy
                     </label>
-                    <label className="flex items-center gap-2 text-xs font-semibold text-slate-600 cursor-pointer select-none whitespace-nowrap">
+                    <label className="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300 cursor-pointer select-none whitespace-nowrap">
                         <input
                             type="checkbox"
                             checked={soloNegativos}
                             onChange={e => setSoloNegativos(e.target.checked)}
-                            className="w-4 h-4 rounded border-slate-300 text-rose-600 focus:ring-rose-500 cursor-pointer"
+                            className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-rose-600 dark:text-rose-400 focus:ring-rose-500 cursor-pointer"
                         />
                         Solo en negativo
                     </label>
-                    <label className="flex items-center gap-2 text-xs font-semibold text-slate-600 cursor-pointer select-none whitespace-nowrap">
+                    <label className="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300 cursor-pointer select-none whitespace-nowrap">
                         <input
                             type="checkbox"
                             checked={ocultarSinMovimiento}
                             onChange={e => setOcultarSinMovimiento(e.target.checked)}
-                            className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                            className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 cursor-pointer"
                         />
                         Ocultar en cero
                     </label>
@@ -288,12 +288,12 @@ export default function ExistenciasPage() {
             )}
 
             {!loading && !error && requiereSucursal && (
-                <div className="flex flex-col items-center justify-center py-20 gap-3 bg-white rounded-2xl border border-slate-100 shadow-xs">
-                    <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                <div className="flex flex-col items-center justify-center py-20 gap-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-xs">
+                    <div className="w-14 h-14 rounded-2xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center">
                         <Building2 size={26} />
                     </div>
-                    <p className="text-sm font-bold text-slate-700 uppercase tracking-wider">Selecciona una sucursal</p>
-                    <p className="text-xs text-slate-400 max-w-md text-center">
+                    <p className="text-sm font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider">Selecciona una sucursal</p>
+                    <p className="text-xs text-slate-400 dark:text-slate-500 max-w-md text-center">
                         La existencia se calcula sucursal por sucursal a partir del corte tipo 99 y los
                         movimientos posteriores.
                     </p>
@@ -358,7 +358,7 @@ export default function ExistenciasPage() {
                         title={`Existencias · ${sucursalDatos}`}
                         subtitle={`Existencia inicial = corte del ERP del ${formatDate(data.meta.fechaCorte)} (generado ${formatDateTime(data.meta.generadoEn)}) · entradas y salidas posteriores leídas en vivo a las ${formatDateTime(data.meta.calculadoEn)}`}
                         action={
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
                                 {formatInt(viewRows.length)} registros · clic en un artículo para ver sus movimientos
                             </span>
                         }
@@ -371,7 +371,7 @@ export default function ExistenciasPage() {
                             rows={viewRows}
                             rowKey={r => String(r.IdArticulo)}
                             initialSort={{ key: 'Descripcion', direction: 'asc' }}
-                            rowClassName={r => (Number(r.ExiFinal) < 0 ? 'bg-rose-50/40' : '')}
+                            rowClassName={r => (Number(r.ExiFinal) < 0 ? 'bg-rose-50/40 dark:bg-rose-950/40' : '')}
                             onRowClick={r => setArticuloAbierto({
                                 IdArticulo: r.IdArticulo,
                                 IdSucursal: r.IdSucursal,

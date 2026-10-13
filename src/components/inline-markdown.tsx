@@ -38,14 +38,14 @@ function renderSegment(segment: string, key: number, onCite?: () => void): React
                     key={key}
                     type="button"
                     onClick={onCite}
-                    className="font-bold text-slate-900 cursor-pointer border-b border-dotted border-slate-400 hover:border-blue-500 hover:text-blue-700 transition-colors decoration-dotted inline"
+                    className="font-bold text-slate-900 dark:text-slate-50 cursor-pointer border-b border-dotted border-slate-400 dark:border-slate-600 hover:border-blue-500 hover:text-blue-700 dark:hover:text-blue-400 transition-colors decoration-dotted inline"
                     title="Ver fuente de este dato"
                 >
                     {content}
                 </button>
             );
         }
-        return <strong key={key} className="font-bold text-slate-900">{content}</strong>;
+        return <strong key={key} className="font-bold text-slate-900 dark:text-slate-50">{content}</strong>;
     }
 
     const italicMatch = segment.match(/^\*(.+?)\*$/);
@@ -56,7 +56,7 @@ function renderSegment(segment: string, key: number, onCite?: () => void): React
     const codeMatch = segment.match(/^`(.+?)`$/);
     if (codeMatch) {
         return (
-            <code key={key} className="px-1.5 py-0.5 bg-slate-100 text-slate-800 rounded text-[0.9em] font-mono">
+            <code key={key} className="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded text-[0.9em] font-mono">
                 {codeMatch[1]}
             </code>
         );

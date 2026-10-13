@@ -357,9 +357,9 @@ function ListaPreciosContent() {
         const diff = numNew - numOrig;
         const pct = numOrig > 0 ? (diff / numOrig) * 100 : 0;
         const sign = diff > 0 ? '+' : '';
-        const color = diff > 0 ? 'text-emerald-600 font-bold' : 'text-rose-600 font-bold';
+        const color = diff > 0 ? 'text-emerald-600 dark:text-emerald-400 font-bold' : 'text-rose-600 dark:text-rose-400 font-bold';
         return (
-            <span className={cn("text-[10px] ml-2 font-mono bg-slate-50 px-1 rounded border border-slate-100", color)}>
+            <span className={cn("text-[10px] ml-2 font-mono bg-slate-50 dark:bg-slate-900 px-1 rounded border border-slate-100 dark:border-slate-800", color)}>
                 {sign}{formatCurrency(diff)} ({sign}{pct.toFixed(1)}%)
             </span>
         );
@@ -376,22 +376,22 @@ function ListaPreciosContent() {
     return (
         <div className="space-y-6 relative">
             {/* Header + filtros */}
-            <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white py-4 px-6 rounded-2xl shadow-sm border border-slate-100 animate-in fade-in duration-500">
+            <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white dark:bg-slate-900 py-4 px-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 animate-in fade-in duration-500">
                 <div className="flex flex-col md:flex-row md:items-center gap-6">
-                    <h1 className="text-2xl font-black text-slate-800 tracking-tight uppercase flex items-center gap-3 select-none">
-                        <Tags className="text-blue-600" />
+                    <h1 className="text-2xl font-black text-slate-800 dark:text-slate-100 tracking-tight uppercase flex items-center gap-3 select-none">
+                        <Tags className="text-blue-600 dark:text-blue-400" />
                         Lista de Precios
                     </h1>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3">
-                    <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
-                        <MapPin size={16} className="text-blue-500" />
-                        <span className="text-[10px] font-bold text-slate-400 uppercase">Zona</span>
+                    <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2">
+                        <MapPin size={16} className="text-blue-500 dark:text-blue-400" />
+                        <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">Zona</span>
                         <select
                             value={zonaId}
                             onChange={(e) => handleParamChange('zonaId', e.target.value)}
-                            className="bg-transparent text-xs font-bold text-slate-700 outline-none border-none cursor-pointer max-w-[220px]"
+                            className="bg-transparent text-xs font-bold text-slate-700 dark:text-slate-200 outline-none border-none cursor-pointer max-w-[220px]"
                         >
                             <option value="">Selecciona una zona</option>
                             {zonas.map(z => (
@@ -401,7 +401,7 @@ function ListaPreciosContent() {
                     </div>
                     <button
                         onClick={() => handleParamChange('zonaId', zonaId)}
-                        className="p-2.5 bg-slate-50 border border-slate-200 text-blue-600 hover:bg-slate-100 hover:border-slate-300 transition-all rounded-xl shadow-sm disabled:opacity-40"
+                        className="p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-blue-600 dark:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600 transition-all rounded-xl shadow-sm disabled:opacity-40"
                         disabled={loading || !zonaId}
                         title="Actualizar Datos"
                     >
@@ -410,7 +410,7 @@ function ListaPreciosContent() {
                     <button
                         onClick={handleExportExcel}
                         disabled={loading || filteredData.length === 0}
-                        className="p-2.5 text-green-600 bg-green-50 hover:bg-green-100 rounded-xl transition-colors border border-green-200 disabled:opacity-40 pointer-events-auto"
+                        className="p-2.5 text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/40 hover:bg-green-100 dark:hover:bg-green-900/40 rounded-xl transition-colors border border-green-200 dark:border-green-800/60 disabled:opacity-40 pointer-events-auto"
                         title="Exportar Excel"
                     >
                         <FileSpreadsheet size={16} />
@@ -418,7 +418,7 @@ function ListaPreciosContent() {
                     <button
                         onClick={handleExportPDF}
                         disabled={loading || filteredData.length === 0}
-                        className="p-2.5 text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-xl transition-colors border border-rose-200 disabled:opacity-40 pointer-events-auto"
+                        className="p-2.5 text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/40 rounded-xl transition-colors border border-rose-200 dark:border-rose-800/60 disabled:opacity-40 pointer-events-auto"
                         title="Exportar PDF"
                     >
                         <FileText size={16} />
@@ -427,48 +427,48 @@ function ListaPreciosContent() {
             </div>
 
             {zonasError && (
-                <div className="bg-amber-50 border border-amber-200 text-amber-700 px-5 py-3 rounded-2xl text-sm font-semibold">
+                <div className="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 text-amber-700 dark:text-amber-400 px-5 py-3 rounded-2xl text-sm font-semibold">
                     No se pudo cargar el catálogo de zonas: {zonasError}
                 </div>
             )}
 
             {/* Contenido */}
             {!zonaId ? (
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center justify-center p-12 text-center text-slate-400 min-h-[400px]">
-                    <MapPin size={48} className="text-blue-500 opacity-40 mb-4" />
-                    <h3 className="text-lg font-semibold text-slate-900">Selecciona una zona</h3>
+                <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col items-center justify-center p-12 text-center text-slate-400 dark:text-slate-500 min-h-[400px]">
+                    <MapPin size={48} className="text-blue-500 dark:text-blue-400 opacity-40 mb-4" />
+                    <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Selecciona una zona</h3>
                     <p className="mt-1 max-w-xs">Elige una zona para ver los precios vigentes de los artículos activos.</p>
                 </div>
             ) : loading ? (
-                <div className="flex flex-col items-center justify-center h-64 text-slate-500">
-                    <Loader2 className="animate-spin mb-4 text-blue-600" size={40} />
+                <div className="flex flex-col items-center justify-center h-64 text-slate-500 dark:text-slate-400">
+                    <Loader2 className="animate-spin mb-4 text-blue-600 dark:text-blue-400" size={40} />
                     <p className="font-medium">Cargando lista de precios...</p>
                 </div>
             ) : error ? (
-                <div className="bg-red-50 border border-red-200 text-red-600 p-6 rounded-2xl flex flex-col items-center">
+                <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 text-red-600 dark:text-red-400 p-6 rounded-2xl flex flex-col items-center">
                     <p className="font-bold">Error al cargar datos</p>
                     <p className="text-sm mt-1">{error}</p>
                 </div>
             ) : (
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
                     {/* Toolbar */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 py-3 border-b border-slate-100 bg-slate-50/60">
-                        <div className="flex items-center gap-2 text-sm font-bold text-slate-700">
-                            <Package size={16} className="text-blue-600" />
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 py-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/60">
+                        <div className="flex items-center gap-2 text-sm font-bold text-slate-700 dark:text-slate-200">
+                            <Package size={16} className="text-blue-600 dark:text-blue-400" />
                             {filteredData.length} artículo{filteredData.length === 1 ? '' : 's'}
-                            {zonaLabel && <span className="text-[11px] font-semibold text-slate-400 ml-1 uppercase tracking-wider">{zonaLabel}</span>}
+                            {zonaLabel && <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 ml-1 uppercase tracking-wider">{zonaLabel}</span>}
                         </div>
-                        <div className="relative flex items-center bg-white border border-slate-200 rounded-xl px-3 py-1.5 focus-within:ring-2 focus-within:ring-blue-500/10 focus-within:border-blue-500 transition-all w-full sm:w-72">
-                            <Search size={15} className="text-slate-400 mr-2 shrink-0" />
+                        <div className="relative flex items-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 focus-within:ring-2 focus-within:ring-blue-500/10 focus-within:border-blue-500 transition-all w-full sm:w-72">
+                            <Search size={15} className="text-slate-400 dark:text-slate-500 mr-2 shrink-0" />
                             <input
                                 type="text"
                                 placeholder="Buscar por descripción o código..."
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                className="bg-transparent text-xs font-semibold text-slate-700 outline-none p-0 border-none h-auto w-full"
+                                className="bg-transparent text-xs font-semibold text-slate-700 dark:text-slate-200 outline-none p-0 border-none h-auto w-full"
                             />
                             {search && (
-                                <button onClick={() => setSearch('')} className="p-1 hover:bg-slate-200/60 rounded-full text-slate-400">
+                                <button onClick={() => setSearch('')} className="p-1 hover:bg-slate-200/60 dark:hover:bg-slate-800/60 rounded-full text-slate-400 dark:text-slate-500">
                                     <X size={12} />
                                 </button>
                             )}
@@ -477,56 +477,56 @@ function ListaPreciosContent() {
 
                     <div className="overflow-auto max-h-[68vh] nice-scroll">
                         <table className="w-full text-left text-sm whitespace-nowrap border-collapse">
-                            <thead className="bg-slate-50 sticky top-0 shadow-sm z-10 border-b border-slate-200">
+                            <thead className="bg-slate-50 dark:bg-slate-900 sticky top-0 shadow-sm z-10 border-b border-slate-200 dark:border-slate-700">
                                 <tr>
                                     <th
-                                        className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors select-none group"
+                                        className="px-6 py-4 font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors select-none group"
                                         onClick={() => handleSort('Codigo')}
                                     >
                                         <div className="flex items-center gap-1 justify-between">
                                             Código
-                                            <ArrowUpDown size={14} className={cn("text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig.key === 'Codigo' && "opacity-100 text-blue-500")} />
+                                            <ArrowUpDown size={14} className={cn("text-slate-400 dark:text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig.key === 'Codigo' && "opacity-100 text-blue-500 dark:text-blue-400")} />
                                         </div>
                                     </th>
                                     <th
-                                        className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors select-none group"
+                                        className="px-6 py-4 font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors select-none group"
                                         onClick={() => handleSort('Descripcion')}
                                     >
                                         <div className="flex items-center gap-1 justify-between">
                                             Descripción
-                                            <ArrowUpDown size={14} className={cn("text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig.key === 'Descripcion' && "opacity-100 text-blue-500")} />
+                                            <ArrowUpDown size={14} className={cn("text-slate-400 dark:text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig.key === 'Descripcion' && "opacity-100 text-blue-500 dark:text-blue-400")} />
                                         </div>
                                     </th>
                                     {priceColumns.map(col => (
                                         <th
                                             key={col.key}
-                                            className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors select-none group text-right"
+                                            className="px-6 py-4 font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors select-none group text-right"
                                             onClick={() => handleSort(col.key)}
                                         >
                                             <div className="flex items-center gap-1 justify-end">
                                                 {col.label}
-                                                <ArrowUpDown size={14} className={cn("text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig.key === col.key && "opacity-100 text-blue-500")} />
+                                                <ArrowUpDown size={14} className={cn("text-slate-400 dark:text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig.key === col.key && "opacity-100 text-blue-500 dark:text-blue-400")} />
                                             </div>
                                         </th>
                                     ))}
                                     <th
-                                        className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors select-none group text-center"
+                                        className="px-6 py-4 font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors select-none group text-center"
                                         onClick={() => handleSort('FechaCambioPrecio')}
                                     >
                                         <div className="flex items-center gap-1 justify-center">
                                             Último Cambio
-                                            <ArrowUpDown size={14} className={cn("text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig.key === 'FechaCambioPrecio' && "opacity-100 text-blue-500")} />
+                                            <ArrowUpDown size={14} className={cn("text-slate-400 dark:text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig.key === 'FechaCambioPrecio' && "opacity-100 text-blue-500 dark:text-blue-400")} />
                                         </div>
                                     </th>
-                                    <th className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider text-center select-none">
+                                    <th className="px-6 py-4 font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider text-center select-none">
                                         Acciones
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100">
+                            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                                 {filteredData.length === 0 ? (
                                     <tr>
-                                        <td colSpan={9} className="px-6 py-12 text-center text-slate-400">
+                                        <td colSpan={9} className="px-6 py-12 text-center text-slate-400 dark:text-slate-500">
                                             {data.length === 0
                                                 ? 'La zona seleccionada no tiene precios registrados.'
                                                 : 'Ningún artículo coincide con la búsqueda.'}
@@ -534,26 +534,26 @@ function ListaPreciosContent() {
                                     </tr>
                                 ) : (
                                     filteredData.map((row, idx) => (
-                                        <tr key={`${row.Codigo}-${idx}`} className="hover:bg-blue-50/50 transition-colors group">
-                                            <td className="px-6 py-3.5 font-mono text-xs font-bold text-slate-500">
+                                        <tr key={`${row.Codigo}-${idx}`} className="hover:bg-blue-50/50 dark:hover:bg-blue-950/40 transition-colors group">
+                                            <td className="px-6 py-3.5 font-mono text-xs font-bold text-slate-500 dark:text-slate-400">
                                                 <div className="flex items-center gap-2">
-                                                    <Tag size={12} className="text-slate-300 group-hover:text-blue-400 transition-colors" />
+                                                    <Tag size={12} className="text-slate-300 dark:text-slate-700 group-hover:text-blue-400 transition-colors" />
                                                     {row.Codigo}
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-3.5 font-medium text-slate-900 group-hover:text-blue-600 transition-colors max-w-[420px] truncate" title={row.Descripcion}>
+                                            <td className="px-6 py-3.5 font-medium text-slate-900 dark:text-slate-50 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors max-w-[420px] truncate" title={row.Descripcion}>
                                                 {row.Descripcion}
                                             </td>
-                                            <td className="px-6 py-3.5 text-right text-slate-500 tabular-nums">{formatCurrency(row.Costo)}</td>
-                                            <td className="px-6 py-3.5 text-right font-bold text-blue-600 tabular-nums">{formatCurrency(row.PrecioPublico)}</td>
-                                            <td className="px-6 py-3.5 text-right text-slate-700 tabular-nums">{formatCurrency(row.PrecioProfesor)}</td>
-                                            <td className="px-6 py-3.5 text-right text-slate-700 tabular-nums">{formatCurrency(row.PrecioDistribuidor)}</td>
-                                            <td className="px-6 py-3.5 text-right text-slate-700 tabular-nums">{formatCurrency(row.DistribuidoEspecial)}</td>
-                                            <td className="px-6 py-3.5 text-center text-slate-600 text-xs tabular-nums">{formatShortDate(row.FechaCambioPrecio)}</td>
+                                            <td className="px-6 py-3.5 text-right text-slate-500 dark:text-slate-400 tabular-nums">{formatCurrency(row.Costo)}</td>
+                                            <td className="px-6 py-3.5 text-right font-bold text-blue-600 dark:text-blue-400 tabular-nums">{formatCurrency(row.PrecioPublico)}</td>
+                                            <td className="px-6 py-3.5 text-right text-slate-700 dark:text-slate-200 tabular-nums">{formatCurrency(row.PrecioProfesor)}</td>
+                                            <td className="px-6 py-3.5 text-right text-slate-700 dark:text-slate-200 tabular-nums">{formatCurrency(row.PrecioDistribuidor)}</td>
+                                            <td className="px-6 py-3.5 text-right text-slate-700 dark:text-slate-200 tabular-nums">{formatCurrency(row.DistribuidoEspecial)}</td>
+                                            <td className="px-6 py-3.5 text-center text-slate-600 dark:text-slate-300 text-xs tabular-nums">{formatShortDate(row.FechaCambioPrecio)}</td>
                                             <td className="px-6 py-3.5 text-center">
                                                 <button
                                                     onClick={() => handleOpenEdit(row)}
-                                                    className="p-1.5 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors cursor-pointer inline-flex items-center gap-1 text-xs font-bold"
+                                                    className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/40 rounded-lg transition-colors cursor-pointer inline-flex items-center gap-1 text-xs font-bold"
                                                     title="Editar Precios"
                                                 >
                                                     <Edit size={13} />
@@ -572,7 +572,7 @@ function ListaPreciosContent() {
             {/* Slide-over Edit Drawer (Panel Deslizable) */}
             <div
                 className={cn(
-                    "fixed inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity duration-300 z-50",
+                    "fixed inset-0 bg-slate-900/40 dark:bg-slate-50/40 backdrop-blur-xs transition-opacity duration-300 z-50",
                     isDrawerOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
                 )}
                 onClick={() => setIsDrawerOpen(false)}
@@ -580,27 +580,27 @@ function ListaPreciosContent() {
 
             <div
                 className={cn(
-                    "fixed top-0 right-0 h-screen w-full sm:w-[480px] bg-white shadow-2xl z-50 border-l border-slate-100 flex flex-col transition-transform duration-300 ease-out transform",
+                    "fixed top-0 right-0 h-screen w-full sm:w-[480px] bg-white dark:bg-slate-900 shadow-2xl z-50 border-l border-slate-100 dark:border-slate-800 flex flex-col transition-transform duration-300 ease-out transform",
                     isDrawerOpen ? "translate-x-0" : "translate-x-full"
                 )}
             >
                 {/* Header */}
-                <div className="p-6 border-b border-slate-150 flex items-center justify-between bg-slate-50/70 select-none">
+                <div className="p-6 border-b border-slate-150 flex items-center justify-between bg-slate-50/70 dark:bg-slate-900/70 select-none">
                     <div>
-                        <span className="text-[10px] font-black text-blue-700 bg-blue-50 border border-blue-200/50 px-2 py-0.5 rounded uppercase tracking-wider">
+                        <span className="text-[10px] font-black text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 border border-blue-200/50 dark:border-blue-800/60 px-2 py-0.5 rounded uppercase tracking-wider">
                             Gestión de Precios
                         </span>
-                        <h2 className="text-base font-bold text-slate-900 mt-1.5 truncate max-w-[340px]" title={selectedRow?.Descripcion}>
+                        <h2 className="text-base font-bold text-slate-900 dark:text-slate-50 mt-1.5 truncate max-w-[340px]" title={selectedRow?.Descripcion}>
                             {selectedRow?.Descripcion}
                         </h2>
                         <div className="flex items-center gap-4 text-xs font-semibold text-slate-450 mt-1">
-                            <span>Código: <span className="font-mono text-slate-700 font-bold">{selectedRow?.Codigo}</span></span>
-                            <span>Zona: <span className="text-slate-700 font-bold uppercase">{zonaLabel}</span></span>
+                            <span>Código: <span className="font-mono text-slate-700 dark:text-slate-200 font-bold">{selectedRow?.Codigo}</span></span>
+                            <span>Zona: <span className="text-slate-700 dark:text-slate-200 font-bold uppercase">{zonaLabel}</span></span>
                         </div>
                     </div>
                     <button
                         onClick={() => setIsDrawerOpen(false)}
-                        className="p-1.5 hover:bg-slate-200/80 rounded-full text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                        className="p-1.5 hover:bg-slate-200/80 dark:hover:bg-slate-800/80 rounded-full text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-pointer"
                     >
                         <X size={18} />
                     </button>
@@ -609,12 +609,12 @@ function ListaPreciosContent() {
                 {/* Body - scrollable */}
                 <div className="flex-1 overflow-y-auto p-6 space-y-6 nice-scroll">
                     {/* Cost Card */}
-                    <div className="bg-slate-50 border border-slate-150 rounded-xl p-4 flex items-center justify-between select-none">
+                    <div className="bg-slate-50 dark:bg-slate-900 border border-slate-150 rounded-xl p-4 flex items-center justify-between select-none">
                         <div className="flex items-center gap-2">
-                            <Info size={14} className="text-slate-400" />
-                            <span className="text-xs font-bold text-slate-500 uppercase">Costo Base</span>
+                            <Info size={14} className="text-slate-400 dark:text-slate-500" />
+                            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Costo Base</span>
                         </div>
-                        <span className="font-mono text-sm font-black text-slate-700">{formatCurrency(selectedRow?.Costo)}</span>
+                        <span className="font-mono text-sm font-black text-slate-700 dark:text-slate-200">{formatCurrency(selectedRow?.Costo)}</span>
                     </div>
 
                     <form onSubmit={handleSavePrices} className="space-y-4">
@@ -626,14 +626,14 @@ function ListaPreciosContent() {
                                     {renderPriceDiff(editPrices.p1, selectedRow?.PrecioPublico || null)}
                                 </label>
                                 <div className="relative">
-                                    <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 text-xs font-bold">$</span>
+                                    <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 dark:text-slate-500 text-xs font-bold">$</span>
                                     <input
                                         type="number"
                                         step="0.01"
                                         min="0"
                                         value={editPrices.p1}
                                         onChange={(e) => setEditPrices(prev => ({ ...prev, p1: e.target.value }))}
-                                        className="block w-full pl-7 pr-3 py-2 bg-white border border-slate-250 rounded-xl text-slate-800 font-bold text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all hover:border-slate-350"
+                                        className="block w-full pl-7 pr-3 py-2 bg-white dark:bg-slate-900 border border-slate-250 rounded-xl text-slate-800 dark:text-slate-100 font-bold text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all hover:border-slate-350"
                                         required
                                     />
                                 </div>
@@ -646,14 +646,14 @@ function ListaPreciosContent() {
                                     {renderPriceDiff(editPrices.p2, selectedRow?.PrecioProfesor || null)}
                                 </label>
                                 <div className="relative">
-                                    <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 text-xs font-bold">$</span>
+                                    <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 dark:text-slate-500 text-xs font-bold">$</span>
                                     <input
                                         type="number"
                                         step="0.01"
                                         min="0"
                                         value={editPrices.p2}
                                         onChange={(e) => setEditPrices(prev => ({ ...prev, p2: e.target.value }))}
-                                        className="block w-full pl-7 pr-3 py-2 bg-white border border-slate-250 rounded-xl text-slate-800 font-bold text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all hover:border-slate-350"
+                                        className="block w-full pl-7 pr-3 py-2 bg-white dark:bg-slate-900 border border-slate-250 rounded-xl text-slate-800 dark:text-slate-100 font-bold text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all hover:border-slate-350"
                                         required
                                     />
                                 </div>
@@ -666,14 +666,14 @@ function ListaPreciosContent() {
                                     {renderPriceDiff(editPrices.p3, selectedRow?.PrecioDistribuidor || null)}
                                 </label>
                                 <div className="relative">
-                                    <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 text-xs font-bold">$</span>
+                                    <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 dark:text-slate-500 text-xs font-bold">$</span>
                                     <input
                                         type="number"
                                         step="0.01"
                                         min="0"
                                         value={editPrices.p3}
                                         onChange={(e) => setEditPrices(prev => ({ ...prev, p3: e.target.value }))}
-                                        className="block w-full pl-7 pr-3 py-2 bg-white border border-slate-250 rounded-xl text-slate-800 font-bold text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all hover:border-slate-350"
+                                        className="block w-full pl-7 pr-3 py-2 bg-white dark:bg-slate-900 border border-slate-250 rounded-xl text-slate-800 dark:text-slate-100 font-bold text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all hover:border-slate-350"
                                         required
                                     />
                                 </div>
@@ -686,14 +686,14 @@ function ListaPreciosContent() {
                                     {renderPriceDiff(editPrices.p4, selectedRow?.DistribuidoEspecial || null)}
                                 </label>
                                 <div className="relative">
-                                    <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 text-xs font-bold">$</span>
+                                    <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 dark:text-slate-500 text-xs font-bold">$</span>
                                     <input
                                         type="number"
                                         step="0.01"
                                         min="0"
                                         value={editPrices.p4}
                                         onChange={(e) => setEditPrices(prev => ({ ...prev, p4: e.target.value }))}
-                                        className="block w-full pl-7 pr-3 py-2 bg-white border border-slate-250 rounded-xl text-slate-800 font-bold text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all hover:border-slate-350"
+                                        className="block w-full pl-7 pr-3 py-2 bg-white dark:bg-slate-900 border border-slate-250 rounded-xl text-slate-800 dark:text-slate-100 font-bold text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all hover:border-slate-350"
                                         required
                                     />
                                 </div>
@@ -701,13 +701,13 @@ function ListaPreciosContent() {
                         </div>
 
                         {saveError && (
-                            <div className="bg-red-50 border border-red-200 text-red-650 px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wide">
+                            <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 text-red-650 px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wide">
                                 {saveError}
                             </div>
                         )}
 
                         {saveSuccess && (
-                            <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wide flex items-center gap-2">
+                            <div className="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-emerald-700 dark:text-emerald-400 px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wide flex items-center gap-2">
                                 <span className="w-1.5 h-1.5 bg-emerald-600 rounded-full animate-ping" />
                                 Precios guardados exitosamente
                             </div>
@@ -716,7 +716,7 @@ function ListaPreciosContent() {
                         <button
                             type="submit"
                             disabled={saving}
-                            className="w-full py-3 bg-slate-900 hover:bg-slate-850 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-md transition-all active:scale-[0.98] disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
+                            className="w-full py-3 bg-slate-900 dark:bg-slate-50 hover:bg-slate-850 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-md transition-all active:scale-[0.98] disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
                         >
                             {saving ? (
                                 <>
@@ -729,17 +729,17 @@ function ListaPreciosContent() {
                         </button>
                     </form>
 
-                    <div className="w-full h-px bg-slate-100 my-2" />
+                    <div className="w-full h-px bg-slate-100 dark:bg-slate-800 my-2" />
 
                     {/* History Section */}
                     <div className="space-y-4">
                         <div className="flex items-center justify-between select-none">
-                            <h3 className="text-xs font-black text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                                <Clock size={14} className="text-blue-500" />
+                            <h3 className="text-xs font-black text-slate-700 dark:text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
+                                <Clock size={14} className="text-blue-500 dark:text-blue-400" />
                                 Historial de Cambios
                             </h3>
-                            <div className="flex items-center gap-1 border border-slate-200 rounded-lg p-0.5 bg-slate-50/50">
-                                <span className="text-[9px] font-bold text-slate-400 uppercase px-1">Rango</span>
+                            <div className="flex items-center gap-1 border border-slate-200 dark:border-slate-700 rounded-lg p-0.5 bg-slate-50/50 dark:bg-slate-900/50">
+                                <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase px-1">Rango</span>
                                 <select
                                     value={historyYears}
                                     onChange={(e) => setHistoryYears(Number(e.target.value))}
@@ -755,14 +755,14 @@ function ListaPreciosContent() {
 
                         {loadingHistory ? (
                             <div className="flex flex-col items-center py-8 text-slate-450 text-xs">
-                                <Loader2 className="animate-spin mb-2 text-blue-600" size={24} />
+                                <Loader2 className="animate-spin mb-2 text-blue-600 dark:text-blue-400" size={24} />
                                 <span>Cargando auditoría de cambios...</span>
                             </div>
                         ) : historyError ? (
-                            <p className="text-xs text-rose-500 bg-rose-50 p-3 rounded-lg font-semibold">{historyError}</p>
+                            <p className="text-xs text-rose-500 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 p-3 rounded-lg font-semibold">{historyError}</p>
                         ) : history.length === 0 ? (
-                            <div className="text-center py-6 text-slate-400 border border-dashed border-slate-200 rounded-xl">
-                                <Info size={24} className="mx-auto text-slate-300 mb-1.5" />
+                            <div className="text-center py-6 text-slate-400 dark:text-slate-500 border border-dashed border-slate-200 dark:border-slate-700 rounded-xl">
+                                <Info size={24} className="mx-auto text-slate-300 dark:text-slate-700 mb-1.5" />
                                 <p className="text-xs font-semibold">Sin cambios de precio registrados</p>
                                 <p className="text-[10px] mt-0.5">No se encontraron actualizaciones en el rango seleccionado.</p>
                             </div>
@@ -790,33 +790,33 @@ function ListaPreciosContent() {
                                             
                                             <div className="flex items-center justify-between text-[10px] text-slate-450 font-bold mb-1.5">
                                                 <span className="flex items-center gap-1">
-                                                    <Clock size={11} className="text-slate-400" />
+                                                    <Clock size={11} className="text-slate-400 dark:text-slate-500" />
                                                     {formatShortDate(h.FechaAct)} {new Date(h.FechaAct).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })}
                                                 </span>
                                                 {h.Cambio === 1 && (
-                                                    <span className="text-[8px] uppercase tracking-wider text-blue-700 bg-blue-50 border border-blue-100 px-1 py-0.5 rounded font-black select-none">
+                                                    <span className="text-[8px] uppercase tracking-wider text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/60 px-1 py-0.5 rounded font-black select-none">
                                                         Auditoría
                                                     </span>
                                                 )}
                                             </div>
 
                                             {changes.length === 0 ? (
-                                                <p className="text-xs text-slate-500 italic">Registro base de precios de lista (inicial o sin variación)</p>
+                                                <p className="text-xs text-slate-500 dark:text-slate-400 italic">Registro base de precios de lista (inicial o sin variación)</p>
                                             ) : (
                                                 <div className="space-y-1.5">
                                                     {changes.map((c, cIdx) => {
                                                         const diff = c.to - c.from;
                                                         const isUp = diff > 0;
                                                         return (
-                                                            <div key={cIdx} className="text-[11px] flex items-center justify-between text-slate-750 bg-slate-50/50 p-2 rounded-xl border border-slate-100 shadow-3xs">
-                                                                <span className="font-bold text-slate-600">{c.label}</span>
+                                                            <div key={cIdx} className="text-[11px] flex items-center justify-between text-slate-750 bg-slate-50/50 dark:bg-slate-900/50 p-2 rounded-xl border border-slate-100 dark:border-slate-800 shadow-3xs">
+                                                                <span className="font-bold text-slate-600 dark:text-slate-300">{c.label}</span>
                                                                 <div className="flex items-center gap-2">
-                                                                    <span className="text-slate-400 line-through font-mono">{formatCurrency(c.from)}</span>
-                                                                    <span className="text-slate-400">→</span>
-                                                                    <span className="font-black text-slate-800 font-mono">{formatCurrency(c.to)}</span>
+                                                                    <span className="text-slate-400 dark:text-slate-500 line-through font-mono">{formatCurrency(c.from)}</span>
+                                                                    <span className="text-slate-400 dark:text-slate-500">→</span>
+                                                                    <span className="font-black text-slate-800 dark:text-slate-100 font-mono">{formatCurrency(c.to)}</span>
                                                                     <span className={cn(
                                                                         "flex items-center text-[9px] font-black px-1 py-0.5 rounded font-mono ml-0.5",
-                                                                        isUp ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : "bg-rose-50 text-rose-700 border border-rose-100"
+                                                                        isUp ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/60" : "bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-100 dark:border-rose-900/60"
                                                                     )}>
                                                                         {isUp ? <TrendingUp size={9} className="mr-0.5" /> : <TrendingDown size={9} className="mr-0.5" />}
                                                                         {formatCurrency(diff)}
@@ -843,7 +843,7 @@ export default function ListaPreciosPage() {
     return (
         <Suspense fallback={
             <div className="flex items-center justify-center min-h-[400px]">
-                <Loader2 className="animate-spin text-blue-600" size={40} />
+                <Loader2 className="animate-spin text-blue-600 dark:text-blue-400" size={40} />
             </div>
         }>
             <ListaPreciosContent />

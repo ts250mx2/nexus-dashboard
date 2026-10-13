@@ -120,8 +120,8 @@ export default function DatePresets() {
                         className={cn(
                             "px-3 py-1.5 text-xs font-semibold rounded-lg transition-all active:scale-95 cursor-pointer",
                             active
-                                ? "bg-slate-900 text-white border border-slate-900 shadow-sm"
-                                : "bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 border border-slate-200 shadow-xs"
+                                ? "bg-slate-900 dark:bg-slate-50 text-white border border-slate-900 dark:border-slate-100 shadow-sm"
+                                : "bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-900 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-50 border border-slate-200 dark:border-slate-700 shadow-xs"
                         )}
                     >
                         {preset}

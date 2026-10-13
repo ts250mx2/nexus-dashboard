@@ -36,10 +36,10 @@ function getStatusKey(row: any): StatusKey {
 }
 
 const STATUS_STYLES: Record<StatusKey, { bg: string; text: string; border: string; dot: string; label: string }> = {
-    PAGADO: { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-100', dot: 'bg-emerald-500', label: 'Pagado' },
-    RECIBIDA: { bg: 'bg-indigo-50', text: 'text-indigo-700', border: 'border-indigo-100', dot: 'bg-indigo-500', label: 'Recibida' },
-    PENDIENTE: { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-100', dot: 'bg-amber-500', label: 'Pendiente' },
-    CANCELADO: { bg: 'bg-red-50', text: 'text-red-700', border: 'border-red-100', dot: 'bg-red-500', label: 'Cancelado' },
+    PAGADO: { bg: 'bg-emerald-50 dark:bg-emerald-950/40', text: 'text-emerald-700 dark:text-emerald-400', border: 'border-emerald-100 dark:border-emerald-900/60', dot: 'bg-emerald-500', label: 'Pagado' },
+    RECIBIDA: { bg: 'bg-indigo-50 dark:bg-indigo-950/40', text: 'text-indigo-700 dark:text-indigo-400', border: 'border-indigo-100 dark:border-indigo-900/60', dot: 'bg-indigo-500', label: 'Recibida' },
+    PENDIENTE: { bg: 'bg-amber-50 dark:bg-amber-950/40', text: 'text-amber-700 dark:text-amber-400', border: 'border-amber-100 dark:border-amber-900/60', dot: 'bg-amber-500', label: 'Pendiente' },
+    CANCELADO: { bg: 'bg-red-50 dark:bg-red-950/40', text: 'text-red-700 dark:text-red-400', border: 'border-red-100 dark:border-red-900/60', dot: 'bg-red-500', label: 'Cancelado' },
 };
 
 function TraspasosContent() {
@@ -307,10 +307,10 @@ function TraspasosContent() {
     return (
         <div className="space-y-6 relative min-h-[calc(100vh-140px)]">
             {/* Header */}
-            <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white py-4 px-6 rounded-2xl shadow-sm border border-slate-100 animate-in fade-in duration-500">
+            <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white dark:bg-slate-900 py-4 px-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 animate-in fade-in duration-500">
                 <div className="flex flex-col md:flex-row md:items-center gap-6">
-                    <h1 className="text-2xl font-black text-slate-800 tracking-tight uppercase flex items-center gap-3 select-none">
-                        <ArrowRightLeft className="text-blue-600" />
+                    <h1 className="text-2xl font-black text-slate-800 dark:text-slate-100 tracking-tight uppercase flex items-center gap-3 select-none">
+                        <ArrowRightLeft className="text-blue-600 dark:text-blue-400" />
                         Traspasos
                     </h1>
 
@@ -318,31 +318,31 @@ function TraspasosContent() {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3">
-                    <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
-                        <Calendar size={16} className="text-blue-500" />
-                        <span className="text-[10px] font-bold text-slate-400 uppercase">Del</span>
+                    <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2">
+                        <Calendar size={16} className="text-blue-500 dark:text-blue-400" />
+                        <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">Del</span>
                         <input
                             type="date"
                             value={startDate}
                             onChange={(e) => handleParamChange('startDate', e.target.value)}
-                            className="bg-transparent text-xs font-bold text-slate-700 outline-none p-0 border-none h-auto w-28 cursor-pointer"
+                            className="bg-transparent text-xs font-bold text-slate-700 dark:text-slate-200 outline-none p-0 border-none h-auto w-28 cursor-pointer"
                         />
                     </div>
-                    <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
-                        <Calendar size={16} className="text-blue-500" />
-                        <span className="text-[10px] font-bold text-slate-400 uppercase">Al</span>
+                    <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2">
+                        <Calendar size={16} className="text-blue-500 dark:text-blue-400" />
+                        <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">Al</span>
                         <input
                             type="date"
                             value={endDate}
                             onChange={(e) => handleParamChange('endDate', e.target.value)}
-                            className="bg-transparent text-xs font-bold text-slate-700 outline-none p-0 border-none h-auto w-28 cursor-pointer"
+                            className="bg-transparent text-xs font-bold text-slate-700 dark:text-slate-200 outline-none p-0 border-none h-auto w-28 cursor-pointer"
                         />
                     </div>
                     <button
                         onClick={() => {
                             handleParamChange('startDate', startDate);
                         }}
-                        className="p-2.5 bg-slate-50 border border-slate-200 text-blue-600 hover:bg-slate-100 hover:border-slate-300 transition-all rounded-xl shadow-sm cursor-pointer"
+                        className="p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-blue-600 dark:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600 transition-all rounded-xl shadow-sm cursor-pointer"
                         disabled={loading}
                         title="Actualizar Datos"
                     >
@@ -353,74 +353,74 @@ function TraspasosContent() {
 
             {/* KPI Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-5">
-                <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4">
-                    <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center shrink-0">
+                <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm flex items-center gap-4">
+                    <div className="w-12 h-12 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 rounded-xl flex items-center justify-center shrink-0">
                         <ArrowRightLeft size={22} />
                     </div>
                     <div>
-                        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Traspasos</p>
-                        <h3 className="text-2xl font-black text-slate-950 mt-0.5 tabular-nums">{kpis.totalTraspasos}</h3>
+                        <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Total Traspasos</p>
+                        <h3 className="text-2xl font-black text-slate-950 dark:text-slate-50 mt-0.5 tabular-nums">{kpis.totalTraspasos}</h3>
                     </div>
                 </div>
 
-                <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4">
-                    <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center shrink-0">
+                <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm flex items-center gap-4">
+                    <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 rounded-xl flex items-center justify-center shrink-0">
                         <DollarSign size={22} />
                     </div>
                     <div>
-                        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Importe Total</p>
-                        <h3 className="text-2xl font-black text-slate-950 mt-0.5 tabular-nums">{formatCurrency(kpis.totalAmount)}</h3>
+                        <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Importe Total</p>
+                        <h3 className="text-2xl font-black text-slate-950 dark:text-slate-50 mt-0.5 tabular-nums">{formatCurrency(kpis.totalAmount)}</h3>
                     </div>
                 </div>
 
-                <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4">
-                    <div className="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center shrink-0">
+                <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm flex items-center gap-4">
+                    <div className="w-12 h-12 bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 rounded-xl flex items-center justify-center shrink-0">
                         <Clock size={22} className="animate-pulse" />
                     </div>
                     <div>
-                        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Pendientes</p>
-                        <h3 className="text-2xl font-black text-amber-600 mt-0.5 tabular-nums">{kpis.pendientes}</h3>
+                        <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Pendientes</p>
+                        <h3 className="text-2xl font-black text-amber-600 dark:text-amber-400 mt-0.5 tabular-nums">{kpis.pendientes}</h3>
                     </div>
                 </div>
 
-                <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4">
-                    <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center shrink-0">
+                <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm flex items-center gap-4">
+                    <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center shrink-0">
                         <CheckCircle size={22} />
                     </div>
                     <div>
-                        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Recibidos / Pagados</p>
-                        <h3 className="text-2xl font-black text-indigo-600 mt-0.5 tabular-nums">{kpis.recibidos + kpis.pagados}</h3>
+                        <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Recibidos / Pagados</p>
+                        <h3 className="text-2xl font-black text-indigo-600 dark:text-indigo-400 mt-0.5 tabular-nums">{kpis.recibidos + kpis.pagados}</h3>
                     </div>
                 </div>
 
-                <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4">
-                    <div className="w-12 h-12 bg-red-50 text-red-600 rounded-xl flex items-center justify-center shrink-0">
+                <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm flex items-center gap-4">
+                    <div className="w-12 h-12 bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 rounded-xl flex items-center justify-center shrink-0">
                         <Ban size={22} />
                     </div>
                     <div>
-                        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Cancelados</p>
-                        <h3 className="text-2xl font-black text-red-600 mt-0.5 tabular-nums">{kpis.cancelados}</h3>
+                        <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Cancelados</p>
+                        <h3 className="text-2xl font-black text-red-600 dark:text-red-400 mt-0.5 tabular-nums">{kpis.cancelados}</h3>
                     </div>
                 </div>
             </div>
 
             {/* Filter and Action Panel */}
-            <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-wrap items-center justify-between gap-4">
+            <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-4">
                 <div className="flex flex-wrap items-center gap-6">
                     {/* Global Search */}
-                    <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 transition-all min-w-[260px]">
-                        <Search size={14} className="text-slate-400 shrink-0" />
+                    <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 transition-all min-w-[260px]">
+                        <Search size={14} className="text-slate-400 dark:text-slate-500 shrink-0" />
                         <input
                             type="text"
                             placeholder="# Orden, # Traspaso, sucursal o proveedor"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="bg-transparent text-xs font-semibold text-slate-700 placeholder-slate-400 outline-none w-full"
+                            className="bg-transparent text-xs font-semibold text-slate-700 dark:text-slate-200 placeholder-slate-400 outline-none w-full"
                         />
                         {searchQuery && (
                             <button
                                 onClick={() => setSearchQuery('')}
-                                className="text-slate-400 hover:text-red-500 transition-colors"
+                                className="text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 transition-colors"
                                 title="Limpiar búsqueda"
                             >
                                 <X size={13} />
@@ -430,32 +430,32 @@ function TraspasosContent() {
 
                     {/* Sucursal Filter */}
                     <div className="flex items-center gap-3">
-                        <span className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5 select-none">
-                            <Store size={14} className="text-blue-500" />
+                        <span className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center gap-1.5 select-none">
+                            <Store size={14} className="text-blue-500 dark:text-blue-400" />
                             Sucursal:
                         </span>
                         <div className="relative">
                             <select
                                 value={idTienda}
                                 onChange={(e) => handleParamChange('idTienda', e.target.value)}
-                                className="w-[220px] pl-3 pr-10 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all appearance-none cursor-pointer"
+                                className="w-[220px] pl-3 pr-10 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all appearance-none cursor-pointer"
                             >
                                 <option value="all">Todas las Sucursales</option>
                                 {sucursales.map(s => (
                                     <option key={s.id} value={s.id}>{s.name}</option>
                                 ))}
                             </select>
-                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={14} />
+                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 pointer-events-none" size={14} />
                         </div>
                     </div>
 
                     {/* Status Tabs */}
                     <div className="flex items-center gap-3">
-                        <span className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5 select-none">
-                            <Filter size={14} className="text-blue-500" />
+                        <span className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center gap-1.5 select-none">
+                            <Filter size={14} className="text-blue-500 dark:text-blue-400" />
                             Estatus:
                         </span>
-                        <div className="flex bg-slate-100 rounded-xl p-0.5 flex-wrap">
+                        <div className="flex bg-slate-100 dark:bg-slate-800 rounded-xl p-0.5 flex-wrap">
                             {[
                                 { id: 'all', label: 'Todos' },
                                 { id: 'pending', label: 'Pendientes' },
@@ -469,8 +469,8 @@ function TraspasosContent() {
                                     className={cn(
                                         "px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer",
                                         statusTab === tab.id
-                                            ? "bg-white text-slate-900 shadow-sm"
-                                            : "text-slate-500 hover:text-slate-800"
+                                            ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-50 shadow-sm"
+                                            : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100"
                                     )}
                                 >
                                     {tab.label}
@@ -493,37 +493,37 @@ function TraspasosContent() {
             </div>
 
             {/* Traspasos Table */}
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col min-h-[400px]">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden flex flex-col min-h-[400px]">
                 {loading ? (
-                    <div className="flex-1 flex flex-col items-center justify-center h-64 text-slate-500">
-                        <Loader2 className="animate-spin mb-4 text-blue-600" size={40} />
+                    <div className="flex-1 flex flex-col items-center justify-center h-64 text-slate-500 dark:text-slate-400">
+                        <Loader2 className="animate-spin mb-4 text-blue-600 dark:text-blue-400" size={40} />
                         <p className="font-semibold text-sm">Consultando traspasos...</p>
                     </div>
                 ) : error ? (
-                    <div className="flex-1 flex flex-col items-center justify-center h-64 text-red-500">
+                    <div className="flex-1 flex flex-col items-center justify-center h-64 text-red-500 dark:text-red-400">
                         <p className="font-bold text-lg">Error de carga</p>
                         <p className="text-sm opacity-80 mt-1">{error}</p>
                     </div>
                 ) : (
                     <div className="overflow-auto max-h-[calc(100vh-380px)]">
                         <table className="w-full text-left text-sm whitespace-nowrap border-collapse">
-                            <thead className="bg-slate-50 sticky top-0 shadow-sm z-10 border-b border-slate-200">
+                            <thead className="bg-slate-50 dark:bg-slate-900 sticky top-0 shadow-sm z-10 border-b border-slate-200 dark:border-slate-700">
                                 <tr>
                                     {visibleCols.map(col => (
                                         <th
                                             key={`th-${col.key}`}
-                                            className="px-5 py-3 font-bold text-slate-600 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors select-none group text-xs"
+                                            className="px-5 py-3 font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors select-none group text-xs"
                                             onClick={() => handleSort(col.key)}
                                         >
                                             <div className="flex items-center gap-1 justify-between">
                                                 {col.label}
-                                                <ArrowUpDown size={12} className={cn("text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig?.key === col.key && "opacity-100 text-blue-500")} />
+                                                <ArrowUpDown size={12} className={cn("text-slate-400 dark:text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig?.key === col.key && "opacity-100 text-blue-500 dark:text-blue-400")} />
                                             </div>
                                         </th>
                                     ))}
-                                    <th className="px-5 py-3 text-right text-slate-600 font-bold uppercase tracking-wider text-xs">Acción</th>
+                                    <th className="px-5 py-3 text-right text-slate-600 dark:text-slate-300 font-bold uppercase tracking-wider text-xs">Acción</th>
                                 </tr>
-                                <tr className="bg-slate-50/80 backdrop-blur border-b border-slate-200">
+                                <tr className="bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur border-b border-slate-200 dark:border-slate-700">
                                     {visibleCols.map(col => (
                                         <th key={`filter-${col.key}`} className="px-2 py-1.5 font-normal">
                                             <div className="relative">
@@ -532,19 +532,19 @@ function TraspasosContent() {
                                                     placeholder={`Filtrar...`}
                                                     value={filters[col.key] || ''}
                                                     onChange={(e) => handleFilterChange(col.key, e.target.value)}
-                                                    className="w-full min-w-[90px] pl-7 pr-2 py-1 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 bg-white font-normal"
+                                                    className="w-full min-w-[90px] pl-7 pr-2 py-1 text-xs border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 bg-white dark:bg-slate-900 font-normal"
                                                 />
-                                                <Filter size={10} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                                                <Filter size={10} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
                                             </div>
                                         </th>
                                     ))}
                                     <th></th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100">
+                            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                                 {sortedAndFilteredData.length === 0 ? (
                                     <tr>
-                                        <td colSpan={visibleCols.length + 1} className="px-5 py-12 text-center text-slate-400 text-sm">
+                                        <td colSpan={visibleCols.length + 1} className="px-5 py-12 text-center text-slate-400 dark:text-slate-500 text-sm">
                                             No se encontraron traspasos en este periodo.
                                         </td>
                                     </tr>
@@ -555,47 +555,47 @@ function TraspasosContent() {
                                         return (
                                             <tr
                                                 key={idx}
-                                                className="hover:bg-blue-50/40 transition-colors group cursor-pointer"
+                                                className="hover:bg-blue-50/40 dark:hover:bg-blue-950/40 transition-colors group cursor-pointer"
                                                 onClick={() => setSelectedTraspaso(row)}
                                             >
-                                                <td className="px-5 py-3 font-mono text-blue-600 font-bold text-xs">
+                                                <td className="px-5 py-3 font-mono text-blue-600 dark:text-blue-400 font-bold text-xs">
                                                     #{row.IdTraspaso}
                                                 </td>
-                                                <td className="px-5 py-3 text-slate-700 font-semibold text-xs truncate max-w-[160px]">
+                                                <td className="px-5 py-3 text-slate-700 dark:text-slate-200 font-semibold text-xs truncate max-w-[160px]">
                                                     {row.SucursalOrigen}
                                                 </td>
-                                                <td className="px-5 py-3 text-slate-700 font-semibold text-xs truncate max-w-[160px]">
+                                                <td className="px-5 py-3 text-slate-700 dark:text-slate-200 font-semibold text-xs truncate max-w-[160px]">
                                                     <div className="flex items-center gap-1.5">
-                                                        <ArrowRight size={11} className="text-slate-400 shrink-0" />
+                                                        <ArrowRight size={11} className="text-slate-400 dark:text-slate-500 shrink-0" />
                                                         {row.SucursalDestino}
                                                     </div>
                                                 </td>
-                                                <td className="px-5 py-3 text-slate-600 text-xs truncate max-w-[160px]" title={row.Proveedor || ''}>
-                                                    {row.Proveedor || <span className="text-slate-300">—</span>}
+                                                <td className="px-5 py-3 text-slate-600 dark:text-slate-300 text-xs truncate max-w-[160px]" title={row.Proveedor || ''}>
+                                                    {row.Proveedor || <span className="text-slate-300 dark:text-slate-700">—</span>}
                                                 </td>
-                                                <td className="px-5 py-3 text-slate-600 text-xs">
+                                                <td className="px-5 py-3 text-slate-600 dark:text-slate-300 text-xs">
                                                     {new Date(row.FechaTraspaso).toLocaleDateString('es-MX', {
                                                         day: '2-digit',
                                                         month: 'short',
                                                         year: 'numeric'
                                                     })}
                                                 </td>
-                                                <td className="px-5 py-3 text-slate-600 text-center text-xs tabular-nums">
+                                                <td className="px-5 py-3 text-slate-600 dark:text-slate-300 text-center text-xs tabular-nums">
                                                     {row.CantProductos}
                                                 </td>
-                                                <td className="px-5 py-3 text-slate-900 font-bold text-xs text-right tabular-nums">
+                                                <td className="px-5 py-3 text-slate-900 dark:text-slate-50 font-bold text-xs text-right tabular-nums">
                                                     {formatCurrency(row.Total)}
                                                 </td>
-                                                <td className="px-5 py-3 text-slate-600 text-xs">
+                                                <td className="px-5 py-3 text-slate-600 dark:text-slate-300 text-xs">
                                                     {row.UsuarioTraspaso}
                                                 </td>
                                                 <td className="px-5 py-3 text-xs">
                                                     {row.OrdenCompraStr ? (
-                                                        <span className="font-mono font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">
+                                                        <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 px-2 py-0.5 rounded">
                                                             OC-{row.OrdenCompraStr}
                                                         </span>
                                                     ) : (
-                                                        <span className="text-slate-300">—</span>
+                                                        <span className="text-slate-300 dark:text-slate-700">—</span>
                                                     )}
                                                 </td>
                                                 <td className="px-5 py-3 text-xs">
@@ -608,7 +608,7 @@ function TraspasosContent() {
                                                     </span>
                                                 </td>
                                                 <td className="px-5 py-3 text-right">
-                                                    <button className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors inline-flex items-center justify-center">
+                                                    <button className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded-lg transition-colors inline-flex items-center justify-center">
                                                         <Eye size={15} />
                                                     </button>
                                                 </td>
@@ -624,17 +624,17 @@ function TraspasosContent() {
 
             {/* Detail Modal */}
             {selectedTraspaso && selectedStatus && (
-                <div className="fixed inset-0 z-[110] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[85vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 border border-slate-200">
+                <div className="fixed inset-0 z-[110] flex items-center justify-center bg-slate-900/60 dark:bg-slate-50/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+                    <div className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl w-full max-w-4xl max-h-[85vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 border border-slate-200 dark:border-slate-700">
                         {/* Modal Header */}
-                        <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+                        <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-900">
                             <div>
                                 <div className="flex items-center gap-2 flex-wrap">
-                                    <span className="text-xs font-bold px-2 py-0.5 bg-blue-100 text-blue-800 rounded">
+                                    <span className="text-xs font-bold px-2 py-0.5 bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 rounded">
                                         Traspaso
                                     </span>
                                     {selectedTraspaso.OrdenCompraStr && (
-                                        <span className="text-xs font-bold px-2 py-0.5 bg-indigo-100 text-indigo-800 rounded">
+                                        <span className="text-xs font-bold px-2 py-0.5 bg-indigo-100 dark:bg-indigo-900/40 text-indigo-800 dark:text-indigo-300 rounded">
                                             Orden Compra #{selectedTraspaso.OrdenCompraStr}
                                         </span>
                                     )}
@@ -646,92 +646,92 @@ function TraspasosContent() {
                                         {STATUS_STYLES[selectedStatus].label}
                                     </span>
                                 </div>
-                                <h2 className="text-xl font-black text-slate-900 mt-1 flex items-center gap-2">
-                                    ID: <span className="font-mono text-blue-600 font-bold">#{selectedTraspaso.IdTraspaso}</span>
+                                <h2 className="text-xl font-black text-slate-900 dark:text-slate-50 mt-1 flex items-center gap-2">
+                                    ID: <span className="font-mono text-blue-600 dark:text-blue-400 font-bold">#{selectedTraspaso.IdTraspaso}</span>
                                 </h2>
                             </div>
                             <button
                                 onClick={() => setSelectedTraspaso(null)}
-                                className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all border border-transparent hover:border-red-100"
+                                className="p-2 text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-xl transition-all border border-transparent hover:border-red-100 dark:hover:border-red-900/60"
                             >
                                 <X size={20} />
                             </button>
                         </div>
 
                         {/* Metadata summary */}
-                        <div className="p-6 bg-slate-50/30 border-b border-slate-100 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-medium text-slate-600">
+                        <div className="p-6 bg-slate-50/30 dark:bg-slate-900/30 border-b border-slate-100 dark:border-slate-800 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-medium text-slate-600 dark:text-slate-300">
                             <div>
-                                <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Sucursal Origen</span>
-                                <span className="text-slate-900 font-bold text-sm block mt-0.5 truncate">{selectedTraspaso.SucursalOrigen}</span>
+                                <span className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Sucursal Origen</span>
+                                <span className="text-slate-900 dark:text-slate-50 font-bold text-sm block mt-0.5 truncate">{selectedTraspaso.SucursalOrigen}</span>
                             </div>
                             <div>
-                                <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Sucursal Destino</span>
-                                <span className="text-slate-900 font-bold text-sm block mt-0.5 truncate">{selectedTraspaso.SucursalDestino}</span>
+                                <span className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Sucursal Destino</span>
+                                <span className="text-slate-900 dark:text-slate-50 font-bold text-sm block mt-0.5 truncate">{selectedTraspaso.SucursalDestino}</span>
                             </div>
                             <div>
-                                <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Fecha Traspaso</span>
-                                <span className="text-slate-900 font-bold text-sm block mt-0.5 truncate">{formatDate(selectedTraspaso.FechaTraspaso)}</span>
+                                <span className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Fecha Traspaso</span>
+                                <span className="text-slate-900 dark:text-slate-50 font-bold text-sm block mt-0.5 truncate">{formatDate(selectedTraspaso.FechaTraspaso)}</span>
                             </div>
                             <div>
-                                <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Fecha Recibo</span>
-                                <span className="text-slate-900 font-bold text-sm block mt-0.5 truncate">{formatDate(selectedTraspaso.FechaRecibo)}</span>
+                                <span className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Fecha Recibo</span>
+                                <span className="text-slate-900 dark:text-slate-50 font-bold text-sm block mt-0.5 truncate">{formatDate(selectedTraspaso.FechaRecibo)}</span>
                             </div>
                             <div>
-                                <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Capturó</span>
-                                <span className="text-slate-900 font-bold text-sm block mt-0.5 truncate">{selectedTraspaso.UsuarioTraspaso}</span>
+                                <span className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Capturó</span>
+                                <span className="text-slate-900 dark:text-slate-50 font-bold text-sm block mt-0.5 truncate">{selectedTraspaso.UsuarioTraspaso}</span>
                             </div>
                             <div>
-                                <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Productos</span>
-                                <span className="text-slate-900 font-bold text-sm block mt-0.5 tabular-nums">{selectedTraspaso.CantProductos}</span>
+                                <span className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Productos</span>
+                                <span className="text-slate-900 dark:text-slate-50 font-bold text-sm block mt-0.5 tabular-nums">{selectedTraspaso.CantProductos}</span>
                             </div>
                             {selectedStatus === 'CANCELADO' && selectedTraspaso.UsuarioCancelacion && (
                                 <div className="col-span-2">
-                                    <span className="block text-[10px] font-bold text-red-500 uppercase tracking-wider">Cancelado por</span>
-                                    <span className="text-red-700 font-bold text-sm block mt-0.5 truncate">{selectedTraspaso.UsuarioCancelacion}</span>
+                                    <span className="block text-[10px] font-bold text-red-500 dark:text-red-400 uppercase tracking-wider">Cancelado por</span>
+                                    <span className="text-red-700 dark:text-red-400 font-bold text-sm block mt-0.5 truncate">{selectedTraspaso.UsuarioCancelacion}</span>
                                 </div>
                             )}
                         </div>
 
                         {/* Items Table */}
-                        <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-white">
-                            <h4 className="text-sm font-bold text-slate-800 flex items-center gap-1.5">
-                                <Package size={16} className="text-slate-500" />
+                        <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-white dark:bg-slate-900">
+                            <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
+                                <Package size={16} className="text-slate-500 dark:text-slate-400" />
                                 Artículos del Traspaso
                             </h4>
 
                             {detailLoading ? (
-                                <div className="flex flex-col items-center justify-center py-20 text-slate-400">
-                                    <Loader2 className="animate-spin mb-3 text-blue-600" size={32} />
+                                <div className="flex flex-col items-center justify-center py-20 text-slate-400 dark:text-slate-500">
+                                    <Loader2 className="animate-spin mb-3 text-blue-600 dark:text-blue-400" size={32} />
                                     <span className="font-semibold text-xs">Cargando desglose de artículos...</span>
                                 </div>
                             ) : detailError ? (
-                                <div className="bg-red-50 text-red-700 p-4 rounded-xl text-xs border border-red-100 flex items-center gap-2">
+                                <div className="bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400 p-4 rounded-xl text-xs border border-red-100 dark:border-red-900/60 flex items-center gap-2">
                                     <span>Error al obtener detalle del traspaso: {detailError}</span>
                                 </div>
                             ) : detailItems.length === 0 ? (
-                                <div className="text-center py-16 text-slate-400 text-xs">
+                                <div className="text-center py-16 text-slate-400 dark:text-slate-500 text-xs">
                                     Este traspaso no contiene productos.
                                 </div>
                             ) : (
-                                <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
+                                <div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden shadow-sm bg-white dark:bg-slate-900">
                                     <table className="w-full text-left text-xs border-collapse">
-                                        <thead className="bg-slate-50 border-b border-slate-200 sticky top-0 z-10">
+                                        <thead className="bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-10">
                                             <tr>
-                                                <th className="px-4 py-3 font-bold text-slate-600 uppercase w-32">Cód. Barras</th>
-                                                <th className="px-4 py-3 font-bold text-slate-600 uppercase">Descripción</th>
-                                                <th className="px-4 py-3 font-bold text-slate-600 uppercase text-center w-20">Cant</th>
-                                                <th className="px-4 py-3 font-bold text-slate-600 uppercase text-right w-32">Costo</th>
-                                                <th className="px-4 py-3 font-bold text-slate-600 uppercase text-right w-32">Subtotal</th>
+                                                <th className="px-4 py-3 font-bold text-slate-600 dark:text-slate-300 uppercase w-32">Cód. Barras</th>
+                                                <th className="px-4 py-3 font-bold text-slate-600 dark:text-slate-300 uppercase">Descripción</th>
+                                                <th className="px-4 py-3 font-bold text-slate-600 dark:text-slate-300 uppercase text-center w-20">Cant</th>
+                                                <th className="px-4 py-3 font-bold text-slate-600 dark:text-slate-300 uppercase text-right w-32">Costo</th>
+                                                <th className="px-4 py-3 font-bold text-slate-600 dark:text-slate-300 uppercase text-right w-32">Subtotal</th>
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-slate-100">
+                                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                                             {detailItems.map((item, idx) => (
-                                                <tr key={idx} className="hover:bg-slate-50/50 transition-colors">
-                                                    <td className="px-4 py-3 font-mono text-slate-500">{item.CodigoBarras}</td>
-                                                    <td className="px-4 py-3 text-slate-700 font-semibold max-w-[200px] truncate">{item.Descripcion}</td>
-                                                    <td className="px-4 py-3 text-slate-700 font-bold text-center tabular-nums">{item.Cantidad}</td>
-                                                    <td className="px-4 py-3 text-slate-600 text-right tabular-nums">{formatCurrency(item.Costo)}</td>
-                                                    <td className="px-4 py-3 text-slate-900 font-black text-right tabular-nums">{formatCurrency(item.Total)}</td>
+                                                <tr key={idx} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/50 transition-colors">
+                                                    <td className="px-4 py-3 font-mono text-slate-500 dark:text-slate-400">{item.CodigoBarras}</td>
+                                                    <td className="px-4 py-3 text-slate-700 dark:text-slate-200 font-semibold max-w-[200px] truncate">{item.Descripcion}</td>
+                                                    <td className="px-4 py-3 text-slate-700 dark:text-slate-200 font-bold text-center tabular-nums">{item.Cantidad}</td>
+                                                    <td className="px-4 py-3 text-slate-600 dark:text-slate-300 text-right tabular-nums">{formatCurrency(item.Costo)}</td>
+                                                    <td className="px-4 py-3 text-slate-900 dark:text-slate-50 font-black text-right tabular-nums">{formatCurrency(item.Total)}</td>
                                                 </tr>
                                             ))}
                                         </tbody>
@@ -741,9 +741,9 @@ function TraspasosContent() {
                         </div>
 
                         {/* Footer total */}
-                        <div className="p-6 border-t border-slate-100 bg-slate-50 flex items-center justify-between font-bold">
-                            <div className="text-slate-400 text-xs uppercase tracking-wider">Total del Traspaso</div>
-                            <div className="text-2xl font-black text-slate-950 tabular-nums">
+                        <div className="p-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 flex items-center justify-between font-bold">
+                            <div className="text-slate-400 dark:text-slate-500 text-xs uppercase tracking-wider">Total del Traspaso</div>
+                            <div className="text-2xl font-black text-slate-950 dark:text-slate-50 tabular-nums">
                                 {formatCurrency(selectedTraspaso.Total)}
                             </div>
                         </div>
@@ -758,7 +758,7 @@ export default function TraspasosDashboardPage() {
     return (
         <Suspense fallback={
             <div className="flex items-center justify-center min-h-[400px]">
-                <Loader2 className="animate-spin text-blue-600" size={40} />
+                <Loader2 className="animate-spin text-blue-600 dark:text-blue-400" size={40} />
             </div>
         }>
             <TraspasosContent />

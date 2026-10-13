@@ -141,14 +141,14 @@ export default function MargenPage() {
     return (
         <div className="p-6 md:p-8 max-w-[1600px] mx-auto space-y-6">
             {/* Header with Filters & Periods */}
-            <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white py-4 px-6 rounded-2xl shadow-sm border border-slate-100 animate-in fade-in duration-500">
+            <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white dark:bg-slate-900 py-4 px-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 animate-in fade-in duration-500">
                 <div className="flex flex-col md:flex-row md:items-center gap-6">
-                    <h1 className="text-2xl font-black text-slate-800 tracking-tight uppercase flex items-center gap-3 select-none">
-                        <TrendingUp className="text-blue-600" />
+                    <h1 className="text-2xl font-black text-slate-800 dark:text-slate-100 tracking-tight uppercase flex items-center gap-3 select-none">
+                        <TrendingUp className="text-blue-600 dark:text-blue-400" />
                         Margen y Rentabilidad
                     </h1>
 
-                    <div className="flex items-center gap-1 bg-slate-100 border border-slate-200 rounded-xl p-1 overflow-x-auto no-scrollbar">
+                    <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-1 overflow-x-auto no-scrollbar">
                         {[
                             { label: 'Hoy', fn: () => { const t = getToday(); setStartDate(t); setEndDate(t); } },
                             { label: '7d', fn: () => { const d = new Date(); d.setDate(d.getDate() - 6); setStartDate(d.toISOString().slice(0, 10)); setEndDate(getToday()); } },
@@ -175,8 +175,8 @@ export default function MargenPage() {
                                     className={cn(
                                         "px-3 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer whitespace-nowrap",
                                         isActive 
-                                            ? "bg-slate-900 text-white shadow-sm" 
-                                            : "text-slate-500 hover:text-slate-900 hover:bg-slate-200/50"
+                                            ? "bg-slate-900 dark:bg-slate-50 text-white shadow-sm" 
+                                            : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 hover:bg-slate-200/50 dark:hover:bg-slate-800/50"
                                     )}
                                 >
                                     {p.label}
@@ -187,24 +187,24 @@ export default function MargenPage() {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3">
-                    <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
-                        <Calendar size={16} className="text-blue-500" />
-                        <span className="text-[10px] font-bold text-slate-400 uppercase">Del</span>
+                    <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2">
+                        <Calendar size={16} className="text-blue-500 dark:text-blue-400" />
+                        <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">Del</span>
                         <input
                             type="date"
                             value={startDate}
                             onChange={(e) => setStartDate(e.target.value)}
-                            className="bg-transparent text-xs font-bold text-slate-700 outline-none p-0 border-none h-auto w-28 cursor-pointer"
+                            className="bg-transparent text-xs font-bold text-slate-700 dark:text-slate-200 outline-none p-0 border-none h-auto w-28 cursor-pointer"
                         />
                     </div>
-                    <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
-                        <Calendar size={16} className="text-blue-500" />
-                        <span className="text-[10px] font-bold text-slate-400 uppercase">Al</span>
+                    <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2">
+                        <Calendar size={16} className="text-blue-500 dark:text-blue-400" />
+                        <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">Al</span>
                         <input
                             type="date"
                             value={endDate}
                             onChange={(e) => setEndDate(e.target.value)}
-                            className="bg-transparent text-xs font-bold text-slate-700 outline-none p-0 border-none h-auto w-28 cursor-pointer"
+                            className="bg-transparent text-xs font-bold text-slate-700 dark:text-slate-200 outline-none p-0 border-none h-auto w-28 cursor-pointer"
                         />
                     </div>
                     <button
@@ -212,7 +212,7 @@ export default function MargenPage() {
                             // Trigger refresh by pushing the same state
                             setStartDate(startDate);
                         }}
-                        className="p-2.5 bg-slate-50 border border-slate-200 text-blue-600 hover:bg-slate-100 hover:border-slate-300 transition-all rounded-xl shadow-sm cursor-pointer"
+                        className="p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-blue-600 dark:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600 transition-all rounded-xl shadow-sm cursor-pointer"
                         disabled={loading}
                         title="Actualizar Datos"
                     >
@@ -222,10 +222,10 @@ export default function MargenPage() {
             </div>
 
             {/* Filtros de Agrupación y Exportación */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-wrap items-center justify-between gap-4">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 shadow-sm flex flex-wrap items-center justify-between gap-4">
                 <div className="flex flex-wrap items-center gap-3">
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5 select-none">
-                        <Filter size={14} className="text-blue-500" />
+                    <span className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center gap-1.5 select-none">
+                        <Filter size={14} className="text-blue-500 dark:text-blue-400" />
                         Agrupar por:
                     </span>
                     <div className="flex flex-wrap gap-1.5">
@@ -236,8 +236,8 @@ export default function MargenPage() {
                                 className={cn(
                                     'px-3 py-1.5 rounded-xl text-xs font-bold border transition-all cursor-pointer',
                                     groupBy === g.key
-                                        ? 'bg-blue-50 text-blue-700 border-blue-200 shadow-xs'
-                                        : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
+                                        ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800/60 shadow-xs'
+                                        : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
                                 )}
                             >
                                 {g.label}
@@ -280,7 +280,7 @@ export default function MargenPage() {
                     loading={loading}
                     secondary={
                         kpis?.utilidad != null && kpis.utilidad < 0 ? (
-                            <span className="text-rose-600 flex items-center gap-1 text-xs font-bold mt-1">
+                            <span className="text-rose-600 dark:text-rose-400 flex items-center gap-1 text-xs font-bold mt-1">
                                 <TrendingDown className="w-3 h-3" /> Pérdida
                             </span>
                         ) : null
@@ -297,7 +297,7 @@ export default function MargenPage() {
                     }
                     loading={loading}
                     secondary={
-                        <span className="text-xs text-slate-500 font-medium mt-1">
+                        <span className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">
                             {fmtNumber(kpis?.tickets)} tickets · {fmtNumber(kpis?.unidades)} u.
                         </span>
                     }
@@ -305,24 +305,24 @@ export default function MargenPage() {
             </div>
 
             {/* Tabla */}
-            <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
-                <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-                    <h2 className="text-sm font-black uppercase tracking-widest text-slate-700">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm">
+                <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                    <h2 className="text-sm font-black uppercase tracking-widest text-slate-700 dark:text-slate-200">
                         Detalle por {GROUPS.find(g => g.key === groupBy)?.label}
                     </h2>
-                    <span className="text-xs text-slate-500 font-bold">{sortedRows.length} filas</span>
+                    <span className="text-xs text-slate-500 dark:text-slate-400 font-bold">{sortedRows.length} filas</span>
                 </div>
                 {error && (
-                    <div className="p-6 text-rose-600 text-sm font-medium">Error: {error}</div>
+                    <div className="p-6 text-rose-600 dark:text-rose-400 text-sm font-medium">Error: {error}</div>
                 )}
                 {loading && rows.length === 0 ? (
-                    <div className="flex items-center justify-center py-20 text-slate-400">
+                    <div className="flex items-center justify-center py-20 text-slate-400 dark:text-slate-500">
                         <Loader2 className="w-6 h-6 animate-spin" />
                     </div>
                 ) : (
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm">
-                            <thead className="bg-slate-50 border-b border-slate-200">
+                            <thead className="bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700">
                                 <tr>
                                     <Th label={GROUPS.find(g => g.key === groupBy)?.label || ''} onClick={() => toggleSort('Grupo')} active={sortKey === 'Grupo'} dir={sortDir} align="left" />
                                     <Th label="Unidades" onClick={() => toggleSort('Unidades')} active={sortKey === 'Unidades'} dir={sortDir} />
@@ -337,32 +337,32 @@ export default function MargenPage() {
                                 {sortedRows.map((r, i) => {
                                     const pct = Number(r.MargenPct) || 0;
                                     return (
-                                        <tr key={i} className="border-b border-slate-100 hover:bg-blue-50/30">
-                                            <td className="px-4 py-3 font-bold text-slate-800">{r.Grupo}</td>
+                                        <tr key={i} className="border-b border-slate-100 dark:border-slate-800 hover:bg-blue-50/30 dark:hover:bg-blue-950/40">
+                                            <td className="px-4 py-3 font-bold text-slate-800 dark:text-slate-100">{r.Grupo}</td>
                                             <td className="px-4 py-3 text-right tabular-nums">{fmtNumber(r.Unidades)}</td>
-                                            <td className="px-4 py-3 text-right tabular-nums font-medium text-slate-700">{fmtMoney(r.Ingreso)}</td>
-                                            <td className="px-4 py-3 text-right tabular-nums text-orange-700">{fmtMoney(r.Costo)}</td>
-                                            <td className={cn('px-4 py-3 text-right tabular-nums font-bold', Number(r.Utilidad) < 0 ? 'text-rose-600' : 'text-emerald-700')}>
+                                            <td className="px-4 py-3 text-right tabular-nums font-medium text-slate-700 dark:text-slate-200">{fmtMoney(r.Ingreso)}</td>
+                                            <td className="px-4 py-3 text-right tabular-nums text-orange-700 dark:text-orange-400">{fmtMoney(r.Costo)}</td>
+                                            <td className={cn('px-4 py-3 text-right tabular-nums font-bold', Number(r.Utilidad) < 0 ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-700 dark:text-emerald-400')}>
                                                 {fmtMoney(r.Utilidad)}
                                             </td>
                                             <td className="px-4 py-3 text-right tabular-nums">
                                                 <span className={cn(
                                                     'inline-flex items-center px-2 py-0.5 rounded-md font-bold text-xs',
-                                                    pct >= 30 ? 'bg-emerald-100 text-emerald-700' :
-                                                        pct >= 15 ? 'bg-blue-100 text-blue-700' :
-                                                            pct >= 0 ? 'bg-amber-100 text-amber-700' :
-                                                                'bg-rose-100 text-rose-700'
+                                                    pct >= 30 ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400' :
+                                                        pct >= 15 ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-400' :
+                                                            pct >= 0 ? 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400' :
+                                                                'bg-rose-100 dark:bg-rose-900/40 text-rose-700 dark:text-rose-400'
                                                 )}>
                                                     {fmtPct(pct)}
                                                 </span>
                                             </td>
-                                            <td className="px-4 py-3 text-right tabular-nums text-slate-500">{fmtNumber(r.Tickets)}</td>
+                                            <td className="px-4 py-3 text-right tabular-nums text-slate-500 dark:text-slate-400">{fmtNumber(r.Tickets)}</td>
                                         </tr>
                                     );
                                 })}
                                 {sortedRows.length === 0 && !loading && (
                                     <tr>
-                                        <td colSpan={7} className="text-center py-12 text-slate-400 font-medium">
+                                        <td colSpan={7} className="text-center py-12 text-slate-400 dark:text-slate-500 font-medium">
                                             Sin datos para los filtros seleccionados
                                         </td>
                                     </tr>
@@ -373,7 +373,7 @@ export default function MargenPage() {
                 )}
             </div>
 
-            <p className="text-xs text-slate-400 mt-6 font-medium">
+            <p className="text-xs text-slate-400 dark:text-slate-500 mt-6 font-medium">
                 * El costo unitario se toma de <code>tblCostoInventario.PrecioBase</code> por sucursal. Cuando una sucursal no tiene costo registrado, se usa el costo global del artículo (<code>tblArticulos.PrecioBase</code>).
             </p>
         </div>
@@ -385,14 +385,14 @@ function Th({ label, onClick, active, dir, align = 'right' }: { label: string; o
         <th
             onClick={onClick}
             className={cn(
-                'px-4 py-3 font-black text-xs uppercase tracking-wider text-slate-600 cursor-pointer select-none hover:text-blue-700',
+                'px-4 py-3 font-black text-xs uppercase tracking-wider text-slate-600 dark:text-slate-300 cursor-pointer select-none hover:text-blue-700 dark:hover:text-blue-400',
                 align === 'right' ? 'text-right' : 'text-left'
             )}
         >
             <span className="inline-flex items-center gap-1">
                 {label}
-                <ArrowUpDown className={cn('w-3 h-3', active ? 'text-blue-600' : 'opacity-30')} />
-                {active && <span className="text-blue-600">{dir === 'asc' ? '↑' : '↓'}</span>}
+                <ArrowUpDown className={cn('w-3 h-3', active ? 'text-blue-600 dark:text-blue-400' : 'opacity-30')} />
+                {active && <span className="text-blue-600 dark:text-blue-400">{dir === 'asc' ? '↑' : '↓'}</span>}
             </span>
         </th>
     );
@@ -409,22 +409,22 @@ function KpiCard({
     secondary?: React.ReactNode;
 }) {
     const accentMap: Record<string, string> = {
-        emerald: 'bg-emerald-50 text-emerald-600',
-        blue: 'bg-blue-50 text-blue-600',
-        orange: 'bg-orange-50 text-orange-600',
-        amber: 'bg-amber-50 text-amber-600',
-        rose: 'bg-rose-50 text-rose-600'
+        emerald: 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400',
+        blue: 'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400',
+        orange: 'bg-orange-50 dark:bg-orange-950/40 text-orange-600 dark:text-orange-400',
+        amber: 'bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400',
+        rose: 'bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400'
     };
     return (
-        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-5 shadow-sm">
             <div className="flex items-center gap-3 mb-2">
                 <div className={cn('p-2 rounded-xl', accentMap[accent])}>
                     {icon}
                 </div>
-                <span className="text-xs font-black uppercase tracking-widest text-slate-500">{label}</span>
+                <span className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">{label}</span>
             </div>
-            <div className="text-2xl font-black tracking-tight text-slate-900 tabular-nums">
-                {loading ? <Loader2 className="w-5 h-5 animate-spin text-slate-300" /> : value}
+            <div className="text-2xl font-black tracking-tight text-slate-900 dark:text-slate-50 tabular-nums">
+                {loading ? <Loader2 className="w-5 h-5 animate-spin text-slate-300 dark:text-slate-700" /> : value}
             </div>
             {secondary}
         </div>

@@ -73,12 +73,12 @@ export default function DashboardChart({ data, startDate, endDate }: DashboardCh
     const CustomTooltip = ({ active, payload }: any) => {
         if (active && payload && payload.length) {
             return (
-                <div className="bg-slate-900 text-white p-3 rounded-lg shadow-lg text-sm border border-slate-700">
+                <div className="bg-slate-900 dark:bg-slate-50 text-white p-3 rounded-lg shadow-lg text-sm border border-slate-700 dark:border-slate-300">
                     <p className="font-bold mb-1">{payload[0].payload.sucursal}</p>
                     <p className="text-blue-300">
                         {getMetricLabel()}: <span className="text-white font-semibold">{formatValue(payload[0].value)}</span>
                     </p>
-                    <p className="text-[10px] text-slate-400 mt-2 italic">Haz clic para ver detalles</p>
+                    <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-2 italic">Haz clic para ver detalles</p>
                 </div>
             );
         }
@@ -90,22 +90,22 @@ export default function DashboardChart({ data, startDate, endDate }: DashboardCh
 
     return (
         <>
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col h-full">
-                <div className="p-6 border-b border-slate-50 bg-gradient-to-r from-blue-50/50 to-white">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden flex flex-col h-full">
+                <div className="p-6 border-b border-slate-50 dark:border-slate-800 bg-gradient-to-r from-blue-50/50 to-white dark:to-slate-900">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div className="flex items-center gap-2">
-                            <TrendingUp className="text-emerald-500" size={20} />
-                            <h2 className="text-lg font-bold text-slate-900">Métricas por Sucursal</h2>
+                            <TrendingUp className="text-emerald-500 dark:text-emerald-400" size={20} />
+                            <h2 className="text-lg font-bold text-slate-900 dark:text-slate-50">Métricas por Sucursal</h2>
                         </div>
 
                         <div className="flex flex-wrap items-center gap-3">
                             {/* Metric Selector */}
-                            <div className="flex bg-slate-100 p-1 rounded-lg">
+                            <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
                                 <button
                                     onClick={() => setMetric('total')}
                                     className={cn(
                                         "px-3 py-1.5 text-xs font-semibold rounded-md transition-all",
-                                        metric === 'total' ? "bg-white text-blue-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
+                                        metric === 'total' ? "bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm" : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
                                     )}
                                 >
                                     Ventas
@@ -114,7 +114,7 @@ export default function DashboardChart({ data, startDate, endDate }: DashboardCh
                                     onClick={() => setMetric('operaciones')}
                                     className={cn(
                                         "px-3 py-1.5 text-xs font-semibold rounded-md transition-all",
-                                        metric === 'operaciones' ? "bg-white text-blue-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
+                                        metric === 'operaciones' ? "bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm" : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
                                     )}
                                 >
                                     Operaciones
@@ -123,22 +123,22 @@ export default function DashboardChart({ data, startDate, endDate }: DashboardCh
                                     onClick={() => setMetric('ticketPromedio')}
                                     className={cn(
                                         "px-3 py-1.5 text-xs font-semibold rounded-md transition-all",
-                                        metric === 'ticketPromedio' ? "bg-white text-blue-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
+                                        metric === 'ticketPromedio' ? "bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm" : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
                                     )}
                                 >
                                     T. Promedio
                                 </button>
                             </div>
 
-                            <div className="w-px h-6 bg-slate-200 hidden sm:block"></div>
+                            <div className="w-px h-6 bg-slate-200 dark:bg-slate-800 hidden sm:block"></div>
 
                             {/* Chart Type Toggle */}
-                            <div className="flex bg-slate-100 p-1 rounded-lg">
+                            <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
                                 <button
                                     onClick={() => setChartType('bar')}
                                     className={cn(
                                         "p-1.5 rounded-md transition-all",
-                                        chartType === 'bar' ? "bg-white text-blue-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
+                                        chartType === 'bar' ? "bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm" : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
                                     )}
                                     title="Gráfico de Barras"
                                 >
@@ -148,7 +148,7 @@ export default function DashboardChart({ data, startDate, endDate }: DashboardCh
                                     onClick={() => setChartType('pie')}
                                     className={cn(
                                         "p-1.5 rounded-md transition-all",
-                                        chartType === 'pie' ? "bg-white text-blue-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
+                                        chartType === 'pie' ? "bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm" : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
                                     )}
                                     title="Gráfico de Pastel"
                                 >
@@ -159,14 +159,14 @@ export default function DashboardChart({ data, startDate, endDate }: DashboardCh
                     </div>
                 </div>
 
-                <div className="p-6 flex-1 flex items-center justify-center bg-slate-50/20 min-h-[500px]">
+                <div className="p-6 flex-1 flex items-center justify-center bg-slate-50/20 dark:bg-slate-900/20 min-h-[500px]">
                     {displayData.length === 0 ? (
-                        <div className="text-slate-500 font-medium">No hay datos suficientes para mostrar en esta métrica.</div>
+                        <div className="text-slate-500 dark:text-slate-400 font-medium">No hay datos suficientes para mostrar en esta métrica.</div>
                     ) : (
                         <ResponsiveContainer width="100%" height={450}>
                             {chartType === 'bar' ? (
                                 <BarChart data={displayData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }} barCategoryGap="15%">
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--grafica-rejilla)" />
                                     <XAxis
                                         dataKey="sucursal"
                                         axisLine={false}
@@ -196,11 +196,11 @@ export default function DashboardChart({ data, startDate, endDate }: DashboardCh
                                     <YAxis
                                         axisLine={false}
                                         tickLine={false}
-                                        tick={{ fill: '#64748b', fontSize: 12 }}
+                                        tick={{ fill: 'var(--grafica-eje)', fontSize: 12 }}
                                         tickFormatter={(value) => metric !== 'operaciones' ? `$${value}` : value}
                                         width={80}
                                     />
-                                    <Tooltip content={<CustomTooltip />} cursor={{ fill: '#f1f5f9' }} />
+                                    <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--grafica-superficie)' }} />
                                     <Bar
                                         dataKey={metric}
                                         fill="#3b82f6"

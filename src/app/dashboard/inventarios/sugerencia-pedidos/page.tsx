@@ -159,26 +159,26 @@ export default function SugerenciaPedidosPage() {
 
     const columns: Column<SugerenciaRow>[] = [
         { key: 'Urgencia', label: 'Urgencia', render: r => <StatusPill tone={URGENCIA_PILL[r.Urgencia].tone}>{URGENCIA_PILL[r.Urgencia].label}</StatusPill> },
-        { key: 'Sucursal', label: 'Sucursal', render: r => <span className="font-semibold text-slate-700">{r.Sucursal}</span> },
+        { key: 'Sucursal', label: 'Sucursal', render: r => <span className="font-semibold text-slate-700 dark:text-slate-200">{r.Sucursal}</span> },
         {
             key: 'Producto',
             label: 'Producto',
             render: r => (
                 <div className="min-w-[190px]">
-                    <p className="font-bold text-slate-800 leading-tight">{r.Producto}</p>
-                    <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">{r.Codigo} · {r.Marca}</p>
+                    <p className="font-bold text-slate-800 dark:text-slate-100 leading-tight">{r.Producto}</p>
+                    <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider">{r.Codigo} · {r.Marca}</p>
                 </div>
             ),
         },
-        { key: 'Proveedor', label: 'Proveedor', render: r => <span className="text-xs text-slate-600 font-semibold">{r.Proveedor}</span> },
-        { key: 'Exi', label: 'Existencia', align: 'right', render: r => <span className={Number(r.Exi) <= 0 ? 'text-rose-600 font-black' : ''}>{formatDecimal(r.Exi, 0)}</span> },
+        { key: 'Proveedor', label: 'Proveedor', render: r => <span className="text-xs text-slate-600 dark:text-slate-300 font-semibold">{r.Proveedor}</span> },
+        { key: 'Exi', label: 'Existencia', align: 'right', render: r => <span className={Number(r.Exi) <= 0 ? 'text-rose-600 dark:text-rose-400 font-black' : ''}>{formatDecimal(r.Exi, 0)}</span> },
         {
             key: 'EnTransito',
             label: 'En tránsito',
             align: 'right',
             render: r => (Number(r.EnTransito) > 0
-                ? <span className="font-semibold text-blue-600">{formatDecimal(r.EnTransito, 0)}</span>
-                : <span className="text-slate-300">—</span>),
+                ? <span className="font-semibold text-blue-600 dark:text-blue-400">{formatDecimal(r.EnTransito, 0)}</span>
+                : <span className="text-slate-300 dark:text-slate-700">—</span>),
         },
         { key: 'PuntoReorden', label: 'Punto reorden', align: 'right', render: r => formatDecimal(r.PuntoReorden, 0) },
         { key: 'DemandaDiaria', label: 'Salida/día', align: 'right', render: r => formatDecimal(r.DemandaDiaria, 2) },
@@ -193,9 +193,9 @@ export default function SugerenciaPedidosPage() {
             key: 'Sugerido',
             label: 'Pedir',
             align: 'right',
-            render: r => <span className="font-black text-blue-700 text-base">{formatInt(r.Sugerido)}</span>,
+            render: r => <span className="font-black text-blue-700 dark:text-blue-400 text-base">{formatInt(r.Sugerido)}</span>,
         },
-        { key: 'CostoSugerido', label: 'Costo del pedido', align: 'right', render: r => <span className="font-bold text-slate-800">{formatCurrency(r.CostoSugerido)}</span> },
+        { key: 'CostoSugerido', label: 'Costo del pedido', align: 'right', render: r => <span className="font-bold text-slate-800 dark:text-slate-100">{formatCurrency(r.CostoSugerido)}</span> },
         {
             key: 'Origen',
             label: 'Base',
@@ -230,7 +230,7 @@ export default function SugerenciaPedidosPage() {
             >
                 <ThresholdInput label="Cobertura objetivo" value={diasCobertura} onChange={setDiasCobertura} max={365} />
                 <div className="w-full lg:w-44">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 block">
+                    <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5 block">
                         Mercancía en tránsito
                     </label>
                     <button
@@ -239,8 +239,8 @@ export default function SugerenciaPedidosPage() {
                         className={cn(
                             'w-full px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider border transition-colors cursor-pointer',
                             ignorarTransito
-                                ? 'bg-amber-50 border-amber-200 text-amber-700'
-                                : 'bg-blue-50 border-blue-200 text-blue-700'
+                                ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800/60 text-amber-700 dark:text-amber-400'
+                                : 'bg-blue-50 dark:bg-blue-950/40 border-blue-200 dark:border-blue-800/60 text-blue-700 dark:text-blue-400'
                         )}
                     >
                         {ignorarTransito ? 'Ignorada' : 'Descontada'}
@@ -287,10 +287,10 @@ export default function SugerenciaPedidosPage() {
                     </div>
 
                     {data.kpis.porMinimoErp > 0 && (
-                        <div className="flex items-start gap-3 bg-slate-50 border border-slate-200 rounded-2xl px-5 py-3.5">
-                            <Truck size={16} className="text-slate-400 shrink-0 mt-0.5" />
-                            <p className="text-xs text-slate-600 leading-relaxed">
-                                <span className="font-bold text-slate-800">{formatInt(data.kpis.porMinimoErp)} sugerencias</span> salen
+                        <div className="flex items-start gap-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-3.5">
+                            <Truck size={16} className="text-slate-400 dark:text-slate-500 shrink-0 mt-0.5" />
+                            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                                <span className="font-bold text-slate-800 dark:text-slate-100">{formatInt(data.kpis.porMinimoErp)} sugerencias</span> salen
                                 del mínimo capturado en el ERP y no de venta reciente: el artículo tiene existencia mínima configurada
                                 pero no registró salidas en los últimos {data.meta.dias} días. Se marcan con la etiqueta
                                 {' '}<span className="font-bold">Mínimo ERP</span> en la columna «Base».
@@ -309,7 +309,7 @@ export default function SugerenciaPedidosPage() {
                                             <button
                                                 type="button"
                                                 onClick={() => setProveedor(r.Proveedor)}
-                                                className="font-bold text-slate-800 hover:text-blue-600 transition-colors cursor-pointer text-left"
+                                                className="font-bold text-slate-800 dark:text-slate-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer text-left"
                                             >
                                                 {r.Proveedor}
                                             </button>
@@ -317,7 +317,7 @@ export default function SugerenciaPedidosPage() {
                                     },
                                     { key: 'Skus', label: 'SKUs', align: 'right', render: r => formatInt(r.Skus) },
                                     { key: 'Unidades', label: 'Unidades', align: 'right', render: r => formatInt(r.Unidades) },
-                                    { key: 'Costo', label: 'Costo', align: 'right', render: r => <span className="font-black text-slate-900">{formatCurrency(r.Costo)}</span> },
+                                    { key: 'Costo', label: 'Costo', align: 'right', render: r => <span className="font-black text-slate-900 dark:text-slate-50">{formatCurrency(r.Costo)}</span> },
                                 ]}
                                 rows={data.porProveedor}
                                 rowKey={r => r.Proveedor}
@@ -329,11 +329,11 @@ export default function SugerenciaPedidosPage() {
                         <Panel title="Pedido por sucursal" subtitle={`${data.porSucursal.length} sucursales con necesidad de resurtido`}>
                             <DataTable
                                 columns={[
-                                    { key: 'Sucursal', label: 'Sucursal', render: r => <span className="font-bold text-slate-800">{r.Sucursal}</span> },
-                                    { key: 'Agotados', label: 'Agotados', align: 'right', render: r => <span className="font-bold text-rose-600">{formatInt(r.Agotados)}</span> },
+                                    { key: 'Sucursal', label: 'Sucursal', render: r => <span className="font-bold text-slate-800 dark:text-slate-100">{r.Sucursal}</span> },
+                                    { key: 'Agotados', label: 'Agotados', align: 'right', render: r => <span className="font-bold text-rose-600 dark:text-rose-400">{formatInt(r.Agotados)}</span> },
                                     { key: 'Skus', label: 'SKUs', align: 'right', render: r => formatInt(r.Skus) },
                                     { key: 'Unidades', label: 'Unidades', align: 'right', render: r => formatInt(r.Unidades) },
-                                    { key: 'Costo', label: 'Costo', align: 'right', render: r => <span className="font-black text-slate-900">{formatCurrency(r.Costo)}</span> },
+                                    { key: 'Costo', label: 'Costo', align: 'right', render: r => <span className="font-black text-slate-900 dark:text-slate-50">{formatCurrency(r.Costo)}</span> },
                                 ]}
                                 rows={data.porSucursal}
                                 rowKey={r => String(r.IdSucursal)}
@@ -352,7 +352,7 @@ export default function SugerenciaPedidosPage() {
                                     <button
                                         type="button"
                                         onClick={() => setProveedor('todos')}
-                                        className="px-3 py-1.5 bg-blue-50 border border-blue-200 rounded-lg text-xs font-bold text-blue-700 hover:bg-blue-100 cursor-pointer"
+                                        className="px-3 py-1.5 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/60 rounded-lg text-xs font-bold text-blue-700 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/40 cursor-pointer"
                                     >
                                         {proveedor} ✕
                                     </button>
@@ -360,7 +360,7 @@ export default function SugerenciaPedidosPage() {
                                 <select
                                     value={urgencia}
                                     onChange={e => setUrgencia(e.target.value as UrgenciaFiltro)}
-                                    className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="px-3 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-700 dark:text-slate-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 >
                                     <option value="todas">Toda urgencia</option>
                                     <option value="agotado">Agotados</option>
@@ -375,7 +375,7 @@ export default function SugerenciaPedidosPage() {
                             rows={filteredRows}
                             rowKey={r => `${r.IdSucursal}-${r.IdArticulo}`}
                             initialSort={{ key: 'CostoSugerido', direction: 'desc' }}
-                            rowClassName={r => (r.Urgencia === 'agotado' ? 'bg-rose-50/30' : '')}
+                            rowClassName={r => (r.Urgencia === 'agotado' ? 'bg-rose-50/30 dark:bg-rose-950/40' : '')}
                             emptyMessage="No hay artículos que requieran pedido con los parámetros seleccionados."
                         />
                     </Panel>

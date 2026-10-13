@@ -254,10 +254,10 @@ function ReportContent() {
     return (
         <div className="space-y-6">
             {/* Header with Filters & Periods */}
-            <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white py-4 px-6 rounded-2xl shadow-sm border border-slate-100 animate-in fade-in duration-500">
+            <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white dark:bg-slate-900 py-4 px-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 animate-in fade-in duration-500">
                 <div className="flex flex-col md:flex-row md:items-center gap-6">
-                    <h1 className="text-2xl font-black text-slate-800 tracking-tight uppercase flex items-center gap-3 select-none">
-                        <UserRound className="text-blue-600" />
+                    <h1 className="text-2xl font-black text-slate-800 dark:text-slate-100 tracking-tight uppercase flex items-center gap-3 select-none">
+                        <UserRound className="text-blue-600 dark:text-blue-400" />
                         Ventas por Usuario
                     </h1>
 
@@ -265,29 +265,29 @@ function ReportContent() {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3">
-                    <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
-                        <Calendar size={16} className="text-blue-500" />
-                        <span className="text-[10px] font-bold text-slate-400 uppercase">Del</span>
+                    <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2">
+                        <Calendar size={16} className="text-blue-500 dark:text-blue-400" />
+                        <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">Del</span>
                         <input
                             type="date"
                             value={startDate}
                             onChange={(e) => handleParamChange('startDate', e.target.value)}
-                            className="bg-transparent text-xs font-bold text-slate-700 outline-none p-0 border-none h-auto w-28 cursor-pointer"
+                            className="bg-transparent text-xs font-bold text-slate-700 dark:text-slate-200 outline-none p-0 border-none h-auto w-28 cursor-pointer"
                         />
                     </div>
-                    <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
-                        <Calendar size={16} className="text-blue-500" />
-                        <span className="text-[10px] font-bold text-slate-400 uppercase">Al</span>
+                    <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2">
+                        <Calendar size={16} className="text-blue-500 dark:text-blue-400" />
+                        <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">Al</span>
                         <input
                             type="date"
                             value={endDate}
                             onChange={(e) => handleParamChange('endDate', e.target.value)}
-                            className="bg-transparent text-xs font-bold text-slate-700 outline-none p-0 border-none h-auto w-28 cursor-pointer"
+                            className="bg-transparent text-xs font-bold text-slate-700 dark:text-slate-200 outline-none p-0 border-none h-auto w-28 cursor-pointer"
                         />
                     </div>
                     <button
                         onClick={() => handleParamChange('startDate', startDate)}
-                        className="p-2.5 bg-slate-50 border border-slate-200 text-blue-600 hover:bg-slate-100 hover:border-slate-300 transition-all rounded-xl shadow-sm"
+                        className="p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-blue-600 dark:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600 transition-all rounded-xl shadow-sm"
                         disabled={loading}
                         title="Actualizar Datos"
                     >
@@ -296,7 +296,7 @@ function ReportContent() {
                     <button
                         onClick={handleExportExcel}
                         disabled={loading || filteredData.length === 0}
-                        className="p-2.5 text-green-600 bg-green-50 hover:bg-green-100 rounded-xl transition-colors border border-green-200 disabled:opacity-40"
+                        className="p-2.5 text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/40 hover:bg-green-100 dark:hover:bg-green-900/40 rounded-xl transition-colors border border-green-200 dark:border-green-800/60 disabled:opacity-40"
                         title="Exportar Excel"
                     >
                         <FileSpreadsheet size={16} />
@@ -304,7 +304,7 @@ function ReportContent() {
                     <button
                         onClick={handleExportPDF}
                         disabled={loading || filteredData.length === 0}
-                        className="p-2.5 text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-xl transition-colors border border-rose-200 disabled:opacity-40"
+                        className="p-2.5 text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/40 rounded-xl transition-colors border border-rose-200 dark:border-rose-800/60 disabled:opacity-40"
                         title="Exportar PDF"
                     >
                         <FileText size={16} />
@@ -314,31 +314,31 @@ function ReportContent() {
 
             {/* Table */}
             {loading ? (
-                <div className="flex flex-col items-center justify-center h-64 text-slate-500">
-                    <Loader2 className="animate-spin mb-4 text-blue-600" size={40} />
+                <div className="flex flex-col items-center justify-center h-64 text-slate-500 dark:text-slate-400">
+                    <Loader2 className="animate-spin mb-4 text-blue-600 dark:text-blue-400" size={40} />
                     <p className="font-medium">Cargando usuarios...</p>
                 </div>
             ) : error ? (
-                <div className="bg-red-50 border border-red-200 text-red-600 p-6 rounded-2xl flex flex-col items-center">
+                <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 text-red-600 dark:text-red-400 p-6 rounded-2xl flex flex-col items-center">
                     <p className="font-bold">Error al cargar datos</p>
                     <p className="text-sm mt-1">{error}</p>
                 </div>
             ) : (
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
                     {/* Toolbar: count + filters */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 py-3 border-b border-slate-100 bg-slate-50/60">
-                        <div className="flex items-center gap-2 text-sm font-bold text-slate-700">
-                            <Users size={16} className="text-blue-600" />
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 py-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/60">
+                        <div className="flex items-center gap-2 text-sm font-bold text-slate-700 dark:text-slate-200">
+                            <Users size={16} className="text-blue-600 dark:text-blue-400" />
                             {filteredData.length} usuario{filteredData.length === 1 ? '' : 's'}
-                            <span className="text-[11px] font-semibold text-slate-400 ml-1">Haz clic en un usuario para ver sus ventas.</span>
+                            <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 ml-1">Haz clic en un usuario para ver sus ventas.</span>
                         </div>
                         <div className="flex flex-wrap items-center gap-3">
-                            <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-3 py-1.5">
-                                <Store size={15} className="text-blue-500" />
+                            <div className="flex items-center gap-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5">
+                                <Store size={15} className="text-blue-500 dark:text-blue-400" />
                                 <select
                                     value={sucursalFilter}
                                     onChange={(e) => setSucursalFilter(e.target.value)}
-                                    className="bg-transparent text-xs font-bold text-slate-700 outline-none border-none cursor-pointer max-w-[180px]"
+                                    className="bg-transparent text-xs font-bold text-slate-700 dark:text-slate-200 outline-none border-none cursor-pointer max-w-[180px]"
                                 >
                                     <option value="all">Todas las sucursales</option>
                                     {sucursalOptions.map(s => (
@@ -346,17 +346,17 @@ function ReportContent() {
                                     ))}
                                 </select>
                             </div>
-                            <div className="relative flex items-center bg-white border border-slate-200 rounded-xl px-3 py-1.5 focus-within:ring-2 focus-within:ring-blue-500/10 focus-within:border-blue-500 transition-all w-full sm:w-56">
-                                <Search size={15} className="text-slate-400 mr-2 shrink-0" />
+                            <div className="relative flex items-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 focus-within:ring-2 focus-within:ring-blue-500/10 focus-within:border-blue-500 transition-all w-full sm:w-56">
+                                <Search size={15} className="text-slate-400 dark:text-slate-500 mr-2 shrink-0" />
                                 <input
                                     type="text"
                                     placeholder="Buscar usuario..."
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
-                                    className="bg-transparent text-xs font-semibold text-slate-700 outline-none p-0 border-none h-auto w-full"
+                                    className="bg-transparent text-xs font-semibold text-slate-700 dark:text-slate-200 outline-none p-0 border-none h-auto w-full"
                                 />
                                 {search && (
-                                    <button onClick={() => setSearch('')} className="p-1 hover:bg-slate-200/60 rounded-full text-slate-400">
+                                    <button onClick={() => setSearch('')} className="p-1 hover:bg-slate-200/60 dark:hover:bg-slate-800/60 rounded-full text-slate-400 dark:text-slate-500">
                                         <X size={12} />
                                     </button>
                                 )}
@@ -366,50 +366,50 @@ function ReportContent() {
 
                     <div className="overflow-auto max-h-[68vh] nice-scroll">
                         <table className="w-full text-left text-sm whitespace-nowrap border-collapse">
-                            <thead className="bg-slate-50 sticky top-0 shadow-sm z-10 border-b border-slate-200">
+                            <thead className="bg-slate-50 dark:bg-slate-900 sticky top-0 shadow-sm z-10 border-b border-slate-200 dark:border-slate-700">
                                 <tr>
-                                    <th className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors select-none group" onClick={() => handleSort('Usuario')}>
+                                    <th className="px-6 py-4 font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors select-none group" onClick={() => handleSort('Usuario')}>
                                         <div className="flex items-center gap-1 justify-between">
                                             Usuario
-                                            <ArrowUpDown size={14} className={cn("text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig.key === 'Usuario' && "opacity-100 text-blue-500")} />
+                                            <ArrowUpDown size={14} className={cn("text-slate-400 dark:text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig.key === 'Usuario' && "opacity-100 text-blue-500 dark:text-blue-400")} />
                                         </div>
                                     </th>
-                                    <th className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors select-none group" onClick={() => handleSort('Sucursal')}>
+                                    <th className="px-6 py-4 font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors select-none group" onClick={() => handleSort('Sucursal')}>
                                         <div className="flex items-center gap-1 justify-between">
                                             Sucursal
-                                            <ArrowUpDown size={14} className={cn("text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig.key === 'Sucursal' && "opacity-100 text-blue-500")} />
+                                            <ArrowUpDown size={14} className={cn("text-slate-400 dark:text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig.key === 'Sucursal' && "opacity-100 text-blue-500 dark:text-blue-400")} />
                                         </div>
                                     </th>
-                                    <th className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors select-none group text-center" onClick={() => handleSort('TotalVentas')}>
+                                    <th className="px-6 py-4 font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors select-none group text-center" onClick={() => handleSort('TotalVentas')}>
                                         <div className="flex items-center gap-1 justify-center">
                                             # Ventas
-                                            <ArrowUpDown size={14} className={cn("text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig.key === 'TotalVentas' && "opacity-100 text-blue-500")} />
+                                            <ArrowUpDown size={14} className={cn("text-slate-400 dark:text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig.key === 'TotalVentas' && "opacity-100 text-blue-500 dark:text-blue-400")} />
                                         </div>
                                     </th>
-                                    <th className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors select-none group text-right" onClick={() => handleSort('TicketPromedio')}>
+                                    <th className="px-6 py-4 font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors select-none group text-right" onClick={() => handleSort('TicketPromedio')}>
                                         <div className="flex items-center gap-1 justify-end">
                                             Ticket Promedio
-                                            <ArrowUpDown size={14} className={cn("text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig.key === 'TicketPromedio' && "opacity-100 text-blue-500")} />
+                                            <ArrowUpDown size={14} className={cn("text-slate-400 dark:text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig.key === 'TicketPromedio' && "opacity-100 text-blue-500 dark:text-blue-400")} />
                                         </div>
                                     </th>
-                                    <th className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors select-none group text-right" onClick={() => handleSort('ImporteTotal')}>
+                                    <th className="px-6 py-4 font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors select-none group text-right" onClick={() => handleSort('ImporteTotal')}>
                                         <div className="flex items-center gap-1 justify-end">
                                             Importe Total
-                                            <ArrowUpDown size={14} className={cn("text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig.key === 'ImporteTotal' && "opacity-100 text-blue-500")} />
+                                            <ArrowUpDown size={14} className={cn("text-slate-400 dark:text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig.key === 'ImporteTotal' && "opacity-100 text-blue-500 dark:text-blue-400")} />
                                         </div>
                                     </th>
-                                    <th className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors select-none group text-center" onClick={() => handleSort('UltimaVenta')}>
+                                    <th className="px-6 py-4 font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors select-none group text-center" onClick={() => handleSort('UltimaVenta')}>
                                         <div className="flex items-center gap-1 justify-center">
                                             Última Venta
-                                            <ArrowUpDown size={14} className={cn("text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig.key === 'UltimaVenta' && "opacity-100 text-blue-500")} />
+                                            <ArrowUpDown size={14} className={cn("text-slate-400 dark:text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig.key === 'UltimaVenta' && "opacity-100 text-blue-500 dark:text-blue-400")} />
                                         </div>
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100">
+                            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                                 {filteredData.length === 0 ? (
                                     <tr>
-                                        <td colSpan={6} className="px-6 py-12 text-center text-slate-400">
+                                        <td colSpan={6} className="px-6 py-12 text-center text-slate-400 dark:text-slate-500">
                                             No se encontraron usuarios con ventas en el periodo seleccionado.
                                         </td>
                                     </tr>
@@ -417,7 +417,7 @@ function ReportContent() {
                                     filteredData.map((row, idx) => (
                                         <tr
                                             key={idx}
-                                            className="hover:bg-blue-50/50 transition-colors group cursor-pointer"
+                                            className="hover:bg-blue-50/50 dark:hover:bg-blue-950/40 transition-colors group cursor-pointer"
                                             onClick={() => {
                                                 setSelectedUsuario({
                                                     id: row.IdUsuario,
@@ -429,25 +429,25 @@ function ReportContent() {
                                             }}
                                             title="Ver ventas de este usuario"
                                         >
-                                            <td className="px-6 py-4 font-medium text-slate-900 group-hover:text-blue-600 transition-colors">
+                                            <td className="px-6 py-4 font-medium text-slate-900 dark:text-slate-50 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                                                 {row.Usuario}
                                             </td>
-                                            <td className="px-6 py-4 text-slate-500 italic">
+                                            <td className="px-6 py-4 text-slate-500 dark:text-slate-400 italic">
                                                 {row.Sucursal}
                                             </td>
-                                            <td className="px-6 py-4 text-center text-slate-600 font-mono">
+                                            <td className="px-6 py-4 text-center text-slate-600 dark:text-slate-300 font-mono">
                                                 {formatInt(row.TotalVentas)}
                                             </td>
-                                            <td className="px-6 py-4 text-right text-slate-500">
+                                            <td className="px-6 py-4 text-right text-slate-500 dark:text-slate-400">
                                                 {formatCurrency(row.TicketPromedio)}
                                             </td>
-                                            <td className="px-6 py-4 text-right font-bold text-blue-600">
+                                            <td className="px-6 py-4 text-right font-bold text-blue-600 dark:text-blue-400">
                                                 <div className="flex items-center justify-end gap-2">
-                                                    <TrendingUp size={14} className="text-green-500" />
+                                                    <TrendingUp size={14} className="text-green-500 dark:text-green-400" />
                                                     {formatCurrency(row.ImporteTotal)}
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 text-center text-slate-600 text-xs tabular-nums">
+                                            <td className="px-6 py-4 text-center text-slate-600 dark:text-slate-300 text-xs tabular-nums">
                                                 {formatShortDate(row.UltimaVenta)}
                                             </td>
                                         </tr>
@@ -455,11 +455,11 @@ function ReportContent() {
                                 )}
                             </tbody>
                             {filteredData.length > 0 && (
-                                <tfoot className="sticky bottom-0 bg-slate-50 border-t-2 border-slate-200">
-                                    <tr className="font-bold text-slate-700">
-                                        <td className="px-6 py-3 text-xs uppercase tracking-wider text-slate-400" colSpan={2}>Totales ({filteredData.length})</td>
+                                <tfoot className="sticky bottom-0 bg-slate-50 dark:bg-slate-900 border-t-2 border-slate-200 dark:border-slate-700">
+                                    <tr className="font-bold text-slate-700 dark:text-slate-200">
+                                        <td className="px-6 py-3 text-xs uppercase tracking-wider text-slate-400 dark:text-slate-500" colSpan={2}>Totales ({filteredData.length})</td>
                                         <td className="px-6 py-3 text-center tabular-nums">{formatInt(totals.totalVentas)}</td>
-                                        <td className="px-6 py-3 text-right tabular-nums text-slate-500">{totals.ticketPromedio !== null ? formatCurrency(totals.ticketPromedio) : '—'}</td>
+                                        <td className="px-6 py-3 text-right tabular-nums text-slate-500 dark:text-slate-400">{totals.ticketPromedio !== null ? formatCurrency(totals.ticketPromedio) : '—'}</td>
                                         <td className="px-6 py-3 text-right tabular-nums">{formatCurrency(totals.totalImporte)}</td>
                                         <td className="px-6 py-3"></td>
                                     </tr>
@@ -505,7 +505,7 @@ export default function VentasPorUsuarioPage() {
     return (
         <Suspense fallback={
             <div className="flex items-center justify-center min-h-[400px]">
-                <Loader2 className="animate-spin text-blue-600" size={40} />
+                <Loader2 className="animate-spin text-blue-600 dark:text-blue-400" size={40} />
             </div>
         }>
             <ReportContent />

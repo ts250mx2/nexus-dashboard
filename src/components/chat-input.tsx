@@ -40,7 +40,7 @@ export function ChatInput({ onSend, isLoading }: ChatInputProps) {
     return (
         <div className="flex flex-col gap-2 w-full max-w-4xl mx-auto px-2">
             {error && (
-                <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest px-4">{error}</p>
+                <p className="text-[10px] text-red-500 dark:text-red-400 font-bold uppercase tracking-widest px-4">{error}</p>
             )}
             <form onSubmit={handleSubmit} className="flex-1 flex gap-3 items-end">
                 <div className="relative flex-1">
@@ -56,9 +56,9 @@ export function ChatInput({ onSend, isLoading }: ChatInputProps) {
                         }}
                         placeholder={isListening ? "Escuchando..." : "Hazme una consulta analítica..."}
                         className={cn(
-                            "w-full px-6 py-4 text-[15px] bg-white border border-slate-200 rounded-[24px] shadow-sm",
+                            "w-full px-6 py-4 text-[15px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-[24px] shadow-sm",
                             "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
-                            "placeholder:text-slate-400 text-slate-700 transition-all duration-300",
+                            "placeholder:text-slate-400 text-slate-700 dark:text-slate-200 transition-all duration-300",
                             "resize-none min-h-[56px] max-h-[150px] overflow-y-auto font-medium",
                             (isLoading || isListening) && "border-blue-500",
                             isLoading && "opacity-50 cursor-not-allowed"
@@ -83,7 +83,7 @@ export function ChatInput({ onSend, isLoading }: ChatInputProps) {
                             "p-4 h-14 w-14 flex items-center justify-center rounded-[20px] transition-all duration-300",
                             isListening
                                 ? "bg-red-500 text-white shadow-lg shadow-red-100 animate-pulse"
-                                : "bg-slate-100 text-slate-500 hover:bg-slate-200",
+                                : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800",
                             "disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 flex-shrink-0"
                         )}
                     >

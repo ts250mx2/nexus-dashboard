@@ -103,6 +103,27 @@
   --ring: 224.3 76.3% 48%;
 }
 
+/*
+ * Cromo de las gráficas: rejilla, ejes y globos de información. Recharts recibe
+ * estos colores como props, no como clases, así que las variantes dark: no los
+ * alcanzan; con variables CSS sí cambian al vuelo con el tema.
+ */
+:root {
+  --grafica-rejilla: #e2e8f0;
+  --grafica-eje: #64748b;
+  --grafica-globo-fondo: #ffffff;
+  --grafica-globo-borde: #e2e8f0;
+  --grafica-superficie: #f8fafc;
+}
+
+.dark {
+  --grafica-rejilla: #1e293b;
+  --grafica-eje: #94a3b8;
+  --grafica-globo-fondo: #0f172a;
+  --grafica-globo-borde: #334155;
+  --grafica-superficie: #1e293b;
+}
+
 * {
   border-color: var(--color-border);
 }

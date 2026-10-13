@@ -128,17 +128,17 @@ export default function MisReportesPage() {
 
     const chipBase = "inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold border transition-colors cursor-pointer";
     const chipCls = (active: boolean, over: boolean) =>
-        `${chipBase} ${over ? "border-indigo-500 bg-indigo-50 ring-2 ring-indigo-200" : active ? "bg-indigo-600 text-white border-indigo-600" : "bg-white text-slate-600 border-slate-200 hover:border-indigo-300"}`;
+        `${chipBase} ${over ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-950/40 ring-2 ring-indigo-200" : active ? "bg-indigo-600 text-white border-indigo-600" : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-700/60"}`;
 
     return (
         <div className="space-y-5">
             <div className="flex items-center justify-between flex-wrap gap-3">
                 <div>
-                    <h1 className="text-2xl font-black tracking-tight text-slate-900 flex items-center gap-2"><span>📁</span> Mis Reportes</h1>
-                    <p className="text-slate-500 font-medium mt-1">Arrastra un reporte a una carpeta para organizarlo.</p>
+                    <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-slate-50 flex items-center gap-2"><span>📁</span> Mis Reportes</h1>
+                    <p className="text-slate-500 dark:text-slate-400 font-medium mt-1">Arrastra un reporte a una carpeta para organizarlo.</p>
                 </div>
                 <div className="flex items-center gap-2">
-                    <button onClick={load} className="p-2.5 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-100 transition-colors" title="Recargar"><RefreshCw className="w-4 h-4" /></button>
+                    <button onClick={load} className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" title="Recargar"><RefreshCw className="w-4 h-4" /></button>
                     <Link href={CONSOLE_PATH} className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 transition-colors"><Plus className="w-4 h-4" /> Crear reporte</Link>
                 </div>
             </div>
@@ -165,10 +165,10 @@ export default function MisReportesPage() {
                         title="Soltar un reporte aquí para moverlo a esta carpeta"
                     >
                         <Folder className="w-4 h-4" /> {f.nombre} <span className="text-[11px] opacity-70">({countIn(f.idFolder)})</span>
-                        <button onClick={(e) => { e.stopPropagation(); removeFolder(f.idFolder); }} className="ml-1 opacity-50 hover:opacity-100 hover:text-red-500"><X className="w-3.5 h-3.5" /></button>
+                        <button onClick={(e) => { e.stopPropagation(); removeFolder(f.idFolder); }} className="ml-1 opacity-50 hover:opacity-100 hover:text-red-500 dark:hover:text-red-400"><X className="w-3.5 h-3.5" /></button>
                     </div>
                 ))}
-                <button onClick={newFolder} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold border border-dashed border-slate-300 text-slate-500 hover:border-indigo-400 hover:text-indigo-600 transition-colors">
+                <button onClick={newFolder} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold border border-dashed border-slate-300 dark:border-slate-600 text-slate-500 dark:text-slate-400 hover:border-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                     <FolderPlus className="w-4 h-4" /> Nueva carpeta
                 </button>
             </div>
@@ -176,26 +176,26 @@ export default function MisReportesPage() {
             {/* Búsqueda */}
             {!loading && reports.length > 0 && (
                 <div className="relative max-w-md">
-                    <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <Search className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
                     <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar por nombre o descripción…"
-                        className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 outline-none focus:border-indigo-400 placeholder:text-slate-400" />
+                        className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 outline-none focus:border-indigo-400 placeholder:text-slate-400" />
                 </div>
             )}
 
-            {loading && <div className="text-slate-400 font-medium py-16 text-center">Cargando reportes…</div>}
-            {error && !loading && <div className="bg-red-50 border border-red-200 text-red-700 rounded-2xl p-4 font-medium">{error}</div>}
+            {loading && <div className="text-slate-400 dark:text-slate-500 font-medium py-16 text-center">Cargando reportes…</div>}
+            {error && !loading && <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 text-red-700 dark:text-red-400 rounded-2xl p-4 font-medium">{error}</div>}
 
             {!loading && !error && reports.length === 0 && (
-                <div className="flex flex-col items-center justify-center text-center py-20 bg-white rounded-3xl border border-slate-100">
-                    <FileBarChart className="w-12 h-12 text-slate-300 mb-4" />
-                    <h2 className="text-lg font-black text-slate-700">Aún no tienes reportes</h2>
-                    <p className="text-slate-500 font-medium max-w-sm mt-1">Usa el Agente Avanzado para crear tu primer reporte hablando en lenguaje natural.</p>
+                <div className="flex flex-col items-center justify-center text-center py-20 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800">
+                    <FileBarChart className="w-12 h-12 text-slate-300 dark:text-slate-700 mb-4" />
+                    <h2 className="text-lg font-black text-slate-700 dark:text-slate-200">Aún no tienes reportes</h2>
+                    <p className="text-slate-500 dark:text-slate-400 font-medium max-w-sm mt-1">Usa el Agente Avanzado para crear tu primer reporte hablando en lenguaje natural.</p>
                     <Link href={CONSOLE_PATH} className="mt-5 inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 transition-colors"><Plus className="w-4 h-4" /> Crear mi primer reporte</Link>
                 </div>
             )}
 
             {!loading && reports.length > 0 && visible.length === 0 && (
-                <div className="text-slate-400 font-medium py-10 text-center">{qn ? `Sin resultados para “${q}”.` : "No hay reportes aquí. Arrastra alguno a esta carpeta."}</div>
+                <div className="text-slate-400 dark:text-slate-500 font-medium py-10 text-center">{qn ? `Sin resultados para “${q}”.` : "No hay reportes aquí. Arrastra alguno a esta carpeta."}</div>
             )}
 
             {!loading && visible.length > 0 && (
@@ -205,29 +205,29 @@ export default function MisReportesPage() {
                             key={r.idReporte}
                             draggable
                             onDragStart={(e) => { e.dataTransfer.setData("text/plain", String(r.idReporte)); e.dataTransfer.effectAllowed = "move"; }}
-                            className="group bg-white rounded-3xl border border-slate-100 hover:border-indigo-300 hover:shadow-xl transition-all overflow-hidden flex flex-col cursor-grab active:cursor-grabbing"
+                            className="group bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700/60 hover:shadow-xl transition-all overflow-hidden flex flex-col cursor-grab active:cursor-grabbing"
                         >
                             <Link href={`${REPORTS_PATH}/${r.idReporte}`} className="flex-1 p-5">
                                 <div className="flex items-start justify-between gap-2">
                                     <span className="text-2xl">{(r.blockCount ?? 0) > 1 ? "🗂️" : (VIZ_EMOJI[r.visualization || "table"] || "📋")}</span>
                                 </div>
-                                <h3 className="font-black text-slate-800 mt-3 leading-tight group-hover:text-indigo-700">{r.titulo}</h3>
-                                {r.descripcion && <p className="text-sm text-slate-500 mt-1.5 line-clamp-2">{r.descripcion}</p>}
+                                <h3 className="font-black text-slate-800 dark:text-slate-100 mt-3 leading-tight group-hover:text-indigo-700 dark:group-hover:text-indigo-400">{r.titulo}</h3>
+                                {r.descripcion && <p className="text-sm text-slate-500 dark:text-slate-400 mt-1.5 line-clamp-2">{r.descripcion}</p>}
                                 <div className="flex items-center flex-wrap gap-2 mt-3">
-                                    <p className="text-[11px] text-slate-400">{fmtFecha(r.fechaCreacion)}</p>
+                                    <p className="text-[11px] text-slate-400 dark:text-slate-500">{fmtFecha(r.fechaCreacion)}</p>
                                     {(r.blockCount ?? 0) > 1 && (
-                                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-violet-600 bg-violet-50 border border-violet-100 rounded-full px-2 py-0.5"><Layers className="w-3 h-3" /> Tablero · {r.blockCount}</span>
+                                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/40 border border-violet-100 dark:border-violet-900/60 rounded-full px-2 py-0.5"><Layers className="w-3 h-3" /> Tablero · {r.blockCount}</span>
                                     )}
                                     {modelLabel(r.modelo) && (
-                                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-100 rounded-full px-2 py-0.5">🧠 {modelLabel(r.modelo)}</span>
+                                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/60 rounded-full px-2 py-0.5">🧠 {modelLabel(r.modelo)}</span>
                                     )}
                                 </div>
                             </Link>
-                            <div className="px-5 py-3 border-t border-slate-50 flex items-center justify-between">
-                                <Link href={`${REPORTS_PATH}/${r.idReporte}`} className="text-sm font-bold text-indigo-600 hover:text-indigo-700">Abrir →</Link>
+                            <div className="px-5 py-3 border-t border-slate-50 dark:border-slate-800 flex items-center justify-between">
+                                <Link href={`${REPORTS_PATH}/${r.idReporte}`} className="text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-400">Abrir →</Link>
                                 <div className="flex items-center gap-1">
-                                    <button onClick={() => handleClone(r.idReporte)} disabled={busy === r.idReporte} className="p-2 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors disabled:opacity-50" title="Clonar (copia)"><Copy className="w-4 h-4" /></button>
-                                    <button onClick={() => handleDelete(r.idReporte)} disabled={busy === r.idReporte} className="p-2 rounded-lg text-slate-300 hover:text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50" title="Eliminar"><Trash2 className="w-4 h-4" /></button>
+                                    <button onClick={() => handleClone(r.idReporte)} disabled={busy === r.idReporte} className="p-2 rounded-lg text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 transition-colors disabled:opacity-50" title="Clonar (copia)"><Copy className="w-4 h-4" /></button>
+                                    <button onClick={() => handleDelete(r.idReporte)} disabled={busy === r.idReporte} className="p-2 rounded-lg text-slate-300 dark:text-slate-700 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors disabled:opacity-50" title="Eliminar"><Trash2 className="w-4 h-4" /></button>
                                 </div>
                             </div>
                         </div>

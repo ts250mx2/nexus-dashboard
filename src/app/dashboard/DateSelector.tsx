@@ -26,22 +26,22 @@ export default function DateSelector({ defaultStartDate, defaultEndDate }: { def
 
     return (
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-            <div className="flex items-center gap-2 bg-white border border-slate-200 px-3 py-1.5 rounded-lg hover:border-slate-300 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 transition-all shadow-xs">
-                <span className="text-[9px] font-extrabold text-slate-400 tracking-wider uppercase">DEL</span>
+            <div className="flex items-center gap-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 px-3 py-1.5 rounded-lg hover:border-slate-300 dark:hover:border-slate-600 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 transition-all shadow-xs">
+                <span className="text-[9px] font-extrabold text-slate-400 dark:text-slate-500 tracking-wider uppercase">DEL</span>
                 <input
                     type="date"
                     value={startDate}
                     onChange={(e) => handleDateChange('start', e.target.value)}
-                    className="text-xs font-bold text-slate-700 bg-transparent border-none p-0 focus:ring-0 cursor-pointer outline-none"
+                    className="text-xs font-bold text-slate-700 dark:text-slate-200 bg-transparent border-none p-0 focus:ring-0 cursor-pointer outline-none"
                 />
             </div>
-            <div className="flex items-center gap-2 bg-white border border-slate-200 px-3 py-1.5 rounded-lg hover:border-slate-300 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 transition-all shadow-xs">
-                <span className="text-[9px] font-extrabold text-slate-400 tracking-wider uppercase">AL</span>
+            <div className="flex items-center gap-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 px-3 py-1.5 rounded-lg hover:border-slate-300 dark:hover:border-slate-600 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 transition-all shadow-xs">
+                <span className="text-[9px] font-extrabold text-slate-400 dark:text-slate-500 tracking-wider uppercase">AL</span>
                 <input
                     type="date"
                     value={endDate}
                     onChange={(e) => handleDateChange('end', e.target.value)}
-                    className="text-xs font-bold text-slate-700 bg-transparent border-none p-0 focus:ring-0 cursor-pointer outline-none"
+                    className="text-xs font-bold text-slate-700 dark:text-slate-200 bg-transparent border-none p-0 focus:ring-0 cursor-pointer outline-none"
                 />
             </div>
         </div>

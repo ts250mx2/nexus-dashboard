@@ -236,17 +236,17 @@ export default function CategoriasGlobalPage() {
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {/* Header with Filters & Periods */}
-            <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white py-4 px-6 rounded-2xl shadow-sm border border-slate-100">
+            <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white dark:bg-slate-900 py-4 px-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
                 <div className="flex flex-col md:flex-row md:items-center gap-6">
-                    <h1 className="text-2xl font-black text-slate-800 tracking-tight uppercase flex items-center gap-3 select-none">
-                        <LayoutGrid className="text-blue-600 animate-pulse" />
+                    <h1 className="text-2xl font-black text-slate-800 dark:text-slate-100 tracking-tight uppercase flex items-center gap-3 select-none">
+                        <LayoutGrid className="text-blue-600 dark:text-blue-400 animate-pulse" />
                         Categorías Global
                     </h1>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3">
                     {/* Quick Date Period Buttons */}
-                    <div className="flex items-center gap-1 bg-slate-100 border border-slate-200 rounded-xl p-1 overflow-x-auto no-scrollbar">
+                    <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-1 overflow-x-auto no-scrollbar">
                         {periods.map(({ label, start, end }) => {
                             const isActive = fechaInicio === start && fechaFin === end;
                             return (
@@ -255,7 +255,7 @@ export default function CategoriasGlobalPage() {
                                     onClick={() => { setFechaInicio(start); setFechaFin(end); }}
                                     className={cn(
                                         'px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap',
-                                        isActive ? 'bg-blue-600 text-white shadow-sm font-black' : 'text-slate-500 hover:text-slate-800 hover:bg-white/50'
+                                        isActive ? 'bg-blue-600 text-white shadow-sm font-black' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-white/50 dark:hover:bg-slate-900/50'
                                     )}
                                 >
                                     {label}
@@ -265,27 +265,27 @@ export default function CategoriasGlobalPage() {
                     </div>
 
                     <div className="flex items-center gap-3">
-                        <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
-                            <Calendar size={16} className="text-blue-500" />
+                        <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2">
+                            <Calendar size={16} className="text-blue-500 dark:text-blue-400" />
                             <input
                                 type="date"
                                 value={fechaInicio}
                                 onChange={(e) => setFechaInicio(e.target.value)}
-                                className="bg-transparent text-xs font-bold text-slate-700 outline-none p-0 border-none h-auto w-28 cursor-pointer"
+                                className="bg-transparent text-xs font-bold text-slate-700 dark:text-slate-200 outline-none p-0 border-none h-auto w-28 cursor-pointer"
                             />
                         </div>
-                        <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
-                            <Calendar size={16} className="text-blue-500" />
+                        <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2">
+                            <Calendar size={16} className="text-blue-500 dark:text-blue-400" />
                             <input
                                 type="date"
                                 value={fechaFin}
                                 onChange={(e) => setFechaFin(e.target.value)}
-                                className="bg-transparent text-xs font-bold text-slate-700 outline-none p-0 border-none h-auto w-28 cursor-pointer"
+                                className="bg-transparent text-xs font-bold text-slate-700 dark:text-slate-200 outline-none p-0 border-none h-auto w-28 cursor-pointer"
                             />
                         </div>
                         <button
                             onClick={fetchData}
-                            className="p-2.5 bg-slate-50 border border-slate-200 text-blue-600 hover:bg-slate-100 hover:border-slate-300 transition-all rounded-xl shadow-sm"
+                            className="p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-blue-600 dark:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600 transition-all rounded-xl shadow-sm"
                             title="Actualizar Datos"
                         >
                             <RefreshCcw size={16} className={cn(loading && "animate-spin")} />
@@ -298,27 +298,27 @@ export default function CategoriasGlobalPage() {
             <div className="flex flex-col lg:flex-row gap-6">
                 {/* Branch selector list card */}
                 <div className="lg:w-72 shrink-0">
-                    <div className="bg-white border border-slate-100 shadow-sm overflow-hidden flex flex-col h-[580px] rounded-2xl">
-                        <div className="p-4 bg-slate-50 border-b border-slate-100">
-                             <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 select-none">
+                    <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col h-[580px] rounded-2xl">
+                        <div className="p-4 bg-slate-50 dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800">
+                             <h2 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest flex items-center gap-2 select-none">
                                 <Store size={14} />
                                 Seleccionar Sucursal
                              </h2>
                         </div>
-                        <div className="flex-1 overflow-y-auto no-scrollbar p-3 space-y-1 bg-white">
+                        <div className="flex-1 overflow-y-auto no-scrollbar p-3 space-y-1 bg-white dark:bg-slate-900">
                             <button
                                 onClick={() => setSelectedStoreId('all')}
                                 className={cn(
                                     "w-full flex items-center justify-between p-3.5 transition-all border-l-4 rounded-xl group mb-2 select-none",
                                     selectedStoreId === 'all' 
-                                        ? "bg-slate-900 text-white border-slate-900 shadow-md shadow-slate-900/10"
-                                        : "bg-white text-slate-600 border-transparent hover:bg-slate-50 hover:border-slate-200"
+                                        ? "bg-slate-900 dark:bg-slate-50 text-white border-slate-900 dark:border-slate-100 shadow-md shadow-slate-900/10"
+                                        : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-transparent hover:bg-slate-50 dark:hover:bg-slate-900 hover:border-slate-200 dark:hover:border-slate-700"
                                     )}
                             >
                                 <div className="flex items-center gap-3">
                                     <div className={cn(
                                         "w-8 h-8 rounded-lg flex items-center justify-center text-xs font-black transition-all",
-                                        selectedStoreId === 'all' ? "bg-white/20 text-white" : "bg-slate-100 text-slate-400 group-hover:bg-slate-200"
+                                        selectedStoreId === 'all' ? "bg-white/20 dark:bg-slate-900/20 text-white" : "bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 group-hover:bg-slate-200 dark:group-hover:bg-slate-800"
                                     )}>
                                         AZ
                                     </div>
@@ -340,8 +340,8 @@ export default function CategoriasGlobalPage() {
                                         className={cn(
                                             "w-full flex items-center justify-between p-3.5 transition-all border-l-4 rounded-xl group select-none",
                                             isActive 
-                                                ? "bg-white text-slate-900 shadow-sm ring-1 ring-slate-100 border-l-4"
-                                                : "bg-white text-slate-600 border-transparent hover:bg-slate-50"
+                                                ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-50 shadow-sm ring-1 ring-slate-100 border-l-4"
+                                                : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-transparent hover:bg-slate-50 dark:hover:bg-slate-900"
                                         )}
                                         style={{ borderLeftColor: isActive ? color : 'transparent' }}
                                     >
@@ -354,11 +354,11 @@ export default function CategoriasGlobalPage() {
                                             </div>
                                             <span className={cn(
                                                 "text-xs font-black tracking-tight uppercase",
-                                                isActive ? "text-slate-900" : "text-slate-500 group-hover:text-slate-800"
+                                                isActive ? "text-slate-900 dark:text-slate-50" : "text-slate-500 dark:text-slate-400 group-hover:text-slate-800 dark:group-hover:text-slate-100"
                                             )}>{store.Tienda}</span>
                                         </div>
                                         <ChevronRight size={14} className={cn(
-                                            "transition-transform text-slate-400",
+                                            "transition-transform text-slate-400 dark:text-slate-500",
                                             isActive ? "translate-x-0" : "-translate-x-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-0"
                                         )} />
                                     </button>
@@ -370,16 +370,16 @@ export default function CategoriasGlobalPage() {
 
                 {/* Treemap Chart Area */}
                 <div className="flex-1 min-w-0">
-                    <div className="bg-white border border-slate-100 shadow-sm relative p-5 h-[580px] rounded-2xl flex flex-col justify-between">
+                    <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm relative p-5 h-[580px] rounded-2xl flex flex-col justify-between">
                         <div>
                             {/* Breadcrumbs / Header controls */}
-                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 pb-4 border-b border-slate-100 select-none">
-                                <div className="flex items-center flex-wrap gap-2 text-xs font-bold text-slate-400">
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 pb-4 border-b border-slate-100 dark:border-slate-800 select-none">
+                                <div className="flex items-center flex-wrap gap-2 text-xs font-bold text-slate-400 dark:text-slate-500">
                                     <button 
                                         onClick={handleResetToLevel1}
                                         className={cn(
                                             "transition-colors duration-150 py-1 px-2 rounded-lg",
-                                            currentLevel === 'categoria' ? "bg-slate-100 text-slate-800 font-extrabold" : "hover:text-blue-600 hover:bg-blue-50"
+                                            currentLevel === 'categoria' ? "bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-extrabold" : "hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40"
                                         )}
                                     >
                                         Categorías
@@ -387,12 +387,12 @@ export default function CategoriasGlobalPage() {
                                     
                                     {selectedCategory && (
                                         <>
-                                            <ChevronRight size={14} className="text-slate-300" />
+                                            <ChevronRight size={14} className="text-slate-300 dark:text-slate-700" />
                                             <button 
                                                 onClick={handleResetToLevel2}
                                                 className={cn(
                                                     "transition-colors duration-150 py-1 px-2 rounded-lg truncate max-w-[150px]",
-                                                    currentLevel === 'producto' ? "bg-slate-100 text-slate-800 font-extrabold" : "hover:text-blue-600 hover:bg-blue-50"
+                                                    currentLevel === 'producto' ? "bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-extrabold" : "hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40"
                                                 )}
                                                 title={selectedCategory.name}
                                             >
@@ -403,9 +403,9 @@ export default function CategoriasGlobalPage() {
 
                                     {selectedProduct && (
                                         <>
-                                            <ChevronRight size={14} className="text-slate-300" />
+                                            <ChevronRight size={14} className="text-slate-300 dark:text-slate-700" />
                                             <span 
-                                                className="bg-slate-100 text-slate-800 font-extrabold py-1 px-2 rounded-lg truncate max-w-[180px]"
+                                                className="bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-extrabold py-1 px-2 rounded-lg truncate max-w-[180px]"
                                                 title={selectedProduct}
                                             >
                                                 {selectedProduct}
@@ -418,13 +418,13 @@ export default function CategoriasGlobalPage() {
                                     {currentLevel !== 'categoria' && (
                                         <button
                                             onClick={handleBack}
-                                            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-650 hover:text-slate-800 transition-all rounded-xl text-xs font-bold shadow-2xs"
+                                            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-650 hover:text-slate-800 dark:hover:text-slate-100 transition-all rounded-xl text-xs font-bold shadow-2xs"
                                         >
                                             <ArrowLeft size={13} />
                                             Atrás
                                         </button>
                                     )}
-                                    <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 border border-blue-100 rounded-xl text-blue-700">
+                                    <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/60 rounded-xl text-blue-700 dark:text-blue-400">
                                         <TrendingUp size={13} />
                                         <span className="text-[10px] font-black uppercase tracking-wider">Venta Total: {formatCurrency(totalVentasMonto)}</span>
                                     </div>
@@ -435,17 +435,17 @@ export default function CategoriasGlobalPage() {
                         {/* Chart Render */}
                         <div className="flex-1 min-h-0 relative flex items-center justify-center">
                             {loading ? (
-                                <div className="absolute inset-0 z-50 bg-white/70 backdrop-blur-[1px] flex flex-col items-center justify-center gap-3 rounded-2xl">
-                                    <RefreshCcw size={32} className="animate-spin text-blue-500" />
-                                    <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest animate-pulse">Generando rectángulos...</p>
+                                <div className="absolute inset-0 z-50 bg-white/70 dark:bg-slate-900/70 backdrop-blur-[1px] flex flex-col items-center justify-center gap-3 rounded-2xl">
+                                    <RefreshCcw size={32} className="animate-spin text-blue-500 dark:text-blue-400" />
+                                    <p className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-widest animate-pulse">Generando rectángulos...</p>
                                 </div>
                             ) : data.length === 0 ? (
                                 <div className="text-center py-12 max-w-sm mx-auto space-y-3 select-none">
-                                    <div className="w-12 h-12 bg-slate-50 text-slate-400 border border-slate-200/60 rounded-2xl flex items-center justify-center mx-auto shadow-2xs">
+                                    <div className="w-12 h-12 bg-slate-50 dark:bg-slate-900 text-slate-400 dark:text-slate-500 border border-slate-200/60 dark:border-slate-700/60 rounded-2xl flex items-center justify-center mx-auto shadow-2xs">
                                         <ListFilter size={22} className="stroke-[1.5]" />
                                     </div>
-                                    <h3 className="font-extrabold text-slate-800 text-sm tracking-tight">Sin ventas registradas</h3>
-                                    <p className="text-xs text-slate-400 font-semibold leading-relaxed">No se encontraron ventas para este nivel de selección en el periodo y sucursal indicados.</p>
+                                    <h3 className="font-extrabold text-slate-800 dark:text-slate-100 text-sm tracking-tight">Sin ventas registradas</h3>
+                                    <p className="text-xs text-slate-400 dark:text-slate-500 font-semibold leading-relaxed">No se encontraron ventas para este nivel de selección en el periodo y sucursal indicados.</p>
                                 </div>
                             ) : (
                                 <div className="w-full h-full">
@@ -463,11 +463,11 @@ export default function CategoriasGlobalPage() {
                         </div>
 
                         {/* Legend / Breadcrumbs info help */}
-                        <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-4 text-[10px] text-slate-400 select-none">
+                        <div className="mt-4 flex items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-4 text-[10px] text-slate-400 dark:text-slate-500 select-none">
                             <span className="font-bold uppercase tracking-wider">
                                 Click en un rectángulo para desglosar · {currentLevel === 'categoria' ? 'Categorías Globales' : currentLevel === 'producto' ? 'Productos de la Categoría' : 'Artículos del Producto'}
                             </span>
-                            <span className="font-bold uppercase tracking-widest bg-slate-50 border border-slate-200/60 rounded-lg px-2 py-0.5">
+                            <span className="font-bold uppercase tracking-widest bg-slate-50 dark:bg-slate-900 border border-slate-200/60 dark:border-slate-700/60 rounded-lg px-2 py-0.5">
                                 {data.length} elementos
                             </span>
                         </div>

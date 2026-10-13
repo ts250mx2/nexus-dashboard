@@ -184,8 +184,8 @@ function ReportContent() {
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Reporte de Ventas</h1>
-                    <p className="text-slate-500 mt-1">Consulta detallada de ventas por sucursal y periodo</p>
+                    <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-50 tracking-tight">Reporte de Ventas</h1>
+                    <p className="text-slate-500 dark:text-slate-400 mt-1">Consulta detallada de ventas por sucursal y periodo</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <button
@@ -200,99 +200,99 @@ function ReportContent() {
             </div>
 
             {/* Filters Bar */}
-            <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-wrap items-center gap-6">
+            <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-wrap items-center gap-6">
                 <div className="flex flex-col gap-1.5 min-w-[200px]">
-                    <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-wider">
-                        <Store size={14} className="text-blue-500" />
+                    <div className="flex items-center gap-2 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                        <Store size={14} className="text-blue-500 dark:text-blue-400" />
                         Sucursal
                     </div>
                     <div className="relative">
                         <select
                             value={sucursalId}
                             onChange={(e) => handleParamChange('sucursalId', e.target.value)}
-                            className="w-full pl-3 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all appearance-none cursor-pointer"
+                            className="w-full pl-3 pr-10 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all appearance-none cursor-pointer"
                         >
                             <option value="">Selecciona una sucursal</option>
                             {sucursales.map(s => (
                                 <option key={s.id} value={s.id}>{s.name}</option>
                             ))}
                         </select>
-                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={16} />
+                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 pointer-events-none" size={16} />
                     </div>
                 </div>
 
                 <div className="flex flex-col gap-1.5 min-w-[300px]">
-                    <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-wider">
-                        <Calendar size={14} className="text-indigo-500" />
+                    <div className="flex items-center gap-2 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                        <Calendar size={14} className="text-indigo-500 dark:text-indigo-400" />
                         Periodo de Tiempo
                     </div>
                     <div className="flex flex-wrap items-center gap-4">
-                        <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5">
+                        <div className="flex items-center gap-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5">
                             <div className="flex items-center gap-2">
-                                <span className="text-[10px] font-bold text-slate-400 uppercase">Del</span>
+                                <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">Del</span>
                                 <input
                                     type="date"
                                     value={startDate}
                                     onChange={(e) => handleParamChange('startDate', e.target.value)}
-                                    className="bg-transparent text-sm font-semibold text-slate-700 focus:outline-none cursor-pointer"
+                                    className="bg-transparent text-sm font-semibold text-slate-700 dark:text-slate-200 focus:outline-none cursor-pointer"
                                 />
                             </div>
-                            <div className="h-4 w-px bg-slate-300"></div>
+                            <div className="h-4 w-px bg-slate-300 dark:bg-slate-700"></div>
                             <div className="flex items-center gap-2">
-                                <span className="text-[10px] font-bold text-slate-400 uppercase">Al</span>
+                                <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">Al</span>
                                 <input
                                     type="date"
                                     value={endDate}
                                     onChange={(e) => handleParamChange('endDate', e.target.value)}
-                                    className="bg-transparent text-sm font-semibold text-slate-700 focus:outline-none cursor-pointer"
+                                    className="bg-transparent text-sm font-semibold text-slate-700 dark:text-slate-200 focus:outline-none cursor-pointer"
                                 />
                             </div>
                         </div>
-                        <div className="hidden sm:block w-px h-8 bg-slate-100"></div>
+                        <div className="hidden sm:block w-px h-8 bg-slate-100 dark:bg-slate-800"></div>
                         <DatePresets />
                     </div>
                 </div>
             </div>
 
             {/* Table Area */}
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col min-h-[400px]">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden flex flex-col min-h-[400px]">
                 {!sucursalId ? (
-                    <div className="flex-1 flex flex-col items-center justify-center p-12 text-center text-slate-400">
+                    <div className="flex-1 flex flex-col items-center justify-center p-12 text-center text-slate-400 dark:text-slate-500">
                         <div className="mb-4">
-                            <Filter size={48} className="text-blue-500 opacity-40" />
+                            <Filter size={48} className="text-blue-500 dark:text-blue-400 opacity-40" />
                         </div>
-                        <h3 className="text-lg font-semibold text-slate-900">Selecciona una sucursal</h3>
+                        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Selecciona una sucursal</h3>
                         <p className="mt-1 max-w-xs">Elige una sucursal y un periodo de tiempo para visualizar los registros de ventas.</p>
                     </div>
                 ) : loading ? (
-                    <div className="flex-1 flex flex-col items-center justify-center h-64 text-slate-500">
-                        <Loader2 className="animate-spin mb-4 text-blue-600" size={40} />
+                    <div className="flex-1 flex flex-col items-center justify-center h-64 text-slate-500 dark:text-slate-400">
+                        <Loader2 className="animate-spin mb-4 text-blue-600 dark:text-blue-400" size={40} />
                         <p className="font-medium">Obteniendo registros de ventas...</p>
                     </div>
                 ) : error ? (
-                    <div className="flex-1 flex flex-col items-center justify-center h-64 text-red-500">
+                    <div className="flex-1 flex flex-col items-center justify-center h-64 text-red-500 dark:text-red-400">
                         <p className="font-bold text-lg">Error al cargar datos</p>
                         <p className="text-sm opacity-80 mt-1">{error}</p>
                     </div>
                 ) : (
                     <div className="overflow-auto max-h-[calc(100vh-380px)]">
                         <table className="w-full text-left text-sm whitespace-nowrap border-collapse">
-                            <thead className="bg-slate-50 sticky top-0 shadow-sm z-10 border-b border-slate-200">
+                            <thead className="bg-slate-50 dark:bg-slate-900 sticky top-0 shadow-sm z-10 border-b border-slate-200 dark:border-slate-700">
                                 <tr>
                                     {cols.map(col => (
                                         <th
                                             key={`th-${col}`}
-                                            className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors select-none group"
+                                            className="px-6 py-4 font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors select-none group"
                                             onClick={() => handleSort(col)}
                                         >
                                             <div className="flex items-center gap-1 justify-between">
                                                 {col}
-                                                <ArrowUpDown size={14} className={cn("text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig?.key === col && "opacity-100 text-blue-500")} />
+                                                <ArrowUpDown size={14} className={cn("text-slate-400 dark:text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig?.key === col && "opacity-100 text-blue-500 dark:text-blue-400")} />
                                             </div>
                                         </th>
                                     ))}
                                 </tr>
-                                <tr className="bg-slate-50/80 backdrop-blur border-b border-slate-200">
+                                <tr className="bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur border-b border-slate-200 dark:border-slate-700">
                                     {cols.map(col => (
                                         <th key={`filter-${col}`} className="px-3 py-2 font-normal">
                                             <div className="relative">
@@ -301,18 +301,18 @@ function ReportContent() {
                                                     placeholder={`Filtrar...`}
                                                     value={filters[col] || ''}
                                                     onChange={(e) => handleFilterChange(col, e.target.value)}
-                                                    className="w-full min-w-[120px] pl-8 pr-3 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 bg-white font-normal"
+                                                    className="w-full min-w-[120px] pl-8 pr-3 py-1.5 text-xs border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 bg-white dark:bg-slate-900 font-normal"
                                                 />
-                                                <Filter size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                                                <Filter size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
                                             </div>
                                         </th>
                                     ))}
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100">
+                            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                                 {sortedAndFilteredData.length === 0 ? (
                                     <tr>
-                                        <td colSpan={cols.length} className="px-6 py-12 text-center text-slate-400">
+                                        <td colSpan={cols.length} className="px-6 py-12 text-center text-slate-400 dark:text-slate-500">
                                             No se encontraron registros en este periodo.
                                         </td>
                                     </tr>
@@ -320,7 +320,7 @@ function ReportContent() {
                                     sortedAndFilteredData.map((row, idx) => (
                                         <tr
                                             key={idx}
-                                            className="hover:bg-blue-50/50 transition-colors group cursor-pointer"
+                                            className="hover:bg-blue-50/50 dark:hover:bg-blue-950/40 transition-colors group cursor-pointer"
                                             onClick={() => {
                                                 setSelectedIdVenta(row.IdVenta);
                                                 setSelectedFolioVenta(row['Folio Venta'] || 'Desconocido');
@@ -336,8 +336,8 @@ function ReportContent() {
                                                 return (
                                                     <td key={col} className={cn(
                                                         "px-6 py-4 transition-all duration-200",
-                                                        isCurrency ? "text-right font-bold text-slate-800" : "text-slate-600",
-                                                        isFolio && "font-mono text-blue-600"
+                                                        isCurrency ? "text-right font-bold text-slate-800 dark:text-slate-100" : "text-slate-600 dark:text-slate-300",
+                                                        isFolio && "font-mono text-blue-600 dark:text-blue-400"
                                                     )}>
                                                         {val !== null && val !== undefined ? (isCurrency ? formatCurrency(val) : val) : '-'}
                                                     </td>
@@ -368,7 +368,7 @@ export default function ReporteVentasPage() {
     return (
         <Suspense fallback={
             <div className="flex items-center justify-center min-h-[400px]">
-                <Loader2 className="animate-spin text-blue-600" size={40} />
+                <Loader2 className="animate-spin text-blue-600 dark:text-blue-400" size={40} />
             </div>
         }>
             <ReportContent />

@@ -90,16 +90,16 @@ export default function InventoryFilters({
     const showDias = dias !== undefined && typeof onDiasChange === 'function';
 
     return (
-        <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-xs flex flex-col lg:flex-row lg:items-end gap-4">
+        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-xs flex flex-col lg:flex-row lg:items-end gap-4">
             <div className="flex-1 min-w-[200px]">
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 block">
+                <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5 block">
                     {selectionMode === 'single' ? 'Sucursal' : 'Sucursales'}
                 </label>
                 {selectionMode === 'single' ? (
                     <select
                         value={selectedSucursales[0] ?? ''}
                         onChange={e => onSucursalesChange(e.target.value ? [e.target.value] : [])}
-                        className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                         {selectedSucursales.length === 0 && (
                             <option value="">Selecciona una sucursal</option>
@@ -121,13 +121,13 @@ export default function InventoryFilters({
 
             {showDias && (
                 <div className="w-full lg:w-40">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 block">
+                    <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5 block">
                         Historia de demanda
                     </label>
                     <select
                         value={dias}
                         onChange={e => onDiasChange(Number(e.target.value))}
-                        className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                         {VENTANAS_DEMANDA.map(v => (
                             <option key={v.value} value={v.value}>{v.label}</option>
@@ -139,24 +139,24 @@ export default function InventoryFilters({
             {children}
 
             <div className="flex-1 min-w-[180px]">
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 block">
+                <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5 block">
                     Buscar artículo
                 </label>
                 <div className="relative">
-                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 pointer-events-none" />
                     <input
                         type="text"
                         value={search}
                         onChange={e => onSearchChange(e.target.value)}
                         placeholder={searchPlaceholder}
-                        className="w-full pl-9 pr-8 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full pl-9 pr-8 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     {search && (
                         <button
                             type="button"
                             onClick={() => onSearchChange('')}
                             title="Limpiar búsqueda"
-                            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer"
                         >
                             <X size={14} />
                         </button>
@@ -182,7 +182,7 @@ export default function InventoryFilters({
                     onClick={onExportDetalle}
                     disabled={exportDetalleDisabled || exportDetalleLoading}
                     title="Descarga el resumen y, en una hoja por sucursal, el detalle de sus artículos"
-                    className="flex items-center gap-2 px-4 py-2 bg-white border border-emerald-600 text-emerald-700 rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-emerald-50 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+                    className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-900 border border-emerald-600 text-emerald-700 dark:text-emerald-400 rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
                 >
                     {exportDetalleLoading
                         ? <Loader2 size={14} className="animate-spin" />
@@ -205,7 +205,7 @@ export function ThresholdInput({ label, value, onChange, suffix = 'días', min =
 }) {
     return (
         <div className="w-full lg:w-40">
-            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 flex items-center gap-1">
+            <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5 flex items-center gap-1">
                 <SlidersHorizontal size={11} />
                 {label}
             </label>
@@ -219,9 +219,9 @@ export function ThresholdInput({ label, value, onChange, suffix = 'días', min =
                         const n = Number(e.target.value);
                         if (Number.isFinite(n)) onChange(Math.min(Math.max(Math.trunc(n), min), max));
                     }}
-                    className="w-full pl-3 pr-12 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full pl-3 pr-12 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-400 uppercase pointer-events-none">
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase pointer-events-none">
                     {suffix}
                 </span>
             </div>

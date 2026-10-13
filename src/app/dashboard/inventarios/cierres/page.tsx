@@ -40,10 +40,10 @@ interface ComparacionResponse {
 
 /** Existencia con la verificación de la transición desde la columna anterior. */
 function Verificada({ valor, celda, primera = false }: { valor: number | null; celda: CeldaComparacion; primera?: boolean }) {
-    if (valor === null) return <span className="text-slate-300">—</span>;
+    if (valor === null) return <span className="text-slate-300 dark:text-slate-700">—</span>;
     const n = Number(valor);
     const cifra = (
-        <span className={n < 0 ? 'text-rose-600 font-black' : n === 0 ? 'text-slate-300' : 'font-semibold text-slate-800'}>
+        <span className={n < 0 ? 'text-rose-600 dark:text-rose-400 font-black' : n === 0 ? 'text-slate-300 dark:text-slate-700' : 'font-semibold text-slate-800 dark:text-slate-100'}>
             {formatDecimal(n, 0)}
         </span>
     );
@@ -117,14 +117,14 @@ export default function CierresInventarioPage() {
 
     const columnas = data?.comparacion.columnas ?? [];
     const columnasTabla: Column<FilaComparacion>[] = [
-        { key: 'Codigo', label: 'Código', render: r => <span className="font-mono text-xs font-bold text-blue-700 whitespace-nowrap">{r.Codigo}</span> },
+        { key: 'Codigo', label: 'Código', render: r => <span className="font-mono text-xs font-bold text-blue-700 dark:text-blue-400 whitespace-nowrap">{r.Codigo}</span> },
         {
             key: 'Descripcion',
             label: 'Descripción',
             render: r => (
                 <div className="min-w-[220px]">
-                    <p className="font-bold text-slate-800 leading-tight">{r.Descripcion}</p>
-                    <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">{r.Marca} · {r.Depto}</p>
+                    <p className="font-bold text-slate-800 dark:text-slate-100 leading-tight">{r.Descripcion}</p>
+                    <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider">{r.Marca} · {r.Depto}</p>
                 </div>
             ),
         },
@@ -132,8 +132,8 @@ export default function CierresInventarioPage() {
             col.esHoy
                 ? [
                     { key: `corte-${i}`, label: 'Corte ERP hoy', align: 'right', render: r => <Verificada valor={r.celdas[i].exiInicial} celda={r.celdas[i]} primera={i === 0} />, sortValue: r => r.celdas[i].exiInicial ?? Number.NEGATIVE_INFINITY },
-                    { key: `entradas-${i}`, label: 'Entradas hoy', align: 'right', render: r => (r.celdas[i].entradas > 0 ? <span className="font-bold text-emerald-600">+{formatDecimal(r.celdas[i].entradas, 0)}</span> : <span className="text-slate-300">—</span>), sortValue: r => r.celdas[i].entradas },
-                    { key: `salidas-${i}`, label: 'Salidas hoy', align: 'right', render: r => (r.celdas[i].salidas > 0 ? <span className="font-bold text-amber-600">−{formatDecimal(r.celdas[i].salidas, 0)}</span> : <span className="text-slate-300">—</span>), sortValue: r => r.celdas[i].salidas },
+                    { key: `entradas-${i}`, label: 'Entradas hoy', align: 'right', render: r => (r.celdas[i].entradas > 0 ? <span className="font-bold text-emerald-600 dark:text-emerald-400">+{formatDecimal(r.celdas[i].entradas, 0)}</span> : <span className="text-slate-300 dark:text-slate-700">—</span>), sortValue: r => r.celdas[i].entradas },
+                    { key: `salidas-${i}`, label: 'Salidas hoy', align: 'right', render: r => (r.celdas[i].salidas > 0 ? <span className="font-bold text-amber-600 dark:text-amber-400">−{formatDecimal(r.celdas[i].salidas, 0)}</span> : <span className="text-slate-300 dark:text-slate-700">—</span>), sortValue: r => r.celdas[i].salidas },
                     { key: `hoy-${i}`, label: 'Hoy (en vivo)', align: 'right', render: r => <Verificada valor={r.celdas[i].exiFinal} celda={r.celdas[i]} primera />, sortValue: r => r.celdas[i].exiFinal ?? Number.NEGATIVE_INFINITY },
                 ]
                 : [
@@ -144,20 +144,20 @@ export default function CierresInventarioPage() {
             key: 'diferenciaTotal',
             label: 'Diferencia',
             align: 'right',
-            render: r => (r.diferenciaTotal > 0 ? <span className="font-black text-rose-600">{formatDecimal(r.diferenciaTotal, 0)}</span> : <span className="text-slate-300">—</span>),
+            render: r => (r.diferenciaTotal > 0 ? <span className="font-black text-rose-600 dark:text-rose-400">{formatDecimal(r.diferenciaTotal, 0)}</span> : <span className="text-slate-300 dark:text-slate-700">—</span>),
         },
     ];
 
     const columnasLista: Column<CierreListado>[] = [
-        { key: 'fecha', label: 'Fecha', render: c => <span className="font-bold text-slate-800 whitespace-nowrap">{formatDate(c.fecha)}</span> },
-        { key: 'Sucursal', label: 'Sucursal', render: c => <span className="font-semibold text-slate-700">{c.Sucursal}</span> },
-        { key: 'generadoEn', label: 'Hora', render: c => <span className="text-xs text-slate-500 whitespace-nowrap">{formatDateTime(c.generadoEn)}</span>, sortValue: c => new Date(c.generadoEn).getTime() },
-        { key: 'fechaCorteERP', label: 'Corte ERP', render: c => <span className="text-xs text-slate-500 whitespace-nowrap">{formatDate(c.fechaCorteERP)}</span>, sortValue: c => (c.fechaCorteERP ? new Date(c.fechaCorteERP).getTime() : 0) },
+        { key: 'fecha', label: 'Fecha', render: c => <span className="font-bold text-slate-800 dark:text-slate-100 whitespace-nowrap">{formatDate(c.fecha)}</span> },
+        { key: 'Sucursal', label: 'Sucursal', render: c => <span className="font-semibold text-slate-700 dark:text-slate-200">{c.Sucursal}</span> },
+        { key: 'generadoEn', label: 'Hora', render: c => <span className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">{formatDateTime(c.generadoEn)}</span>, sortValue: c => new Date(c.generadoEn).getTime() },
+        { key: 'fechaCorteERP', label: 'Corte ERP', render: c => <span className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">{formatDate(c.fechaCorteERP)}</span>, sortValue: c => (c.fechaCorteERP ? new Date(c.fechaCorteERP).getTime() : 0) },
         { key: 'articulos', label: 'Artículos', align: 'right', render: c => formatInt(c.articulos) },
         { key: 'conMovimiento', label: 'Con movimiento', align: 'right', render: c => formatInt(c.conMovimiento) },
-        { key: 'unidades', label: 'Unidades', align: 'right', render: c => <span className="font-bold text-slate-800">{formatInt(c.unidades)}</span> },
+        { key: 'unidades', label: 'Unidades', align: 'right', render: c => <span className="font-bold text-slate-800 dark:text-slate-100">{formatInt(c.unidades)}</span> },
         { key: 'valor', label: 'Valor a costo', align: 'right', render: c => formatCurrency(c.valor) },
-        { key: 'negativos', label: 'Negativos', align: 'right', render: c => <span className={c.negativos > 0 ? 'font-bold text-rose-600' : ''}>{formatInt(c.negativos)}</span> },
+        { key: 'negativos', label: 'Negativos', align: 'right', render: c => <span className={c.negativos > 0 ? 'font-bold text-rose-600 dark:text-rose-400' : ''}>{formatInt(c.negativos)}</span> },
         { key: 'ok', label: 'Estado', render: c => <EstadoCierre c={c} />, sortValue: c => (c.ok ? 1 : 0) },
     ];
 
@@ -192,7 +192,7 @@ export default function CierresInventarioPage() {
             </InventoryHeader>
 
             {mensaje && (
-                <div className={`flex items-start gap-3 rounded-2xl px-5 py-4 border text-xs ${mensaje.tono === 'ok' ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-rose-50 border-rose-200 text-rose-900'}`}>
+                <div className={`flex items-start gap-3 rounded-2xl px-5 py-4 border text-xs ${mensaje.tono === 'ok' ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800/60 text-emerald-900 dark:text-emerald-300' : 'bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800/60 text-rose-900 dark:text-rose-300'}`}>
                     {mensaje.tono === 'ok' ? <CheckCircle2 size={18} className="shrink-0 mt-0.5" /> : <XCircle size={18} className="shrink-0 mt-0.5" />}
                     <p className="font-semibold">{mensaje.texto}</p>
                 </div>
@@ -208,12 +208,12 @@ export default function CierresInventarioPage() {
                 searchPlaceholder="Filtrar: código, descripción o marca"
             >
                 <div className="flex flex-col gap-1.5 pb-1.5">
-                    <label className="flex items-center gap-2 text-xs font-semibold text-slate-600 cursor-pointer select-none whitespace-nowrap">
-                        <input type="checkbox" checked={soloDiferencias} onChange={e => setSoloDiferencias(e.target.checked)} className="w-4 h-4 rounded border-slate-300 text-rose-600 focus:ring-rose-500 cursor-pointer" />
+                    <label className="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300 cursor-pointer select-none whitespace-nowrap">
+                        <input type="checkbox" checked={soloDiferencias} onChange={e => setSoloDiferencias(e.target.checked)} className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-rose-600 dark:text-rose-400 focus:ring-rose-500 cursor-pointer" />
                         Solo con diferencia
                     </label>
-                    <label className="flex items-center gap-2 text-xs font-semibold text-slate-600 cursor-pointer select-none whitespace-nowrap">
-                        <input type="checkbox" checked={soloNegativos} onChange={e => setSoloNegativos(e.target.checked)} className="w-4 h-4 rounded border-slate-300 text-rose-600 focus:ring-rose-500 cursor-pointer" />
+                    <label className="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300 cursor-pointer select-none whitespace-nowrap">
+                        <input type="checkbox" checked={soloNegativos} onChange={e => setSoloNegativos(e.target.checked)} className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-rose-600 dark:text-rose-400 focus:ring-rose-500 cursor-pointer" />
                         Solo en negativo
                     </label>
                 </div>
@@ -226,12 +226,12 @@ export default function CierresInventarioPage() {
             )}
 
             {!comp.loading && !comp.error && requiereSucursal && (
-                <div className="flex flex-col items-center justify-center py-16 gap-3 bg-white rounded-2xl border border-slate-100 shadow-xs">
-                    <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                <div className="flex flex-col items-center justify-center py-16 gap-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-xs">
+                    <div className="w-14 h-14 rounded-2xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center">
                         <ShieldCheck size={26} />
                     </div>
-                    <p className="text-sm font-bold text-slate-700 uppercase tracking-wider">Selecciona una sucursal para comparar</p>
-                    <p className="text-xs text-slate-400 max-w-lg text-center">
+                    <p className="text-sm font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider">Selecciona una sucursal para comparar</p>
+                    <p className="text-xs text-slate-400 dark:text-slate-500 max-w-lg text-center">
                         Cada día, el corte que el ERP recalcula en la madrugada se compara con el cierre que el portal
                         guardó la noche anterior. Si coinciden artículo por artículo, el inventario del día está bien.
                     </p>
@@ -241,8 +241,8 @@ export default function CierresInventarioPage() {
             {data && kpis && !comp.loading && !comp.error && !requiereSucursal && (
                 <>
                     {data.comparacion.columnas.length <= 1 && (
-                        <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-2xl px-5 py-4 text-xs text-amber-900">
-                            <AlertTriangle size={18} className="text-amber-600 shrink-0 mt-0.5" />
+                        <div className="flex items-start gap-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 rounded-2xl px-5 py-4 text-xs text-amber-900 dark:text-amber-300">
+                            <AlertTriangle size={18} className="text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
                             <p>
                                 {hoyGuardado
                                     ? `El cierre de hoy de ${sucursalDatos} ya está guardado. Mañana, cuando el ERP regenere su corte, tendrás la primera verificación.`
@@ -288,19 +288,19 @@ export default function CierresInventarioPage() {
                             <ul className="space-y-2">
                                 {data.comparacion.transiciones.map(t => (
                                     <li key={`${t.de}-${t.a}`} className="flex flex-wrap items-center gap-3 text-sm">
-                                        <span className="font-semibold text-slate-700">{etiquetaColumna(t.de)} → {etiquetaColumna(t.a)}</span>
+                                        <span className="font-semibold text-slate-700 dark:text-slate-200">{etiquetaColumna(t.de)} → {etiquetaColumna(t.a)}</span>
                                         {t.corteRenovado ? (
                                             <>
                                                 <StatusPill tone={t.conDiferencia === 0 ? 'emerald' : 'rose'}>
                                                     {formatInt(t.cuadran)} / {formatInt(t.comparados)} cuadran
                                                 </StatusPill>
                                                 {t.conDiferencia > 0 && (
-                                                    <span className="text-xs font-semibold text-rose-600">
+                                                    <span className="text-xs font-semibold text-rose-600 dark:text-rose-400">
                                                         {formatInt(t.conDiferencia)} con diferencia · {formatInt(t.unidadesDiferencia)} unidades
                                                     </span>
                                                 )}
                                                 {t.conConteo > 0 && (
-                                                    <span className="text-xs font-semibold text-violet-600">
+                                                    <span className="text-xs font-semibold text-violet-600 dark:text-violet-400">
                                                         {formatInt(t.conConteo)} con conteo físico (no comparables)
                                                     </span>
                                                 )}
@@ -317,7 +317,7 @@ export default function CierresInventarioPage() {
                     <Panel
                         title={`Comparación · ${sucursalDatos}`}
                         subtitle="Cada columna muestra la existencia final de ese cierre; la marca indica si el corte del ERP con que abrió coincidió con el cierre anterior"
-                        action={<span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{formatInt(filas.length)} artículos</span>}
+                        action={<span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">{formatInt(filas.length)} artículos</span>}
                     >
                         <DataTable
                             key={`${data.sucursal}|${search}|${soloDiferencias}|${soloNegativos}`}
@@ -325,7 +325,7 @@ export default function CierresInventarioPage() {
                             rows={filas}
                             rowKey={r => String(r.IdArticulo)}
                             initialSort={{ key: 'diferenciaTotal', direction: 'desc' }}
-                            rowClassName={r => (r.estado === 'diferencia' ? 'bg-rose-50/40' : '')}
+                            rowClassName={r => (r.estado === 'diferencia' ? 'bg-rose-50/40 dark:bg-rose-950/40' : '')}
                             emptyMessage="Ningún artículo coincide con los filtros."
                         />
                     </Panel>
@@ -345,7 +345,7 @@ export default function CierresInventarioPage() {
                         rowKey={c => String(c.IdCierre)}
                         initialSort={{ key: 'generadoEn', direction: 'desc' }}
                         pageSize={20}
-                        rowClassName={c => (c.ok ? '' : 'bg-rose-50/40')}
+                        rowClassName={c => (c.ok ? '' : 'bg-rose-50/40 dark:bg-rose-950/40')}
                         emptyMessage="Todavía no hay cierres guardados. Pulsa «Guardar cierre ahora» o espera a la tarea programada de las 23:55."
                     />
                 )}

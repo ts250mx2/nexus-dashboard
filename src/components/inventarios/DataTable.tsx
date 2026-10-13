@@ -91,7 +91,7 @@ export default function DataTable<T>({
     if (rows.length === 0) {
         return (
             <div className="py-12 text-center">
-                <p className="text-sm font-semibold text-slate-400">{emptyMessage}</p>
+                <p className="text-sm font-semibold text-slate-400 dark:text-slate-500">{emptyMessage}</p>
             </div>
         );
     }
@@ -101,7 +101,7 @@ export default function DataTable<T>({
             <div className="overflow-x-auto -mx-2 px-2">
                 <table className="w-full text-sm border-collapse">
                     <thead>
-                        <tr className="border-b border-slate-200">
+                        <tr className="border-b border-slate-200 dark:border-slate-700">
                             {columns.map(col => {
                                 const sortable = col.sortable !== false;
                                 const activa = sort?.key === col.key;
@@ -109,7 +109,7 @@ export default function DataTable<T>({
                                     <>
                                         {col.label}
                                         {sortable && (
-                                            <ArrowUpDown size={11} className={cn(activa ? 'text-blue-600' : 'text-slate-300')} />
+                                            <ArrowUpDown size={11} className={cn(activa ? 'text-blue-600 dark:text-blue-400' : 'text-slate-300 dark:text-slate-700')} />
                                         )}
                                     </>
                                 );
@@ -119,7 +119,7 @@ export default function DataTable<T>({
                                         key={col.key}
                                         aria-sort={activa ? (sort.direction === 'asc' ? 'ascending' : 'descending') : undefined}
                                         className={cn(
-                                            'py-2.5 px-3 text-[10px] font-black text-slate-400 uppercase tracking-wider whitespace-nowrap',
+                                            'py-2.5 px-3 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider whitespace-nowrap',
                                             col.align === 'right' && 'text-right',
                                             col.align === 'center' && 'text-center',
                                             !col.align && 'text-left'
@@ -132,7 +132,7 @@ export default function DataTable<T>({
                                                 onClick={() => toggleSort(col.key)}
                                                 className={cn(
                                                     claseContenido,
-                                                    'uppercase tracking-wider cursor-pointer select-none hover:text-slate-700 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500'
+                                                    'uppercase tracking-wider cursor-pointer select-none hover:text-slate-700 dark:hover:text-slate-200 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500'
                                                 )}
                                             >
                                                 {contenido}
@@ -159,7 +159,7 @@ export default function DataTable<T>({
                                     }
                                 } : undefined}
                                 className={cn(
-                                    'border-b border-slate-50 hover:bg-slate-50/70 transition-colors',
+                                    'border-b border-slate-50 dark:border-slate-800 hover:bg-slate-50/70 dark:hover:bg-slate-900/70 transition-colors',
                                     onRowClick && 'cursor-pointer focus:outline-none focus-visible:bg-blue-50/60 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500',
                                     rowClassName?.(row)
                                 )}
@@ -168,7 +168,7 @@ export default function DataTable<T>({
                                     <td
                                         key={col.key}
                                         className={cn(
-                                            'py-2.5 px-3 text-slate-700',
+                                            'py-2.5 px-3 text-slate-700 dark:text-slate-200',
                                             col.align === 'right' && 'text-right tabular-nums',
                                             col.align === 'center' && 'text-center',
                                             col.className
@@ -185,31 +185,31 @@ export default function DataTable<T>({
 
             {totalPages > 1 && (
                 <div className="flex items-center justify-between pt-1">
-                    <p className="text-[11px] font-semibold text-slate-400">
-                        Mostrando <span className="text-slate-700 font-bold">{(safePage - 1) * pageSize + 1}</span>
+                    <p className="text-[11px] font-semibold text-slate-400 dark:text-slate-500">
+                        Mostrando <span className="text-slate-700 dark:text-slate-200 font-bold">{(safePage - 1) * pageSize + 1}</span>
                         {' – '}
-                        <span className="text-slate-700 font-bold">{Math.min(safePage * pageSize, sorted.length)}</span>
+                        <span className="text-slate-700 dark:text-slate-200 font-bold">{Math.min(safePage * pageSize, sorted.length)}</span>
                         {' de '}
-                        <span className="text-slate-700 font-bold">{sorted.length.toLocaleString('es-MX')}</span>
+                        <span className="text-slate-700 dark:text-slate-200 font-bold">{sorted.length.toLocaleString('es-MX')}</span>
                     </p>
                     <div className="flex items-center gap-2">
                         <button
                             type="button"
                             onClick={() => setPage(p => Math.max(1, p - 1))}
                             disabled={safePage === 1}
-                            className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                            className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                             title="Página anterior"
                         >
                             <ChevronLeft size={14} />
                         </button>
-                        <span className="text-[11px] font-bold text-slate-500 tabular-nums">
+                        <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 tabular-nums">
                             {safePage} / {totalPages}
                         </span>
                         <button
                             type="button"
                             onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                             disabled={safePage === totalPages}
-                            className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                            className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                             title="Página siguiente"
                         >
                             <ChevronRight size={14} />
@@ -224,11 +224,11 @@ export default function DataTable<T>({
 /** Etiqueta de estado con color semántico. */
 export function StatusPill({ tone, children }: { tone: 'rose' | 'amber' | 'emerald' | 'slate' | 'violet'; children: React.ReactNode }) {
     const tones = {
-        rose: 'bg-rose-50 text-rose-700 border-rose-200',
-        amber: 'bg-amber-50 text-amber-700 border-amber-200',
-        emerald: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-        slate: 'bg-slate-100 text-slate-600 border-slate-200',
-        violet: 'bg-violet-50 text-violet-700 border-violet-200',
+        rose: 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border-rose-200 dark:border-rose-800/60',
+        amber: 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800/60',
+        emerald: 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/60',
+        slate: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700',
+        violet: 'bg-violet-50 dark:bg-violet-950/40 text-violet-700 dark:text-violet-400 border-violet-200 dark:border-violet-800/60',
     };
     return (
         <span className={cn('inline-block px-2 py-0.5 rounded-md border text-[10px] font-black uppercase tracking-wider whitespace-nowrap', tones[tone])}>

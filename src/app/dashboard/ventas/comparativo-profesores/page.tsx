@@ -33,14 +33,14 @@ const METRICS = [
 
 // Tintes suaves por año para agrupar visualmente las tres métricas
 const YEAR_TINTS = [
-    { headBg: 'bg-blue-50 text-blue-700', cellBg: 'bg-blue-50/30', bar: 'bg-blue-500' },
-    { headBg: 'bg-purple-50 text-purple-700', cellBg: 'bg-purple-50/30', bar: 'bg-purple-500' },
-    { headBg: 'bg-emerald-50 text-emerald-700', cellBg: 'bg-emerald-50/30', bar: 'bg-emerald-500' },
-    { headBg: 'bg-amber-50 text-amber-700', cellBg: 'bg-amber-50/30', bar: 'bg-amber-500' },
-    { headBg: 'bg-rose-50 text-rose-700', cellBg: 'bg-rose-50/30', bar: 'bg-rose-500' },
-    { headBg: 'bg-cyan-50 text-cyan-700', cellBg: 'bg-cyan-50/30', bar: 'bg-cyan-500' },
-    { headBg: 'bg-indigo-50 text-indigo-700', cellBg: 'bg-indigo-50/30', bar: 'bg-indigo-500' },
-    { headBg: 'bg-slate-100 text-slate-700', cellBg: 'bg-slate-50/40', bar: 'bg-slate-500' }
+    { headBg: 'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400', cellBg: 'bg-blue-50/30 dark:bg-blue-950/40', bar: 'bg-blue-500' },
+    { headBg: 'bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-400', cellBg: 'bg-purple-50/30 dark:bg-purple-950/40', bar: 'bg-purple-500' },
+    { headBg: 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400', cellBg: 'bg-emerald-50/30 dark:bg-emerald-950/40', bar: 'bg-emerald-500' },
+    { headBg: 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400', cellBg: 'bg-amber-50/30 dark:bg-amber-950/40', bar: 'bg-amber-500' },
+    { headBg: 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400', cellBg: 'bg-rose-50/30 dark:bg-rose-950/40', bar: 'bg-rose-500' },
+    { headBg: 'bg-cyan-50 dark:bg-cyan-950/40 text-cyan-700 dark:text-cyan-400', cellBg: 'bg-cyan-50/30 dark:bg-cyan-950/40', bar: 'bg-cyan-500' },
+    { headBg: 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-400', cellBg: 'bg-indigo-50/30 dark:bg-indigo-950/40', bar: 'bg-indigo-500' },
+    { headBg: 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200', cellBg: 'bg-slate-50/40 dark:bg-slate-900/40', bar: 'bg-slate-500 dark:bg-slate-400' }
 ];
 
 const MAX_YEARS = 8;
@@ -329,21 +329,21 @@ export default function ComparativoProfesoresPage() {
     return (
         <div className="space-y-6">
             {/* Header + controls */}
-            <div className="flex flex-col gap-4 bg-white py-4 px-6 rounded-2xl shadow-sm border border-slate-100 animate-in fade-in duration-500">
+            <div className="flex flex-col gap-4 bg-white dark:bg-slate-900 py-4 px-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 animate-in fade-in duration-500">
                 <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
-                    <h1 className="text-2xl font-black text-slate-800 tracking-tight uppercase flex items-center gap-3 select-none">
-                        <BarChart3 className="text-blue-600" />
+                    <h1 className="text-2xl font-black text-slate-800 dark:text-slate-100 tracking-tight uppercase flex items-center gap-3 select-none">
+                        <BarChart3 className="text-blue-600 dark:text-blue-400" />
                         Comparativo Profesores
                     </h1>
 
                     <div className="flex flex-wrap items-center gap-3">
                         {/* Mode toggle */}
-                        <div className="flex items-center bg-slate-100 rounded-xl p-1 gap-1">
+                        <div className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-xl p-1 gap-1">
                             <button
                                 onClick={() => setMode('ytd')}
                                 className={cn(
                                     'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all',
-                                    mode === 'ytd' ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                                    mode === 'ytd' ? 'bg-white dark:bg-slate-900 text-blue-700 dark:text-blue-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                                 )}
                                 title="Comparar solo hasta la fecha actual de cada año"
                             >
@@ -353,7 +353,7 @@ export default function ComparativoProfesoresPage() {
                                 onClick={() => setMode('full')}
                                 className={cn(
                                     'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all',
-                                    mode === 'full' ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                                    mode === 'full' ? 'bg-white dark:bg-slate-900 text-blue-700 dark:text-blue-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                                 )}
                                 title="Comparar el año completo"
                             >
@@ -364,7 +364,7 @@ export default function ComparativoProfesoresPage() {
                         <button
                             onClick={handleExportExcel}
                             disabled={loading || filteredData.length === 0}
-                            className="p-2.5 text-green-600 bg-green-50 hover:bg-green-100 rounded-xl transition-colors border border-green-200 disabled:opacity-40"
+                            className="p-2.5 text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/40 hover:bg-green-100 dark:hover:bg-green-900/40 rounded-xl transition-colors border border-green-200 dark:border-green-800/60 disabled:opacity-40"
                             title="Exportar Excel"
                         >
                             <FileSpreadsheet size={16} />
@@ -372,7 +372,7 @@ export default function ComparativoProfesoresPage() {
                         <button
                             onClick={handleExportPDF}
                             disabled={loading || filteredData.length === 0}
-                            className="p-2.5 text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-xl transition-colors border border-rose-200 disabled:opacity-40"
+                            className="p-2.5 text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/40 rounded-xl transition-colors border border-rose-200 dark:border-rose-800/60 disabled:opacity-40"
                             title="Exportar PDF"
                         >
                             <FileText size={16} />
@@ -381,22 +381,22 @@ export default function ComparativoProfesoresPage() {
                 </div>
 
                 {/* Years + filters row */}
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pt-2 border-t border-slate-100">
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pt-2 border-t border-slate-100 dark:border-slate-800">
                     {/* Year chips */}
                     <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mr-1">Años</span>
+                        <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mr-1">Años</span>
                         {sortedYears.map((y, yi) => {
                             const tint = YEAR_TINTS[yi % YEAR_TINTS.length];
                             return (
                                 <span
                                     key={y}
-                                    className={cn('flex items-center gap-1.5 pl-2.5 pr-1.5 py-1 rounded-lg text-xs font-bold border', tint.headBg, 'border-slate-200')}
+                                    className={cn('flex items-center gap-1.5 pl-2.5 pr-1.5 py-1 rounded-lg text-xs font-bold border', tint.headBg, 'border-slate-200 dark:border-slate-700')}
                                 >
                                     {y}
                                     {years.length > 1 && (
                                         <button
                                             onClick={() => removeYear(y)}
-                                            className="p-0.5 hover:bg-white/70 rounded-full transition-colors"
+                                            className="p-0.5 hover:bg-white/70 dark:hover:bg-slate-900/70 rounded-full transition-colors"
                                             title={`Quitar ${y}`}
                                         >
                                             <X size={11} />
@@ -408,7 +408,7 @@ export default function ComparativoProfesoresPage() {
                         {years.length < MAX_YEARS && Math.min(...years) - 1 >= MIN_YEAR && (
                             <button
                                 onClick={addOlderYear}
-                                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold text-blue-600 bg-blue-50 border border-blue-200 hover:bg-blue-100 transition-all active:scale-95"
+                                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/60 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-all active:scale-95"
                                 title={`Agregar ${Math.min(...years) - 1}`}
                             >
                                 <Plus size={13} /> Año
@@ -416,7 +416,7 @@ export default function ComparativoProfesoresPage() {
                         )}
                         <button
                             onClick={resetYears}
-                            className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-slate-100 rounded-lg transition-colors"
+                            className="p-1.5 text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
                             title="Restablecer a año actual vs anterior"
                             disabled={loading}
                         >
@@ -426,12 +426,12 @@ export default function ComparativoProfesoresPage() {
 
                     {/* Filters */}
                     <div className="flex flex-wrap items-center gap-3">
-                        <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
-                            <Store size={15} className="text-blue-500" />
+                        <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2">
+                            <Store size={15} className="text-blue-500 dark:text-blue-400" />
                             <select
                                 value={sucursalFilter}
                                 onChange={(e) => setSucursalFilter(e.target.value)}
-                                className="bg-transparent text-xs font-bold text-slate-700 outline-none border-none cursor-pointer max-w-[180px]"
+                                className="bg-transparent text-xs font-bold text-slate-700 dark:text-slate-200 outline-none border-none cursor-pointer max-w-[180px]"
                             >
                                 <option value="all">Todas las sucursales</option>
                                 {sucursalOptions.map(s => (
@@ -439,17 +439,17 @@ export default function ComparativoProfesoresPage() {
                                 ))}
                             </select>
                         </div>
-                        <div className="relative flex items-center bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 focus-within:ring-2 focus-within:ring-blue-500/10 focus-within:border-blue-500 transition-all w-full sm:w-64">
-                            <Search size={15} className="text-slate-400 mr-2 shrink-0" />
+                        <div className="relative flex items-center bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 focus-within:ring-2 focus-within:ring-blue-500/10 focus-within:border-blue-500 transition-all w-full sm:w-64">
+                            <Search size={15} className="text-slate-400 dark:text-slate-500 mr-2 shrink-0" />
                             <input
                                 type="text"
                                 placeholder="Buscar profesor..."
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                className="bg-transparent text-xs font-semibold text-slate-700 outline-none p-0 border-none h-auto w-full"
+                                className="bg-transparent text-xs font-semibold text-slate-700 dark:text-slate-200 outline-none p-0 border-none h-auto w-full"
                             />
                             {search && (
-                                <button onClick={() => setSearch('')} className="p-1 hover:bg-slate-200/60 rounded-full text-slate-400">
+                                <button onClick={() => setSearch('')} className="p-1 hover:bg-slate-200/60 dark:hover:bg-slate-800/60 rounded-full text-slate-400 dark:text-slate-500">
                                     <X size={12} />
                                 </button>
                             )}
@@ -460,49 +460,49 @@ export default function ComparativoProfesoresPage() {
 
             {/* Table */}
             {loading ? (
-                <div className="flex flex-col items-center justify-center h-64 text-slate-500">
-                    <Loader2 className="animate-spin mb-4 text-blue-600" size={40} />
+                <div className="flex flex-col items-center justify-center h-64 text-slate-500 dark:text-slate-400">
+                    <Loader2 className="animate-spin mb-4 text-blue-600 dark:text-blue-400" size={40} />
                     <p className="font-medium">Cargando comparativo...</p>
                 </div>
             ) : error ? (
-                <div className="bg-red-50 border border-red-200 text-red-600 p-6 rounded-2xl flex flex-col items-center">
+                <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 text-red-600 dark:text-red-400 p-6 rounded-2xl flex flex-col items-center">
                     <p className="font-bold">Error al cargar datos</p>
                     <p className="text-sm mt-1">{error}</p>
                 </div>
             ) : (
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                    <div className="flex items-center justify-between px-5 py-3 border-b border-slate-100 bg-slate-50/60">
-                        <div className="flex items-center gap-2 text-sm font-bold text-slate-700">
-                            <Users size={16} className="text-blue-600" />
+                <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
+                    <div className="flex items-center justify-between px-5 py-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/60">
+                        <div className="flex items-center gap-2 text-sm font-bold text-slate-700 dark:text-slate-200">
+                            <Users size={16} className="text-blue-600 dark:text-blue-400" />
                             {filteredData.length} profesor{filteredData.length === 1 ? '' : 'es'}
                         </div>
-                        <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">{modeLabel}</span>
+                        <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">{modeLabel}</span>
                     </div>
                     <div ref={tableWrapRef} className="relative" style={{ '--socio-w': `${socioW}px` } as React.CSSProperties}>
                     <div className="overflow-auto max-h-[68vh] nice-scroll">
                         <table className="w-full text-left text-sm whitespace-nowrap border-collapse">
-                            <thead className="bg-white sticky top-0 z-30 shadow-sm">
-                                <tr className="border-b border-slate-200">
+                            <thead className="bg-white dark:bg-slate-900 sticky top-0 z-30 shadow-sm">
+                                <tr className="border-b border-slate-200 dark:border-slate-700">
                                     {/* Panel congelado: IdSocio */}
                                     <th
                                         onClick={() => handleSort('IdSocio')}
                                         style={{ left: 0, width: ID_W, minWidth: ID_W, maxWidth: ID_W }}
-                                        className="sticky z-20 bg-white px-2 py-3 font-bold text-slate-600 text-[11px] uppercase tracking-wider cursor-pointer hover:bg-slate-50 transition-colors select-none group overflow-hidden"
+                                        className="sticky z-20 bg-white dark:bg-slate-900 px-2 py-3 font-bold text-slate-600 dark:text-slate-300 text-[11px] uppercase tracking-wider cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors select-none group overflow-hidden"
                                     >
                                         <div className="flex items-center gap-1 justify-center">
                                             IdSocio
-                                            <ArrowUpDown size={12} className={cn('text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity', sortConfig.key === 'IdSocio' && 'opacity-100 text-blue-500')} />
+                                            <ArrowUpDown size={12} className={cn('text-slate-300 dark:text-slate-700 opacity-0 group-hover:opacity-100 transition-opacity', sortConfig.key === 'IdSocio' && 'opacity-100 text-blue-500 dark:text-blue-400')} />
                                         </div>
                                     </th>
                                     {/* Panel congelado: Socio + línea divisoria (split) */}
                                     <th
                                         onClick={() => handleSort('Socio')}
                                         style={{ left: ID_W, width: 'var(--socio-w)', minWidth: 'var(--socio-w)', maxWidth: 'var(--socio-w)' }}
-                                        className="sticky z-20 bg-white border-r-2 border-slate-300 shadow-[2px_0_5px_-2px_rgba(15,23,42,0.12)] px-3 py-3 font-bold text-slate-600 text-[11px] uppercase tracking-wider cursor-pointer hover:bg-slate-50 transition-colors select-none group"
+                                        className="sticky z-20 bg-white dark:bg-slate-900 border-r-2 border-slate-300 dark:border-slate-600 shadow-[2px_0_5px_-2px_rgba(15,23,42,0.12)] px-3 py-3 font-bold text-slate-600 dark:text-slate-300 text-[11px] uppercase tracking-wider cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors select-none group"
                                     >
                                         <div className="flex items-center gap-1 justify-between">
                                             Socio
-                                            <ArrowUpDown size={12} className={cn('text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity', sortConfig.key === 'Socio' && 'opacity-100 text-blue-500')} />
+                                            <ArrowUpDown size={12} className={cn('text-slate-300 dark:text-slate-700 opacity-0 group-hover:opacity-100 transition-opacity', sortConfig.key === 'Socio' && 'opacity-100 text-blue-500 dark:text-blue-400')} />
                                         </div>
                                     </th>
                                     {identityCols.slice(2).map(col => (
@@ -510,13 +510,13 @@ export default function ComparativoProfesoresPage() {
                                             key={col.key}
                                             onClick={() => handleSort(col.key)}
                                             className={cn(
-                                                'px-4 py-3 font-bold text-slate-600 text-[11px] uppercase tracking-wider cursor-pointer hover:bg-slate-50 transition-colors select-none group',
+                                                'px-4 py-3 font-bold text-slate-600 dark:text-slate-300 text-[11px] uppercase tracking-wider cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors select-none group',
                                                 col.className
                                             )}
                                         >
                                             <div className={cn('flex items-center gap-1', col.className === 'text-center' ? 'justify-center' : 'justify-between')}>
                                                 {col.label}
-                                                <ArrowUpDown size={12} className={cn('text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity', sortConfig.key === col.key && 'opacity-100 text-blue-500')} />
+                                                <ArrowUpDown size={12} className={cn('text-slate-300 dark:text-slate-700 opacity-0 group-hover:opacity-100 transition-opacity', sortConfig.key === col.key && 'opacity-100 text-blue-500 dark:text-blue-400')} />
                                             </div>
                                         </th>
                                     ))}
@@ -528,7 +528,7 @@ export default function ComparativoProfesoresPage() {
                                                 <th
                                                     key={key}
                                                     onClick={() => handleSort(key)}
-                                                    className={cn('px-4 py-3 text-right font-bold text-[11px] uppercase tracking-wider cursor-pointer transition-colors select-none group border-l', tint.headBg, m.key === 'Cantidad' ? 'border-slate-200' : 'border-slate-100')}
+                                                    className={cn('px-4 py-3 text-right font-bold text-[11px] uppercase tracking-wider cursor-pointer transition-colors select-none group border-l', tint.headBg, m.key === 'Cantidad' ? 'border-slate-200 dark:border-slate-700' : 'border-slate-100 dark:border-slate-800')}
                                                 >
                                                     <div className="flex items-center gap-1 justify-end">
                                                         <span className="flex flex-col items-end leading-tight">
@@ -543,23 +543,23 @@ export default function ComparativoProfesoresPage() {
                                     })}
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100">
+                            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                                 {filteredData.length === 0 ? (
                                     <tr>
-                                        <td colSpan={identityCols.length + sortedYears.length * 3} className="px-6 py-14 text-center text-slate-400">
+                                        <td colSpan={identityCols.length + sortedYears.length * 3} className="px-6 py-14 text-center text-slate-400 dark:text-slate-500">
                                             No se encontraron profesores con ventas en los años seleccionados.
                                         </td>
                                     </tr>
                                 ) : (
                                     filteredData.map((r, idx) => (
-                                        <tr key={idx} className="group hover:bg-blue-50/40 transition-colors">
-                                            <td style={{ left: 0, width: ID_W, minWidth: ID_W, maxWidth: ID_W }} className="sticky z-20 bg-white group-hover:bg-blue-50/40 px-2 py-3 text-center text-slate-400 font-mono text-xs overflow-hidden">{r.IdSocio}</td>
-                                            <td style={{ left: ID_W, width: 'var(--socio-w)', minWidth: 'var(--socio-w)', maxWidth: 'var(--socio-w)' }} title={r.Socio} className="sticky z-20 bg-white group-hover:bg-blue-50/40 border-r-2 border-slate-300 shadow-[2px_0_5px_-2px_rgba(15,23,42,0.12)] px-3 py-3 font-semibold text-slate-800 truncate">{r.Socio}</td>
-                                            <td className="px-4 py-3 text-slate-500 italic text-xs">{r.Sucursal}</td>
-                                            <td className="px-4 py-3 text-slate-500 text-xs tabular-nums">{r.Telefono || <span className="text-slate-300">—</span>}</td>
-                                            <td className="px-4 py-3 text-slate-500 text-xs max-w-[220px] truncate" title={r.Direccion || ''}>{r.Direccion || <span className="text-slate-300">—</span>}</td>
-                                            <td className="px-4 py-3 text-slate-500 text-xs max-w-[200px] truncate" title={r.Correo || ''}>{r.Correo || <span className="text-slate-300">—</span>}</td>
-                                            <td className="px-4 py-3 text-slate-600 text-xs">{r.Disciplina || <span className="text-slate-300">—</span>}</td>
+                                        <tr key={idx} className="group hover:bg-blue-50/40 dark:hover:bg-blue-950/40 transition-colors">
+                                            <td style={{ left: 0, width: ID_W, minWidth: ID_W, maxWidth: ID_W }} className="sticky z-20 bg-white dark:bg-slate-900 group-hover:bg-blue-50/40 dark:group-hover:bg-blue-950/40 px-2 py-3 text-center text-slate-400 dark:text-slate-500 font-mono text-xs overflow-hidden">{r.IdSocio}</td>
+                                            <td style={{ left: ID_W, width: 'var(--socio-w)', minWidth: 'var(--socio-w)', maxWidth: 'var(--socio-w)' }} title={r.Socio} className="sticky z-20 bg-white dark:bg-slate-900 group-hover:bg-blue-50/40 dark:group-hover:bg-blue-950/40 border-r-2 border-slate-300 dark:border-slate-600 shadow-[2px_0_5px_-2px_rgba(15,23,42,0.12)] px-3 py-3 font-semibold text-slate-800 dark:text-slate-100 truncate">{r.Socio}</td>
+                                            <td className="px-4 py-3 text-slate-500 dark:text-slate-400 italic text-xs">{r.Sucursal}</td>
+                                            <td className="px-4 py-3 text-slate-500 dark:text-slate-400 text-xs tabular-nums">{r.Telefono || <span className="text-slate-300 dark:text-slate-700">—</span>}</td>
+                                            <td className="px-4 py-3 text-slate-500 dark:text-slate-400 text-xs max-w-[220px] truncate" title={r.Direccion || ''}>{r.Direccion || <span className="text-slate-300 dark:text-slate-700">—</span>}</td>
+                                            <td className="px-4 py-3 text-slate-500 dark:text-slate-400 text-xs max-w-[200px] truncate" title={r.Correo || ''}>{r.Correo || <span className="text-slate-300 dark:text-slate-700">—</span>}</td>
+                                            <td className="px-4 py-3 text-slate-600 dark:text-slate-300 text-xs">{r.Disciplina || <span className="text-slate-300 dark:text-slate-700">—</span>}</td>
                                             {sortedYears.map((y, yi) => {
                                                 const tint = YEAR_TINTS[yi % YEAR_TINTS.length];
                                                 const c = num(r[`Cantidad_${y}`]);
@@ -567,17 +567,17 @@ export default function ComparativoProfesoresPage() {
                                                 const v = variance(r, yi);
                                                 return (
                                                     <React.Fragment key={y}>
-                                                        <td className={cn('px-4 py-3 text-right text-slate-700 font-medium tabular-nums border-l border-slate-200', tint.cellBg)}>
-                                                            {c > 0 ? formatInt(c) : <span className="text-slate-300">0</span>}
+                                                        <td className={cn('px-4 py-3 text-right text-slate-700 dark:text-slate-200 font-medium tabular-nums border-l border-slate-200 dark:border-slate-700', tint.cellBg)}>
+                                                            {c > 0 ? formatInt(c) : <span className="text-slate-300 dark:text-slate-700">0</span>}
                                                         </td>
-                                                        <td className={cn('px-4 py-3 text-right text-slate-600 tabular-nums border-l border-slate-100', tint.cellBg)}>
-                                                            {tk !== null ? formatCurrency(tk) : <span className="text-slate-300">—</span>}
+                                                        <td className={cn('px-4 py-3 text-right text-slate-600 dark:text-slate-300 tabular-nums border-l border-slate-100 dark:border-slate-800', tint.cellBg)}>
+                                                            {tk !== null ? formatCurrency(tk) : <span className="text-slate-300 dark:text-slate-700">—</span>}
                                                         </td>
-                                                        <td className={cn('px-4 py-3 text-right font-bold text-slate-800 tabular-nums border-l border-slate-100', tint.cellBg)}>
+                                                        <td className={cn('px-4 py-3 text-right font-bold text-slate-800 dark:text-slate-100 tabular-nums border-l border-slate-100 dark:border-slate-800', tint.cellBg)}>
                                                             <div className="flex flex-col items-end leading-tight">
-                                                                <span>{c > 0 ? formatCurrency(num(r[`Total_${y}`])) : <span className="text-slate-300">—</span>}</span>
+                                                                <span>{c > 0 ? formatCurrency(num(r[`Total_${y}`])) : <span className="text-slate-300 dark:text-slate-700">—</span>}</span>
                                                                 {v !== null && (
-                                                                    <span className={cn('flex items-center gap-0.5 text-[10px] font-bold', v >= 0 ? 'text-emerald-600' : 'text-rose-500')}>
+                                                                    <span className={cn('flex items-center gap-0.5 text-[10px] font-bold', v >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500 dark:text-rose-400')}>
                                                                         {v >= 0 ? <TrendingUp size={10} /> : <TrendingDown size={10} />}
                                                                         {Math.abs(v).toFixed(0)}%
                                                                     </span>
@@ -592,10 +592,10 @@ export default function ComparativoProfesoresPage() {
                                 )}
                             </tbody>
                             {filteredData.length > 0 && (
-                                <tfoot className="sticky bottom-0 z-30 bg-slate-50 border-t-2 border-slate-200">
-                                    <tr className="font-bold text-slate-700">
-                                        <td style={{ left: 0, width: ID_W, minWidth: ID_W, maxWidth: ID_W }} className="sticky z-20 bg-slate-50 px-2 py-3"></td>
-                                        <td style={{ left: ID_W, width: 'var(--socio-w)', minWidth: 'var(--socio-w)', maxWidth: 'var(--socio-w)' }} className="sticky z-20 bg-slate-50 border-r-2 border-slate-300 shadow-[2px_0_5px_-2px_rgba(15,23,42,0.12)] px-3 py-3 text-xs uppercase tracking-wider text-slate-400 truncate">Totales ({filteredData.length})</td>
+                                <tfoot className="sticky bottom-0 z-30 bg-slate-50 dark:bg-slate-900 border-t-2 border-slate-200 dark:border-slate-700">
+                                    <tr className="font-bold text-slate-700 dark:text-slate-200">
+                                        <td style={{ left: 0, width: ID_W, minWidth: ID_W, maxWidth: ID_W }} className="sticky z-20 bg-slate-50 dark:bg-slate-900 px-2 py-3"></td>
+                                        <td style={{ left: ID_W, width: 'var(--socio-w)', minWidth: 'var(--socio-w)', maxWidth: 'var(--socio-w)' }} className="sticky z-20 bg-slate-50 dark:bg-slate-900 border-r-2 border-slate-300 dark:border-slate-600 shadow-[2px_0_5px_-2px_rgba(15,23,42,0.12)] px-3 py-3 text-xs uppercase tracking-wider text-slate-400 dark:text-slate-500 truncate">Totales ({filteredData.length})</td>
                                         <td className="px-4 py-3" colSpan={identityCols.length - 2}></td>
                                         {sortedYears.map((y, yi) => {
                                             const tint = YEAR_TINTS[yi % YEAR_TINTS.length];
@@ -603,9 +603,9 @@ export default function ComparativoProfesoresPage() {
                                             const tavg = tt.cantidad > 0 ? tt.total / tt.cantidad : null;
                                             return (
                                                 <React.Fragment key={y}>
-                                                    <td className={cn('px-4 py-3 text-right tabular-nums border-l border-slate-200', tint.cellBg)}>{formatInt(tt.cantidad)}</td>
-                                                    <td className={cn('px-4 py-3 text-right tabular-nums text-slate-500 border-l border-slate-100', tint.cellBg)}>{tavg !== null ? formatCurrency(tavg) : '—'}</td>
-                                                    <td className={cn('px-4 py-3 text-right tabular-nums border-l border-slate-100', tint.cellBg)}>{formatCurrency(tt.total)}</td>
+                                                    <td className={cn('px-4 py-3 text-right tabular-nums border-l border-slate-200 dark:border-slate-700', tint.cellBg)}>{formatInt(tt.cantidad)}</td>
+                                                    <td className={cn('px-4 py-3 text-right tabular-nums text-slate-500 dark:text-slate-400 border-l border-slate-100 dark:border-slate-800', tint.cellBg)}>{tavg !== null ? formatCurrency(tavg) : '—'}</td>
+                                                    <td className={cn('px-4 py-3 text-right tabular-nums border-l border-slate-100 dark:border-slate-800', tint.cellBg)}>{formatCurrency(tt.total)}</td>
                                                 </React.Fragment>
                                             );
                                         })}
@@ -622,7 +622,7 @@ export default function ComparativoProfesoresPage() {
                             title="Arrastra para ajustar el ancho de la columna fija"
                         >
                             <div className="h-full w-0.5 bg-transparent group-hover:bg-blue-500/70 transition-colors" />
-                            <div className="absolute top-1/2 -translate-y-1/2 h-8 w-1.5 rounded-full bg-slate-300 group-hover:bg-blue-500 shadow-sm transition-colors" />
+                            <div className="absolute top-1/2 -translate-y-1/2 h-8 w-1.5 rounded-full bg-slate-300 dark:bg-slate-700 group-hover:bg-blue-500 shadow-sm transition-colors" />
                         </div>
                     </div>
                 </div>

@@ -155,24 +155,24 @@ export default function VentasDetailModal({
 
     return (
         <div className={cn(
-            "fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/40 backdrop-blur-sm animate-in fade-in duration-300",
+            "fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/40 dark:bg-slate-50/40 backdrop-blur-sm animate-in fade-in duration-300",
             isMaximized ? "p-0" : "p-4"
         )}>
             <div className={cn(
-                "glass-panel shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-300 transition-all border border-slate-200/50 backdrop-blur-2xl bg-white/95",
+                "glass-panel shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-300 transition-all border border-slate-200/50 dark:border-slate-700/50 backdrop-blur-2xl bg-white/95 dark:bg-slate-900/95",
                 isMaximized ? "w-full h-[100dvh] max-w-none rounded-none" : "rounded-2xl w-full max-w-6xl max-h-[90vh]"
             )}>
 
                 {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-slate-200/40 bg-gradient-to-r from-slate-50/40 to-transparent">
+                <div className="flex items-center justify-between p-6 border-b border-slate-200/40 dark:border-slate-700/40 bg-gradient-to-r from-slate-50/40 dark:from-slate-900/40 to-transparent">
                     <div>
-                        <h2 className="text-lg font-extrabold text-slate-800 flex items-center gap-2.5">
-                            <div className="p-2 bg-indigo-500/10 text-indigo-500 border border-indigo-500/20 rounded-xl">
+                        <h2 className="text-lg font-extrabold text-slate-800 dark:text-slate-100 flex items-center gap-2.5">
+                            <div className="p-2 bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 border border-indigo-500/20 rounded-xl">
                                 <Store size={20} strokeWidth={2.2} />
                             </div>
                             <span className="uppercase tracking-wider">Detalle de Ventas - {sucursalName}</span>
                         </h2>
-                        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Periodo: {startDate} al {endDate}</p>
+                        <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1">Periodo: {startDate} al {endDate}</p>
                     </div>
                     <div className="flex items-center gap-3">
                         <button
@@ -185,14 +185,14 @@ export default function VentasDetailModal({
                         </button>
                         <button
                             onClick={() => setIsMaximized(!isMaximized)}
-                            className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-500/10 hover:border-indigo-500/20 border border-transparent rounded-xl transition-all cursor-pointer"
+                            className="p-2 text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-500/10 hover:border-indigo-500/20 border border-transparent rounded-xl transition-all cursor-pointer"
                             title={isMaximized ? "Restaurar" : "Maximizar"}
                         >
                             {isMaximized ? <Minimize size={18} /> : <Maximize size={18} />}
                         </button>
                         <button
                             onClick={onClose}
-                            className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-500/10 hover:border-red-500/20 border border-transparent rounded-xl transition-all cursor-pointer"
+                            className="p-2 text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-500/10 hover:border-red-500/20 border border-transparent rounded-xl transition-all cursor-pointer"
                         >
                             <X size={20} />
                         </button>
@@ -202,38 +202,38 @@ export default function VentasDetailModal({
                 {/* Body */}
                 <div className="flex-1 overflow-auto p-0 bg-transparent">
                     {loading ? (
-                        <div className="flex flex-col items-center justify-center h-64 text-slate-500">
-                            <Loader2 className="animate-spin mb-4 text-indigo-500" size={32} />
+                        <div className="flex flex-col items-center justify-center h-64 text-slate-500 dark:text-slate-400">
+                            <Loader2 className="animate-spin mb-4 text-indigo-500 dark:text-indigo-400" size={32} />
                             <p className="text-xs font-bold uppercase tracking-wider">Cargando registros...</p>
                         </div>
                     ) : error ? (
-                        <div className="flex flex-col items-center justify-center h-64 text-red-500">
+                        <div className="flex flex-col items-center justify-center h-64 text-red-500 dark:text-red-400">
                             <p className="font-bold uppercase tracking-wider">Error al cargar datos</p>
                             <p className="text-xs font-semibold opacity-80 mt-1">{error}</p>
                         </div>
                     ) : sortedAndFilteredData.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center h-64 text-slate-500">
-                            <p className="font-bold uppercase tracking-wider text-slate-400">No se encontraron resultados</p>
+                        <div className="flex flex-col items-center justify-center h-64 text-slate-500 dark:text-slate-400">
+                            <p className="font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">No se encontraron resultados</p>
                             <p className="text-xs font-semibold mt-1">Intenta ajustando los filtros de las columnas.</p>
                         </div>
                     ) : (
                         <table className="w-full text-left text-sm whitespace-nowrap border-collapse">
-                            <thead className="bg-slate-50/50 sticky top-0 shadow-sm z-10 backdrop-blur-md border-b border-slate-200/50">
+                            <thead className="bg-slate-50/50 dark:bg-slate-900/50 sticky top-0 shadow-sm z-10 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-700/50">
                                 <tr>
                                     {cols.map(col => (
                                         <th
                                             key={`th-${col}`}
-                                            className="px-5 py-3 text-[10px] font-extrabold text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-indigo-50/30 transition-colors select-none group"
+                                            className="px-5 py-3 text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider cursor-pointer hover:bg-indigo-50/30 dark:hover:bg-indigo-950/40 transition-colors select-none group"
                                             onClick={() => handleSort(col)}
                                         >
                                             <div className="flex items-center gap-1.5 justify-between">
                                                 {col}
-                                                <ArrowUpDown size={12} className={cn("text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig?.key === col && "opacity-100 text-indigo-500")} />
+                                                <ArrowUpDown size={12} className={cn("text-slate-400 dark:text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig?.key === col && "opacity-100 text-indigo-500 dark:text-indigo-400")} />
                                             </div>
                                         </th>
                                     ))}
                                 </tr>
-                                <tr className="bg-slate-50/20 border-b border-slate-200/40">
+                                <tr className="bg-slate-50/20 dark:bg-slate-900/20 border-b border-slate-200/40 dark:border-slate-700/40">
                                     {cols.map(col => (
                                         <th key={`filter-${col}`} className="px-3 py-2 font-normal">
                                             <input
@@ -241,13 +241,13 @@ export default function VentasDetailModal({
                                                 placeholder={`Filtrar...`}
                                                 value={filters[col] || ''}
                                                 onChange={(e) => handleFilterChange(col, e.target.value)}
-                                                className="w-full min-w-[100px] px-3 py-1.5 text-xs border border-slate-200/60 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 bg-slate-50/80 hover:border-slate-300 font-semibold text-slate-700 transition-all"
+                                                className="w-full min-w-[100px] px-3 py-1.5 text-xs border border-slate-200/60 dark:border-slate-700/60 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 bg-slate-50/80 dark:bg-slate-900/80 hover:border-slate-300 dark:hover:border-slate-600 font-semibold text-slate-700 dark:text-slate-200 transition-all"
                                             />
                                         </th>
                                     ))}
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100/60 bg-transparent">
+                            <tbody className="divide-y divide-slate-100/60 dark:divide-slate-800/60 bg-transparent">
                                 {sortedAndFilteredData.map((row, idx) => (
                                     <tr
                                         key={idx}
@@ -266,7 +266,7 @@ export default function VentasDetailModal({
                                             return (
                                                 <td key={col} className={cn(
                                                     "px-5 py-3 text-xs",
-                                                    isCurrency ? "text-right font-bold text-slate-800" : "text-slate-600 font-semibold"
+                                                    isCurrency ? "text-right font-bold text-slate-800 dark:text-slate-100" : "text-slate-600 dark:text-slate-300 font-semibold"
                                                 )}>
                                                     {val !== null && val !== undefined ? (isCurrency ? formatCurrency(val) : val) : '-'}
                                                 </td>

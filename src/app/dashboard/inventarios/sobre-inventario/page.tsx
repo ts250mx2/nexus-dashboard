@@ -151,14 +151,14 @@ export default function SobreInventarioPage() {
                     ? <StatusPill tone="amber">Exceso</StatusPill>
                     : <StatusPill tone="violet">Sin rotación</StatusPill>,
         },
-        { key: 'Sucursal', label: 'Sucursal', render: r => <span className="font-semibold text-slate-700">{r.Sucursal}</span> },
+        { key: 'Sucursal', label: 'Sucursal', render: r => <span className="font-semibold text-slate-700 dark:text-slate-200">{r.Sucursal}</span> },
         {
             key: 'Producto',
             label: 'Producto',
             render: r => (
                 <div className="min-w-[180px]">
-                    <p className="font-bold text-slate-800 leading-tight">{r.Producto}</p>
-                    <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">
+                    <p className="font-bold text-slate-800 dark:text-slate-100 leading-tight">{r.Producto}</p>
+                    <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider">
                         {r.Codigo} · {r.Depto}
                     </p>
                 </div>
@@ -170,19 +170,19 @@ export default function SobreInventarioPage() {
             label: 'Cobertura',
             align: 'right',
             sortValue: r => (r.Cobertura === null ? Number.MAX_SAFE_INTEGER : Number(r.Cobertura)),
-            render: r => <span className="font-semibold text-slate-600">{formatCobertura(r.Cobertura)}</span>,
+            render: r => <span className="font-semibold text-slate-600 dark:text-slate-300">{formatCobertura(r.Cobertura)}</span>,
         },
-        { key: 'UnidadesExceso', label: 'Sobrante', align: 'right', render: r => <span className="font-bold text-slate-800">{formatDecimal(r.UnidadesExceso, 0)}</span> },
+        { key: 'UnidadesExceso', label: 'Sobrante', align: 'right', render: r => <span className="font-bold text-slate-800 dark:text-slate-100">{formatDecimal(r.UnidadesExceso, 0)}</span> },
         { key: 'CostoUnitario', label: 'Costo unit.', align: 'right', render: r => formatCurrency(r.CostoUnitario) },
-        { key: 'CapitalInmovilizado', label: 'Capital parado', align: 'right', render: r => <span className="font-black text-violet-700">{formatCurrency(r.CapitalInmovilizado)}</span> },
+        { key: 'CapitalInmovilizado', label: 'Capital parado', align: 'right', render: r => <span className="font-black text-violet-700 dark:text-violet-400">{formatCurrency(r.CapitalInmovilizado)}</span> },
         {
             key: 'DiasSinMovimiento',
             label: 'Sin movimiento',
             align: 'right',
             sortValue: r => (r.DiasSinMovimiento === null ? Number.MAX_SAFE_INTEGER : Number(r.DiasSinMovimiento)),
-            render: r => (r.DiasSinMovimiento === null ? <span className="text-slate-400">Nunca</span> : `${formatInt(r.DiasSinMovimiento)} d`),
+            render: r => (r.DiasSinMovimiento === null ? <span className="text-slate-400 dark:text-slate-500">Nunca</span> : `${formatInt(r.DiasSinMovimiento)} d`),
         },
-        { key: 'UltimaSalida', label: 'Última salida', align: 'right', render: r => <span className="text-xs text-slate-500">{formatDate(r.UltimaSalida)}</span> },
+        { key: 'UltimaSalida', label: 'Última salida', align: 'right', render: r => <span className="text-xs text-slate-500 dark:text-slate-400">{formatDate(r.UltimaSalida)}</span> },
     ];
 
     return (
@@ -263,7 +263,7 @@ export default function SobreInventarioPage() {
                                     >
                                         <Tooltip
                                             formatter={(value) => formatCurrency(value)}
-                                            contentStyle={{ backgroundColor: '#fff', borderRadius: 12, border: '1px solid #E2E8F0' }}
+                                            contentStyle={{ backgroundColor: 'var(--grafica-globo-fondo)', borderRadius: 12, border: '1px solid var(--grafica-globo-borde)' }}
                                         />
                                     </Treemap>
                                 </ResponsiveContainer>
@@ -273,10 +273,10 @@ export default function SobreInventarioPage() {
                         <Panel title="Capital parado por sucursal" subtitle={`${data.porSucursal.length} sucursales`}>
                             <DataTable
                                 columns={[
-                                    { key: 'Sucursal', label: 'Sucursal', render: r => <span className="font-bold text-slate-800">{r.Sucursal}</span> },
-                                    { key: 'SkusExceso', label: 'Exceso', align: 'right', render: r => <span className="font-bold text-amber-600">{formatInt(r.SkusExceso)}</span> },
-                                    { key: 'SkusSinRotacion', label: 'Sin rotación', align: 'right', render: r => <span className="font-bold text-violet-600">{formatInt(r.SkusSinRotacion)}</span> },
-                                    { key: 'Capital', label: 'Capital parado', align: 'right', render: r => <span className="font-black text-slate-800">{formatCurrency(r.Capital)}</span> },
+                                    { key: 'Sucursal', label: 'Sucursal', render: r => <span className="font-bold text-slate-800 dark:text-slate-100">{r.Sucursal}</span> },
+                                    { key: 'SkusExceso', label: 'Exceso', align: 'right', render: r => <span className="font-bold text-amber-600 dark:text-amber-400">{formatInt(r.SkusExceso)}</span> },
+                                    { key: 'SkusSinRotacion', label: 'Sin rotación', align: 'right', render: r => <span className="font-bold text-violet-600 dark:text-violet-400">{formatInt(r.SkusSinRotacion)}</span> },
+                                    { key: 'Capital', label: 'Capital parado', align: 'right', render: r => <span className="font-black text-slate-800 dark:text-slate-100">{formatCurrency(r.Capital)}</span> },
                                 ]}
                                 rows={data.porSucursal}
                                 rowKey={r => String(r.IdSucursal)}
@@ -293,7 +293,7 @@ export default function SobreInventarioPage() {
                             <select
                                 value={estado}
                                 onChange={e => setEstado(e.target.value as EstadoFiltro)}
-                                className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="px-3 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-700 dark:text-slate-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
                                 <option value="todos">Todos</option>
                                 <option value="exceso">Solo exceso</option>

@@ -200,7 +200,7 @@ export default function SalesTrendsPage() {
                     const canvas = await html2canvas(chartRef.current, {
                         scale: 2, // High-quality display resolution
                         useCORS: true,
-                        backgroundColor: '#ffffff',
+                        backgroundColor: 'var(--grafica-globo-fondo)',
                         logging: false
                     });
                     chartImgData = canvas.toDataURL('image/png');
@@ -420,14 +420,14 @@ export default function SalesTrendsPage() {
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {/* Header with Filters & Periods */}
-            <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white py-4 px-6 rounded-2xl shadow-sm border border-slate-100">
+            <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white dark:bg-slate-900 py-4 px-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
                 <div className="flex flex-col md:flex-row md:items-center gap-6">
-                    <h1 className="text-2xl font-black text-slate-800 tracking-tight uppercase flex items-center gap-3">
+                    <h1 className="text-2xl font-black text-slate-800 dark:text-slate-100 tracking-tight uppercase flex items-center gap-3">
                         <TrendingUp style={{ color: storeColor }} className="transition-all duration-300" />
                         Tendencias de Ventas
                     </h1>
 
-                    <div className="flex items-center gap-1 bg-slate-100 border border-slate-200 rounded-xl p-1 overflow-x-auto no-scrollbar">
+                    <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-1 overflow-x-auto no-scrollbar">
                         {periods.map(({ label, start, end }) => {
                             const isActive = fechaInicio === start && fechaFin === end;
                             return (
@@ -436,7 +436,7 @@ export default function SalesTrendsPage() {
                                     onClick={() => { setFechaInicio(start); setFechaFin(end); }}
                                     className={cn(
                                         'px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap',
-                                        isActive ? 'bg-blue-600 text-white shadow-sm font-black' : 'text-slate-500 hover:text-slate-800 hover:bg-white/50'
+                                        isActive ? 'bg-blue-600 text-white shadow-sm font-black' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-white/50 dark:hover:bg-slate-900/50'
                                     )}
                                 >
                                     {label}
@@ -447,27 +447,27 @@ export default function SalesTrendsPage() {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3">
-                    <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
-                        <Calendar size={16} className="text-blue-500" />
+                    <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2">
+                        <Calendar size={16} className="text-blue-500 dark:text-blue-400" />
                         <input
                             type="date"
                             value={fechaInicio}
                             onChange={(e) => setFechaInicio(e.target.value)}
-                            className="bg-transparent text-xs font-bold text-slate-700 outline-none p-0 border-none h-auto w-28"
+                            className="bg-transparent text-xs font-bold text-slate-700 dark:text-slate-200 outline-none p-0 border-none h-auto w-28"
                         />
                     </div>
-                    <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
-                        <Calendar size={16} className="text-blue-500" />
+                    <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2">
+                        <Calendar size={16} className="text-blue-500 dark:text-blue-400" />
                         <input
                             type="date"
                             value={fechaFin}
                             onChange={(e) => setFechaFin(e.target.value)}
-                            className="bg-transparent text-xs font-bold text-slate-700 outline-none p-0 border-none h-auto w-28"
+                            className="bg-transparent text-xs font-bold text-slate-700 dark:text-slate-200 outline-none p-0 border-none h-auto w-28"
                         />
                     </div>
                     <button
                         onClick={handleExportPDF}
-                        className="flex items-center gap-2 px-3 py-2.5 bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-100 hover:border-rose-300 transition-all rounded-xl shadow-sm text-xs font-bold cursor-pointer disabled:opacity-50"
+                        className="flex items-center gap-2 px-3 py-2.5 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/60 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/40 hover:border-rose-300 dark:hover:border-rose-700/60 transition-all rounded-xl shadow-sm text-xs font-bold cursor-pointer disabled:opacity-50"
                         disabled={loading || !data || exporting}
                         title="Exportar Reporte a PDF"
                     >
@@ -480,7 +480,7 @@ export default function SalesTrendsPage() {
                     </button>
                     <button
                         onClick={fetchData}
-                        className="p-2.5 bg-slate-50 border border-slate-200 text-blue-600 hover:bg-slate-100 hover:border-slate-300 transition-all rounded-xl shadow-sm cursor-pointer"
+                        className="p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-blue-600 dark:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600 transition-all rounded-xl shadow-sm cursor-pointer"
                         disabled={loading}
                     >
                         <RefreshCcw size={16} className={cn(loading && "animate-spin")} />
@@ -489,7 +489,7 @@ export default function SalesTrendsPage() {
             </div>
 
             {/* Advanced Filters Bar */}
-            <div className="bg-slate-900 py-3.5 px-6 rounded-2xl shadow-lg border border-slate-800 flex flex-col gap-3">
+            <div className="bg-slate-900 dark:bg-slate-50 py-3.5 px-6 rounded-2xl shadow-lg border border-slate-800 dark:border-slate-200 flex flex-col gap-3">
                 <div className="flex flex-wrap items-center gap-4">
                     <div className="w-52">
                         <MultiSelect 
@@ -533,7 +533,7 @@ export default function SalesTrendsPage() {
                         {selectedDeptos.map(depto => (
                             <div 
                                 key={depto}
-                                className="inline-flex items-center gap-1 bg-white/10 text-white/90 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-tight"
+                                className="inline-flex items-center gap-1 bg-white/10 dark:bg-slate-900/10 text-white/90 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-tight"
                             >
                                 <span className="text-white/40 font-black mr-0.5">DEP:</span>
                                 {depto}
@@ -573,49 +573,49 @@ export default function SalesTrendsPage() {
             {/* KPI Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {/* KPI: Sales */}
-                <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm relative overflow-hidden group hover:shadow-md hover:border-blue-100 transition-all duration-300">
+                <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden group hover:shadow-md hover:border-blue-100 dark:hover:border-blue-900/60 transition-all duration-300">
                     <div className="absolute top-0 right-0 p-3 opacity-[0.03] group-hover:scale-110 transition-transform duration-300">
                         <DollarSign size={80} style={{ color: storeColor }} />
                     </div>
                     <div>
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 block">Venta Total</span>
-                        <h2 className="text-3xl font-black text-slate-900 mb-2 tracking-tight">{formatCurrency(totalSales)}</h2>
+                        <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5 block">Venta Total</span>
+                        <h2 className="text-3xl font-black text-slate-900 dark:text-slate-50 mb-2 tracking-tight">{formatCurrency(totalSales)}</h2>
                     </div>
-                    <div className="flex justify-between items-center text-xs font-bold border-t border-slate-50 pt-4 mt-2">
-                        <span className="text-slate-500">Ticket Promedio</span>
+                    <div className="flex justify-between items-center text-xs font-bold border-t border-slate-50 dark:border-slate-800 pt-4 mt-2">
+                        <span className="text-slate-500 dark:text-slate-400">Ticket Promedio</span>
                         <span style={{ color: storeColor }}>{formatCurrency(ticketPromedio)}</span>
                     </div>
                 </div>
 
                 {/* KPI: Operations */}
-                <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm relative overflow-hidden group hover:shadow-md hover:border-emerald-100 transition-all duration-300">
+                <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden group hover:shadow-md hover:border-emerald-100 dark:hover:border-emerald-900/60 transition-all duration-300">
                     <div className="absolute top-0 right-0 p-3 opacity-[0.03] group-hover:scale-110 transition-transform duration-300">
-                        <ShoppingCart size={80} className="text-emerald-500" />
+                        <ShoppingCart size={80} className="text-emerald-500 dark:text-emerald-400" />
                     </div>
                     <div>
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 block">Operaciones</span>
-                        <h2 className="text-3xl font-black text-slate-900 mb-2 tracking-tight">{new Intl.NumberFormat('es-MX').format(totalOps)}</h2>
+                        <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5 block">Operaciones</span>
+                        <h2 className="text-3xl font-black text-slate-900 dark:text-slate-50 mb-2 tracking-tight">{new Intl.NumberFormat('es-MX').format(totalOps)}</h2>
                     </div>
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500 bg-slate-50 p-2 rounded-xl mt-4">
-                        <ArrowUpRight size={14} className="text-emerald-500 animate-pulse" />
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-900 p-2 rounded-xl mt-4">
+                        <ArrowUpRight size={14} className="text-emerald-500 dark:text-emerald-400 animate-pulse" />
                         <span>Flujo de tickets</span>
                     </div>
                 </div>
 
                 {/* KPI: Trend */}
-                <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm relative overflow-hidden group hover:shadow-md hover:border-purple-100 transition-all duration-300">
+                <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden group hover:shadow-md hover:border-purple-100 dark:hover:border-purple-900/60 transition-all duration-300">
                     <div className="absolute top-0 right-0 p-3 opacity-[0.03] group-hover:scale-110 transition-transform duration-300">
-                        {globalTrend > 0 ? <TrendingUp size={80} className="text-blue-500" /> : <TrendingDown size={80} className="text-rose-500" />}
+                        {globalTrend > 0 ? <TrendingUp size={80} className="text-blue-500 dark:text-blue-400" /> : <TrendingDown size={80} className="text-rose-500 dark:text-rose-400" />}
                     </div>
                     <div>
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 block">Variación</span>
-                        <h2 className={cn("text-3xl font-black mb-2 tracking-tight", globalTrend >= 0 ? "text-blue-600" : "text-rose-600")}>
+                        <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5 block">Variación</span>
+                        <h2 className={cn("text-3xl font-black mb-2 tracking-tight", globalTrend >= 0 ? "text-blue-600 dark:text-blue-400" : "text-rose-600 dark:text-rose-400")}>
                             {globalTrend >= 0 ? '+' : ''}{globalTrend.toFixed(1)}%
                         </h2>
                     </div>
-                    <div className="flex justify-between items-center text-xs font-bold border-t border-slate-50 pt-4 mt-2">
-                        <span className="text-slate-500">Vs. Periodo Anterior</span>
-                        <span className={cn(globalTrend >= 0 ? "text-emerald-600" : "text-rose-600")}>
+                    <div className="flex justify-between items-center text-xs font-bold border-t border-slate-50 dark:border-slate-800 pt-4 mt-2">
+                        <span className="text-slate-500 dark:text-slate-400">Vs. Periodo Anterior</span>
+                        <span className={cn(globalTrend >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400")}>
                             {formatCurrency(currentTotal - prevTotal)}
                         </span>
                     </div>
@@ -630,8 +630,8 @@ export default function SalesTrendsPage() {
                         <span className="text-[10px] font-black text-white/70 uppercase tracking-widest mb-1.5 block">Sucursales</span>
                         <h2 className="text-2xl font-black text-white mb-2 uppercase truncate pr-6 tracking-tight">{currentStoreTitle}</h2>
                     </div>
-                    <div className="w-full bg-white/20 h-1.5 rounded-full mt-5 overflow-hidden">
-                        <div className="bg-white h-full rounded-full transition-all duration-1000 w-[100%]" />
+                    <div className="w-full bg-white/20 dark:bg-slate-900/20 h-1.5 rounded-full mt-5 overflow-hidden">
+                        <div className="bg-white dark:bg-slate-900 h-full rounded-full transition-all duration-1000 w-[100%]" />
                     </div>
                 </div>
             </div>
@@ -640,9 +640,9 @@ export default function SalesTrendsPage() {
             <div className="flex flex-col lg:flex-row gap-6">
                 {/* Branch selector list card */}
                 <div className="lg:w-72 shrink-0">
-                    <div className="bg-white border border-slate-100 shadow-sm overflow-hidden flex flex-col h-[520px] rounded-2xl">
-                        <div className="p-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-                             <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                    <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col h-[520px] rounded-2xl">
+                        <div className="p-4 bg-slate-50 dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                             <h2 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest flex items-center gap-2">
                                 <Store size={14} />
                                 Seleccionar Sucursales
                              </h2>
@@ -650,7 +650,7 @@ export default function SalesTrendsPage() {
                                 {selectedStoreIds.length > 0 && (
                                     <button
                                         onClick={() => setSelectedStoreIds([])}
-                                        className="text-[10px] font-black text-blue-600 uppercase hover:underline"
+                                        className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase hover:underline"
                                     >
                                         Limpiar
                                     </button>
@@ -664,7 +664,7 @@ export default function SalesTrendsPage() {
                                         'flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all border',
                                         sumarSucursales
                                             ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
-                                            : 'bg-white text-slate-400 border-slate-200 hover:text-slate-600 hover:border-slate-300'
+                                            : 'bg-white dark:bg-slate-900 text-slate-400 dark:text-slate-500 border-slate-200 dark:border-slate-700 hover:text-slate-600 dark:hover:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600'
                                     )}
                                 >
                                     <Sigma size={11} /> Sumar
@@ -678,8 +678,8 @@ export default function SalesTrendsPage() {
                                 className={cn(
                                     'flex items-center justify-between gap-2 px-4 py-2 border-b text-[10px] font-black uppercase tracking-widest transition-colors',
                                     compararSucursales
-                                        ? 'bg-blue-50 border-blue-100 text-blue-700'
-                                        : 'bg-white border-slate-100 text-slate-400 hover:text-slate-600'
+                                        ? 'bg-blue-50 dark:bg-blue-950/40 border-blue-100 dark:border-blue-900/60 text-blue-700 dark:text-blue-400'
+                                        : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'
                                 )}
                             >
                                 <span className="flex items-center gap-1.5">
@@ -687,29 +687,29 @@ export default function SalesTrendsPage() {
                                 </span>
                                 <span className={cn(
                                     'w-7 h-4 rounded-full transition-colors relative shrink-0',
-                                    compararSucursales ? 'bg-blue-600' : 'bg-slate-200'
+                                    compararSucursales ? 'bg-blue-600' : 'bg-slate-200 dark:bg-slate-800'
                                 )}>
                                     <span className={cn(
-                                        'absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all',
+                                        'absolute top-0.5 w-3 h-3 bg-white dark:bg-slate-900 rounded-full transition-all',
                                         compararSucursales ? 'left-3.5' : 'left-0.5'
                                     )} />
                                 </span>
                             </button>
                         )}
-                        <div className="flex-1 overflow-y-auto no-scrollbar p-3 space-y-1 bg-white">
+                        <div className="flex-1 overflow-y-auto no-scrollbar p-3 space-y-1 bg-white dark:bg-slate-900">
                             <button
                                 onClick={() => setSelectedStoreIds([])}
                                 className={cn(
                                     "w-full flex items-center justify-between p-3.5 transition-all border-l-4 rounded-xl group mb-2",
                                     selectedStoreIds.length === 0 
-                                        ? "bg-slate-900 text-white border-slate-900 shadow-md shadow-slate-900/10"
-                                        : "bg-white text-slate-600 border-transparent hover:bg-slate-50 hover:border-slate-200"
+                                        ? "bg-slate-900 dark:bg-slate-50 text-white border-slate-900 dark:border-slate-100 shadow-md shadow-slate-900/10"
+                                        : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-transparent hover:bg-slate-50 dark:hover:bg-slate-900 hover:border-slate-200 dark:hover:border-slate-700"
                                 )}
                             >
                                 <div className="flex items-center gap-3">
                                     <div className={cn(
                                         "w-8 h-8 rounded-lg flex items-center justify-center text-xs font-black transition-all",
-                                        selectedStoreIds.length === 0 ? "bg-white/20 text-white" : "bg-slate-100 text-slate-400 group-hover:bg-slate-200"
+                                        selectedStoreIds.length === 0 ? "bg-white/20 dark:bg-slate-900/20 text-white" : "bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 group-hover:bg-slate-200 dark:group-hover:bg-slate-800"
                                     )}>
                                         AZ
                                     </div>
@@ -720,8 +720,8 @@ export default function SalesTrendsPage() {
                                         ? <CheckSquare size={14} className="text-white" />
                                         : <CheckCircle2 size={14} className="text-white" />)
                                     : (sumarSucursales
-                                        ? <Square size={14} className="text-slate-200 group-hover:text-slate-300" />
-                                        : <Circle size={14} className="text-slate-200 group-hover:text-slate-300" />)}
+                                        ? <Square size={14} className="text-slate-200 dark:text-slate-800 group-hover:text-slate-300 dark:group-hover:text-slate-700" />
+                                        : <Circle size={14} className="text-slate-200 dark:text-slate-800 group-hover:text-slate-300 dark:group-hover:text-slate-700" />)}
                             </button>
 
                             {stores.map((store, i) => {
@@ -734,8 +734,8 @@ export default function SalesTrendsPage() {
                                         className={cn(
                                             "w-full flex items-center justify-between p-3.5 transition-all border-l-4 rounded-xl group",
                                             isActive 
-                                                ? "bg-white text-slate-900 shadow-sm ring-1 ring-slate-100 border-l-4"
-                                                : "bg-white text-slate-600 border-transparent hover:bg-slate-50"
+                                                ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-50 shadow-sm ring-1 ring-slate-100 border-l-4"
+                                                : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-transparent hover:bg-slate-50 dark:hover:bg-slate-900"
                                         )}
                                         style={{ borderLeftColor: isActive ? color : 'transparent' }}
                                     >
@@ -750,7 +750,7 @@ export default function SalesTrendsPage() {
                                             </div>
                                             <span className={cn(
                                                 "text-xs font-black tracking-tight uppercase",
-                                                isActive ? "text-slate-900" : "text-slate-500 group-hover:text-slate-800"
+                                                isActive ? "text-slate-900 dark:text-slate-50" : "text-slate-500 dark:text-slate-400 group-hover:text-slate-800 dark:group-hover:text-slate-100"
                                             )}>{store.Tienda}</span>
                                         </div>
                                         {isActive
@@ -758,8 +758,8 @@ export default function SalesTrendsPage() {
                                                 ? <CheckSquare size={14} style={{ color }} />
                                                 : <CheckCircle2 size={14} style={{ color }} />)
                                             : (sumarSucursales
-                                                ? <Square size={14} className="text-slate-200 group-hover:text-slate-300" />
-                                                : <Circle size={14} className="text-slate-200 group-hover:text-slate-300" />)}
+                                                ? <Square size={14} className="text-slate-200 dark:text-slate-800 group-hover:text-slate-300 dark:group-hover:text-slate-700" />
+                                                : <Circle size={14} className="text-slate-200 dark:text-slate-800 group-hover:text-slate-300 dark:group-hover:text-slate-700" />)}
                                     </button>
                                 );
                             })}
@@ -769,27 +769,27 @@ export default function SalesTrendsPage() {
 
                 {/* Main chart panel */}
                 <div className="flex-1 min-w-0">
-                    <div className="bg-white border border-slate-100 shadow-sm p-5 h-[520px] flex flex-col rounded-2xl">
-                        <div className="mb-4 pb-4 border-b border-slate-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                            <h2 className="text-base font-black text-slate-800 uppercase tracking-tight flex items-center flex-wrap gap-2">
+                    <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm p-5 h-[520px] flex flex-col rounded-2xl">
+                        <div className="mb-4 pb-4 border-b border-slate-50 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <h2 className="text-base font-black text-slate-800 dark:text-slate-100 uppercase tracking-tight flex items-center flex-wrap gap-2">
                                 <span className="w-2.5 h-2.5 rounded-full shrink-0 animate-ping" style={{ backgroundColor: storeColor }} />
                                 Tendencia de Venta
-                                <span className="text-slate-300 font-light mx-1">/</span>
+                                <span className="text-slate-300 dark:text-slate-700 font-light mx-1">/</span>
                                 <span style={{ color: storeColor }} className="transition-all duration-300">{currentStoreTitle}</span>
                                 {filterTitle && (
-                                    <span className="text-slate-400 font-bold text-[10px] normal-case bg-slate-50 px-2 py-1 rounded-lg border border-slate-100">
+                                    <span className="text-slate-400 dark:text-slate-500 font-bold text-[10px] normal-case bg-slate-50 dark:bg-slate-900 px-2 py-1 rounded-lg border border-slate-100 dark:border-slate-800">
                                         {filterTitle.substring(3)}
                                     </span>
                                 )}
                             </h2>
 
                              {/* Metrics selector */}
-                             <div className="flex items-center gap-1 bg-slate-100 border border-slate-200 rounded-xl p-1 self-end md:self-auto overflow-x-auto no-scrollbar">
+                             <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-1 self-end md:self-auto overflow-x-auto no-scrollbar">
                                 <button
                                     onClick={() => setMetric('venta')}
                                     className={cn(
                                         'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap',
-                                        metric === 'venta' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-800 hover:bg-white/50'
+                                        metric === 'venta' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-white/50 dark:hover:bg-slate-900/50'
                                     )}
                                     title="Por Venta"
                                 >
@@ -799,7 +799,7 @@ export default function SalesTrendsPage() {
                                     onClick={() => setMetric('operaciones')}
                                     className={cn(
                                         'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap',
-                                        metric === 'operaciones' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-800 hover:bg-white/50'
+                                        metric === 'operaciones' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-white/50 dark:hover:bg-slate-900/50'
                                     )}
                                     title="Por Operaciones"
                                 >
@@ -809,7 +809,7 @@ export default function SalesTrendsPage() {
                                     onClick={() => setMetric('ticket')}
                                     className={cn(
                                         'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap',
-                                        metric === 'ticket' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-800 hover:bg-white/50'
+                                        metric === 'ticket' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-white/50 dark:hover:bg-slate-900/50'
                                     )}
                                     title="Por Ticket Promedio"
                                 >
@@ -818,12 +818,12 @@ export default function SalesTrendsPage() {
                             </div>
 
                             {/* Grouping Toggle */}
-                            <div className="flex items-center gap-1 bg-slate-100 border border-slate-200 rounded-xl p-1 self-end md:self-auto">
+                            <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-1 self-end md:self-auto">
                                 <button
                                     onClick={() => setGroupBy('dia')}
                                     className={cn(
                                         'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all',
-                                        groupBy === 'dia' ? 'bg-white text-slate-900 shadow-sm font-black' : 'text-slate-500 hover:text-slate-800'
+                                        groupBy === 'dia' ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-50 shadow-sm font-black' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100'
                                     )}
                                 >
                                     <Clock size={12} /> Día
@@ -832,7 +832,7 @@ export default function SalesTrendsPage() {
                                     onClick={() => setGroupBy('semana')}
                                     className={cn(
                                         'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all',
-                                        groupBy === 'semana' ? 'bg-white text-slate-900 shadow-sm font-black' : 'text-slate-500 hover:text-slate-800'
+                                        groupBy === 'semana' ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-50 shadow-sm font-black' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100'
                                     )}
                                 >
                                     <CalendarDays size={12} /> Sem
@@ -841,7 +841,7 @@ export default function SalesTrendsPage() {
                                     onClick={() => setGroupBy('mes')}
                                     className={cn(
                                         'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all',
-                                        groupBy === 'mes' ? 'bg-white text-slate-900 shadow-sm font-black' : 'text-slate-500 hover:text-slate-800'
+                                        groupBy === 'mes' ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-50 shadow-sm font-black' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100'
                                     )}
                                 >
                                     <CalendarRange size={12} /> Mes
@@ -850,17 +850,17 @@ export default function SalesTrendsPage() {
                         </div>
 
                         {/* Rendering Recharts SalesTrendsChart */}
-                        <div ref={chartRef} className="flex-1 pt-2 relative bg-white rounded-xl">
+                        <div ref={chartRef} className="flex-1 pt-2 relative bg-white dark:bg-slate-900 rounded-xl">
                             {loading ? (
-                                <div className="absolute inset-0 flex items-center justify-center bg-white/70 backdrop-blur-[1px] z-10">
+                                <div className="absolute inset-0 flex items-center justify-center bg-white/70 dark:bg-slate-900/70 backdrop-blur-[1px] z-10">
                                     <div className="flex flex-col items-center gap-3">
-                                        <RefreshCcw size={32} className="animate-spin text-blue-500" />
-                                        <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Cargando Tendencias...</span>
+                                        <RefreshCcw size={32} className="animate-spin text-blue-500 dark:text-blue-400" />
+                                        <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Cargando Tendencias...</span>
                                     </div>
                                 </div>
                             ) : data?.timeSeries?.length === 0 ? (
-                                <div className="h-full flex flex-col items-center justify-center p-8 text-center text-slate-400 space-y-3">
-                                    <Info size={36} className="opacity-20 text-blue-500" />
+                                <div className="h-full flex flex-col items-center justify-center p-8 text-center text-slate-400 dark:text-slate-500 space-y-3">
+                                    <Info size={36} className="opacity-20 text-blue-500 dark:text-blue-400" />
                                     <p className="text-xs font-black uppercase tracking-widest">No se encontraron datos para este rango y filtros</p>
                                 </div>
                             ) : (

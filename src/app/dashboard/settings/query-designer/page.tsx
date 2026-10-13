@@ -487,7 +487,7 @@ export default function QueryDesignerPage() {
     return (
         <div className="space-y-6 max-w-7xl mx-auto p-4 md:p-6 pb-20">
             {/* Header Area */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-slate-900 dark:bg-slate-50 border border-slate-800 dark:border-slate-200 rounded-2xl p-6 shadow-xl relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl -z-10"></div>
                 <div className="absolute bottom-0 left-0 w-60 h-60 bg-pink-500/5 rounded-full blur-2xl -z-10"></div>
                 
@@ -498,7 +498,7 @@ export default function QueryDesignerPage() {
                         </div>
                         <h1 className="text-2xl font-bold text-white tracking-tight">Diseñador de Consultas</h1>
                     </div>
-                    <p className="text-slate-400 text-sm max-w-2xl">
+                    <p className="text-slate-400 dark:text-slate-500 text-sm max-w-2xl">
                         Configura esquemas relacionales, mapea tablas y describe sus campos para enriquecer la memoria técnica de **Nexus IA**. Haz que tu agente entienda a fondo la base de datos para responder consultas precisas.
                     </p>
                 </div>
@@ -531,21 +531,21 @@ export default function QueryDesignerPage() {
                 /* ------------------- CARD GRID VIEW ------------------- */
                 loadingSchemas ? (
                     <div className="flex flex-col items-center justify-center py-20 gap-3">
-                        <Loader2 className="w-8 h-8 text-pink-500 animate-spin" />
-                        <span className="text-slate-400 text-sm">Cargando esquemas de aprendizaje...</span>
+                        <Loader2 className="w-8 h-8 text-pink-500 dark:text-pink-400 animate-spin" />
+                        <span className="text-slate-400 dark:text-slate-500 text-sm">Cargando esquemas de aprendizaje...</span>
                     </div>
                 ) : schemas.length === 0 ? (
-                    <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-12 text-center max-w-xl mx-auto space-y-4">
-                        <div className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto text-slate-500">
+                    <div className="bg-slate-900/50 dark:bg-slate-50/50 border border-slate-800 dark:border-slate-200 rounded-2xl p-12 text-center max-w-xl mx-auto space-y-4">
+                        <div className="w-16 h-16 bg-slate-800 dark:bg-slate-100 rounded-full flex items-center justify-center mx-auto text-slate-500 dark:text-slate-400">
                             <Database className="w-8 h-8" />
                         </div>
                         <h3 className="text-lg font-bold text-white">Sin esquemas registrados</h3>
-                        <p className="text-slate-400 text-sm">
+                        <p className="text-slate-400 dark:text-slate-500 text-sm">
                             Aún no has diseñado ningún contexto de consulta personalizado. Agrega uno para documentar las relaciones complejas de tu base de datos y facilitar la generación de SQL de la IA.
                         </p>
                         <button
                             onClick={handleNewSchema}
-                            className="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-pink-400 border border-pink-500/20 font-semibold text-sm rounded-xl transition duration-150"
+                            className="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-800 dark:bg-slate-100 hover:bg-slate-700 dark:hover:bg-slate-200 text-pink-400 border border-pink-500/20 font-semibold text-sm rounded-xl transition duration-150"
                         >
                             <Plus className="w-4 h-4" />
                             Crear Primer Esquema
@@ -556,7 +556,7 @@ export default function QueryDesignerPage() {
                         {schemas.map(schema => (
                             <div 
                                 key={schema.id} 
-                                className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between hover:border-pink-500/40 transition-all duration-200 group"
+                                className="bg-slate-900 dark:bg-slate-50 border border-slate-800 dark:border-slate-200 rounded-2xl p-6 shadow-xl flex flex-col justify-between hover:border-pink-500/40 transition-all duration-200 group"
                             >
                                 <div className="space-y-3">
                                     <div className="flex justify-between items-start">
@@ -567,14 +567,14 @@ export default function QueryDesignerPage() {
                                             <button
                                                 onClick={() => handleEditSchema(schema)}
                                                 title="Editar esquema"
-                                                className="p-1.5 hover:bg-slate-800 text-slate-300 hover:text-pink-400 rounded-md transition"
+                                                className="p-1.5 hover:bg-slate-800 dark:hover:bg-slate-100 text-slate-300 dark:text-slate-700 hover:text-pink-400 rounded-md transition"
                                             >
                                                 <Edit className="w-4 h-4" />
                                             </button>
                                             <button
                                                 onClick={() => handleDeleteSchema(schema.id)}
                                                 title="Eliminar esquema"
-                                                className="p-1.5 hover:bg-rose-500/10 text-slate-400 hover:text-rose-400 rounded-md transition"
+                                                className="p-1.5 hover:bg-rose-500/10 text-slate-400 dark:text-slate-500 hover:text-rose-400 rounded-md transition"
                                             >
                                                 <Trash className="w-4 h-4" />
                                             </button>
@@ -583,7 +583,7 @@ export default function QueryDesignerPage() {
 
                                     <div>
                                         <h3 className="text-base font-bold text-white group-hover:text-pink-400 transition-colors">{schema.name}</h3>
-                                        <p className="text-slate-400 text-xs mt-1 line-clamp-2">{schema.description || 'Sin descripción.'}</p>
+                                        <p className="text-slate-400 dark:text-slate-500 text-xs mt-1 line-clamp-2">{schema.description || 'Sin descripción.'}</p>
                                     </div>
 
                                     {/* Tables Tagged */}
@@ -591,7 +591,7 @@ export default function QueryDesignerPage() {
                                         {schema.tables.map(table => (
                                             <span 
                                                 key={table} 
-                                                className="px-2 py-0.5 bg-slate-800 border border-slate-700/60 rounded text-[10px] font-semibold text-slate-300"
+                                                className="px-2 py-0.5 bg-slate-800 dark:bg-slate-100 border border-slate-700/60 dark:border-slate-300/60 rounded text-[10px] font-semibold text-slate-300 dark:text-slate-700"
                                             >
                                                 {table}
                                             </span>
@@ -599,7 +599,7 @@ export default function QueryDesignerPage() {
                                     </div>
                                 </div>
 
-                                <div className="mt-6 pt-4 border-t border-slate-800 flex justify-between items-center text-xs text-slate-500">
+                                <div className="mt-6 pt-4 border-t border-slate-800 dark:border-slate-200 flex justify-between items-center text-xs text-slate-500 dark:text-slate-400">
                                     <span className="flex items-center gap-1">
                                         <Link className="w-3.5 h-3.5" />
                                         {schema.relationships.length} relaciones
@@ -618,14 +618,14 @@ export default function QueryDesignerPage() {
                 currentSchema && (
                     <form onSubmit={handleSaveSchema} className="space-y-6">
                         {/* Action Bar */}
-                        <div className="flex justify-between items-center bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-md">
+                        <div className="flex justify-between items-center bg-slate-900 dark:bg-slate-50 border border-slate-800 dark:border-slate-200 rounded-xl p-4 shadow-md">
                             <button
                                 type="button"
                                 onClick={() => {
                                     setIsEditing(false);
                                     setCurrentSchema(null);
                                 }}
-                                className="flex items-center gap-1.5 px-3 py-2 text-slate-300 hover:text-white hover:bg-slate-800 font-semibold text-xs rounded-lg transition"
+                                className="flex items-center gap-1.5 px-3 py-2 text-slate-300 dark:text-slate-700 hover:text-white hover:bg-slate-800 dark:hover:bg-slate-100 font-semibold text-xs rounded-lg transition"
                             >
                                 <Undo2 className="w-4 h-4" />
                                 Volver a esquemas
@@ -638,7 +638,7 @@ export default function QueryDesignerPage() {
                                         setIsEditing(false);
                                         setCurrentSchema(null);
                                     }}
-                                    className="px-4 py-2 border border-slate-700 text-slate-300 font-semibold text-xs hover:bg-slate-800 rounded-lg transition"
+                                    className="px-4 py-2 border border-slate-700 dark:border-slate-300 text-slate-300 dark:text-slate-700 font-semibold text-xs hover:bg-slate-800 dark:hover:bg-slate-100 rounded-lg transition"
                                 >
                                     Cancelar
                                 </button>
@@ -666,40 +666,40 @@ export default function QueryDesignerPage() {
                             {/* Left Column: Metadata & Tables */}
                             <div className="lg:col-span-1 space-y-6">
                                 {/* Metadata Card */}
-                                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4 shadow-xl">
-                                    <h3 className="text-sm font-bold text-white border-b border-slate-800 pb-2">Información General</h3>
+                                <div className="bg-slate-900 dark:bg-slate-50 border border-slate-800 dark:border-slate-200 rounded-2xl p-6 space-y-4 shadow-xl">
+                                    <h3 className="text-sm font-bold text-white border-b border-slate-800 dark:border-slate-200 pb-2">Información General</h3>
                                     
                                     <div className="space-y-1.5">
-                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Nombre del Esquema</label>
+                                        <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Nombre del Esquema</label>
                                         <input
                                             type="text"
                                             required
                                             value={currentSchema.name}
                                             onChange={e => setCurrentSchema({ ...currentSchema, name: e.target.value })}
                                             placeholder="ej: Órdenes de Compra y Proveedores"
-                                            className="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-pink-500/50 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:ring-0 outline-none transition"
+                                            className="w-full bg-slate-950 dark:bg-slate-50 border border-slate-800 dark:border-slate-200 hover:border-slate-700 dark:hover:border-slate-300 focus:border-pink-500/50 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:ring-0 outline-none transition"
                                         />
                                     </div>
 
                                     <div className="space-y-1.5">
-                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Descripción del Contexto</label>
+                                        <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Descripción del Contexto</label>
                                         <textarea
                                             value={currentSchema.description}
                                             onChange={e => setCurrentSchema({ ...currentSchema, description: e.target.value })}
                                             placeholder="Mapea relaciones y glosario de términos para compras de inventario..."
                                             rows={3}
-                                            className="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-pink-500/50 rounded-xl p-3 text-sm text-white placeholder-slate-600 focus:ring-0 outline-none transition resize-none"
+                                            className="w-full bg-slate-950 dark:bg-slate-50 border border-slate-800 dark:border-slate-200 hover:border-slate-700 dark:hover:border-slate-300 focus:border-pink-500/50 rounded-xl p-3 text-sm text-white placeholder-slate-600 focus:ring-0 outline-none transition resize-none"
                                         />
                                     </div>
                                 </div>
 
                                 {/* Tables Config Card */}
-                                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4 shadow-xl">
-                                    <h3 className="text-sm font-bold text-white border-b border-slate-800 pb-2">Tablas Involucradas</h3>
+                                <div className="bg-slate-900 dark:bg-slate-50 border border-slate-800 dark:border-slate-200 rounded-2xl p-6 space-y-4 shadow-xl">
+                                    <h3 className="text-sm font-bold text-white border-b border-slate-800 dark:border-slate-200 pb-2">Tablas Involucradas</h3>
 
                                     {/* Add Table Select */}
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Agregar Tabla</label>
+                                        <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Agregar Tabla</label>
                                         <div className="flex gap-2">
                                             <select
                                                 onChange={e => {
@@ -708,7 +708,7 @@ export default function QueryDesignerPage() {
                                                 }}
                                                 defaultValue=""
                                                 disabled={loadingTables}
-                                                className="flex-1 bg-slate-950 border border-slate-800 focus:border-pink-500/50 rounded-xl px-3 py-2.5 text-xs text-white focus:ring-0 outline-none transition"
+                                                className="flex-1 bg-slate-950 dark:bg-slate-50 border border-slate-800 dark:border-slate-200 focus:border-pink-500/50 rounded-xl px-3 py-2.5 text-xs text-white focus:ring-0 outline-none transition"
                                             >
                                                 <option value="" disabled>-- Selecciona tabla --</option>
                                                 {dbTables.map(t => (
@@ -722,21 +722,21 @@ export default function QueryDesignerPage() {
 
                                     {/* Active Tables List */}
                                     <div className="space-y-2 pt-2">
-                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tablas Activas</label>
+                                        <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Tablas Activas</label>
                                         {currentSchema.tables.length === 0 ? (
-                                            <p className="text-slate-600 text-xs italic">Ninguna tabla seleccionada.</p>
+                                            <p className="text-slate-600 dark:text-slate-300 text-xs italic">Ninguna tabla seleccionada.</p>
                                         ) : (
                                             <div className="space-y-1.5">
                                                 {currentSchema.tables.map(table => (
                                                     <div 
                                                         key={table} 
-                                                        className="flex justify-between items-center px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl"
+                                                        className="flex justify-between items-center px-3 py-2 bg-slate-950 dark:bg-slate-50 border border-slate-800 dark:border-slate-200 rounded-xl"
                                                     >
-                                                        <span className="text-xs font-semibold text-slate-300">{table}</span>
+                                                        <span className="text-xs font-semibold text-slate-300 dark:text-slate-700">{table}</span>
                                                         <button
                                                             type="button"
                                                             onClick={() => handleRemoveTable(table)}
-                                                            className="text-slate-500 hover:text-rose-400 p-1"
+                                                            className="text-slate-500 dark:text-slate-400 hover:text-rose-400 p-1"
                                                         >
                                                             <Trash className="w-3.5 h-3.5" />
                                                         </button>
@@ -751,8 +751,8 @@ export default function QueryDesignerPage() {
                             {/* Right Column: Relationships & Glossaries */}
                             <div className="lg:col-span-2 space-y-6">
                                 {/* Relationships Config Card */}
-                                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4 shadow-xl">
-                                    <div className="flex justify-between items-center border-b border-slate-800 pb-2">
+                                <div className="bg-slate-900 dark:bg-slate-50 border border-slate-800 dark:border-slate-200 rounded-2xl p-6 space-y-4 shadow-xl">
+                                    <div className="flex justify-between items-center border-b border-slate-800 dark:border-slate-200 pb-2">
                                         <h3 className="text-sm font-bold text-white flex items-center gap-1.5">
                                             <Link className="w-4 h-4 text-indigo-400" />
                                             Relaciones (Joins)
@@ -761,7 +761,7 @@ export default function QueryDesignerPage() {
                                             type="button"
                                             onClick={handleAddRelationship}
                                             disabled={currentSchema.tables.length < 2}
-                                            className="flex items-center gap-1 px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-pink-400 font-semibold text-[10px] border border-pink-500/20 uppercase tracking-wider rounded-lg transition disabled:opacity-40"
+                                            className="flex items-center gap-1 px-2.5 py-1.5 bg-slate-800 dark:bg-slate-100 hover:bg-slate-700 dark:hover:bg-slate-200 text-pink-400 font-semibold text-[10px] border border-pink-500/20 uppercase tracking-wider rounded-lg transition disabled:opacity-40"
                                         >
                                             <Plus className="w-3.5 h-3.5" />
                                             Agregar Join
@@ -769,7 +769,7 @@ export default function QueryDesignerPage() {
                                     </div>
 
                                     {currentSchema.relationships.length === 0 ? (
-                                        <div className="py-6 text-center text-slate-600 text-xs italic bg-slate-950/40 border border-dashed border-slate-800 rounded-xl">
+                                        <div className="py-6 text-center text-slate-600 dark:text-slate-300 text-xs italic bg-slate-950/40 dark:bg-slate-50/40 border border-dashed border-slate-800 dark:border-slate-200 rounded-xl">
                                             {currentSchema.tables.length < 2 
                                                 ? 'Agrega al menos dos tablas para establecer relaciones entre campos.' 
                                                 : 'No hay joins definidos. Define relaciones para que la IA sepa qué columnas conectar.'}
@@ -779,16 +779,16 @@ export default function QueryDesignerPage() {
                                             {currentSchema.relationships.map((rel, index) => (
                                                 <div 
                                                     key={index}
-                                                    className="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-3 shadow-md"
+                                                    className="bg-slate-950 dark:bg-slate-50 border border-slate-800 dark:border-slate-200 rounded-xl p-4 space-y-3 shadow-md"
                                                 >
                                                     {/* Header: Table A JoinType Table B & Actions */}
-                                                    <div className="flex flex-col md:flex-row gap-3 items-center justify-between pb-3 border-b border-slate-900">
+                                                    <div className="flex flex-col md:flex-row gap-3 items-center justify-between pb-3 border-b border-slate-900 dark:border-slate-100">
                                                         <div className="flex flex-wrap items-center gap-2">
                                                             {/* Table A select */}
                                                             <select
                                                                 value={rel.tableA}
                                                                 onChange={e => handleUpdateRelationship(index, 'tableA', e.target.value)}
-                                                                className="bg-slate-900 border border-slate-800 rounded-lg py-1 px-2.5 text-xs text-white font-semibold outline-none"
+                                                                className="bg-slate-900 dark:bg-slate-50 border border-slate-800 dark:border-slate-200 rounded-lg py-1 px-2.5 text-xs text-white font-semibold outline-none"
                                                             >
                                                                 {currentSchema.tables.map(t => (
                                                                     <option key={t} value={t}>{t}</option>
@@ -810,7 +810,7 @@ export default function QueryDesignerPage() {
                                                             <select
                                                                 value={rel.tableB}
                                                                 onChange={e => handleUpdateRelationship(index, 'tableB', e.target.value)}
-                                                                className="bg-slate-900 border border-slate-800 rounded-lg py-1 px-2.5 text-xs text-white font-semibold outline-none"
+                                                                className="bg-slate-900 dark:bg-slate-50 border border-slate-800 dark:border-slate-200 rounded-lg py-1 px-2.5 text-xs text-white font-semibold outline-none"
                                                             >
                                                                 {currentSchema.tables.map(t => (
                                                                     <option key={t} value={t}>{t}</option>
@@ -822,7 +822,7 @@ export default function QueryDesignerPage() {
                                                             <button
                                                                 type="button"
                                                                 onClick={() => handleAddFieldPair(index)}
-                                                                className="flex items-center gap-1 px-2 py-1 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-lg text-[10px] font-bold text-slate-300 transition"
+                                                                className="flex items-center gap-1 px-2 py-1 bg-slate-900 dark:bg-slate-50 hover:bg-slate-800 dark:hover:bg-slate-100 border border-slate-800 dark:border-slate-200 rounded-lg text-[10px] font-bold text-slate-300 dark:text-slate-700 transition"
                                                             >
                                                                 <Plus className="w-3 h-3" />
                                                                 Relacionar otro campo
@@ -831,7 +831,7 @@ export default function QueryDesignerPage() {
                                                             <button
                                                                 type="button"
                                                                 onClick={() => handleRemoveRelationship(index)}
-                                                                className="text-slate-500 hover:text-rose-400 p-1 hover:bg-slate-900 rounded transition"
+                                                                className="text-slate-500 dark:text-slate-400 hover:text-rose-400 p-1 hover:bg-slate-900 dark:hover:bg-slate-50 rounded transition"
                                                                 title="Eliminar relación completa"
                                                             >
                                                                 <Trash className="w-3.5 h-3.5" />
@@ -844,16 +844,16 @@ export default function QueryDesignerPage() {
                                                         {rel.fieldPairs.map((pair, pIdx) => (
                                                             <div 
                                                                 key={pIdx}
-                                                                className="flex flex-col md:flex-row items-center gap-3 bg-slate-900/40 p-2.5 rounded-lg border border-slate-900"
+                                                                className="flex flex-col md:flex-row items-center gap-3 bg-slate-900/40 dark:bg-slate-50/40 p-2.5 rounded-lg border border-slate-900 dark:border-slate-100"
                                                             >
-                                                                <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider md:w-20">Par {pIdx + 1}:</span>
+                                                                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider md:w-20">Par {pIdx + 1}:</span>
                                                                 
                                                                 {/* Field A dropdown */}
                                                                 <div className="flex-1 w-full">
                                                                     <select
                                                                         value={pair.fieldA}
                                                                         onChange={e => handleUpdateFieldPair(index, pIdx, 'fieldA', e.target.value)}
-                                                                        className="w-full bg-slate-950 border border-slate-800 rounded-lg p-1.5 text-xs text-white focus:border-pink-500/40 transition outline-none"
+                                                                        className="w-full bg-slate-950 dark:bg-slate-50 border border-slate-800 dark:border-slate-200 rounded-lg p-1.5 text-xs text-white focus:border-pink-500/40 transition outline-none"
                                                                     >
                                                                         {!pair.fieldA && <option value="">-- Seleccionar campo --</option>}
                                                                         {columnsCache[rel.tableA]?.map(c => (
@@ -863,14 +863,14 @@ export default function QueryDesignerPage() {
                                                                 </div>
 
                                                                 {/* Connector */}
-                                                                <span className="text-slate-600 text-xs font-bold font-mono"> = </span>
+                                                                <span className="text-slate-600 dark:text-slate-300 text-xs font-bold font-mono"> = </span>
 
                                                                 {/* Field B dropdown */}
                                                                 <div className="flex-1 w-full">
                                                                     <select
                                                                         value={pair.fieldB}
                                                                         onChange={e => handleUpdateFieldPair(index, pIdx, 'fieldB', e.target.value)}
-                                                                        className="w-full bg-slate-950 border border-slate-800 rounded-lg p-1.5 text-xs text-white focus:border-pink-500/40 transition outline-none"
+                                                                        className="w-full bg-slate-950 dark:bg-slate-50 border border-slate-800 dark:border-slate-200 rounded-lg p-1.5 text-xs text-white focus:border-pink-500/40 transition outline-none"
                                                                     >
                                                                         {!pair.fieldB && <option value="">-- Seleccionar campo --</option>}
                                                                         {columnsCache[rel.tableB]?.map(c => (
@@ -884,7 +884,7 @@ export default function QueryDesignerPage() {
                                                                     <button
                                                                         type="button"
                                                                         onClick={() => handleRemoveFieldPair(index, pIdx)}
-                                                                        className="text-slate-500 hover:text-rose-400 p-1 hover:bg-slate-900 rounded"
+                                                                        className="text-slate-500 dark:text-slate-400 hover:text-rose-400 p-1 hover:bg-slate-900 dark:hover:bg-slate-50 rounded"
                                                                     >
                                                                         <Trash className="w-3.5 h-3.5" />
                                                                     </button>
@@ -894,7 +894,7 @@ export default function QueryDesignerPage() {
                                                     </div>
 
                                                     {/* Join Preview String */}
-                                                    <div className="text-[10px] text-slate-500 font-mono italic bg-slate-950/50 p-2 rounded border border-slate-900/50">
+                                                    <div className="text-[10px] text-slate-500 dark:text-slate-400 font-mono italic bg-slate-950/50 dark:bg-slate-50/50 p-2 rounded border border-slate-900/50 dark:border-slate-100/50">
                                                         ON {rel.fieldPairs.map(p => `${rel.tableA}.${p.fieldA || '?' } = ${rel.tableB}.${p.fieldB || '?'}`).join(' AND ')}
                                                     </div>
                                                 </div>
@@ -904,14 +904,14 @@ export default function QueryDesignerPage() {
                                 </div>
 
                                 {/* Glossaries / Fields Descriptions Card */}
-                                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4 shadow-xl">
-                                    <h3 className="text-sm font-bold text-white flex items-center gap-1.5 border-b border-slate-800 pb-2">
+                                <div className="bg-slate-900 dark:bg-slate-50 border border-slate-800 dark:border-slate-200 rounded-2xl p-6 space-y-4 shadow-xl">
+                                    <h3 className="text-sm font-bold text-white flex items-center gap-1.5 border-b border-slate-800 dark:border-slate-200 pb-2">
                                         <FileText className="w-4 h-4 text-pink-400" />
                                         Glosario y Reglas de los Campos
                                     </h3>
 
                                     {currentSchema.tables.length === 0 ? (
-                                        <p className="text-slate-600 text-xs italic text-center py-6">Agrega tablas arriba para documentar sus campos individuales.</p>
+                                        <p className="text-slate-600 dark:text-slate-300 text-xs italic text-center py-6">Agrega tablas arriba para documentar sus campos individuales.</p>
                                     ) : (
                                         <div className="space-y-6">
                                             {currentSchema.tables.map(table => {
@@ -919,15 +919,15 @@ export default function QueryDesignerPage() {
                                                 const loading = loadingColumns[table];
 
                                                 return (
-                                                    <div key={table} className="space-y-3 bg-slate-950 border border-slate-800 rounded-xl p-4">
-                                                        <div className="flex items-center gap-2 border-b border-slate-900 pb-2">
+                                                    <div key={table} className="space-y-3 bg-slate-950 dark:bg-slate-50 border border-slate-800 dark:border-slate-200 rounded-xl p-4">
+                                                        <div className="flex items-center gap-2 border-b border-slate-900 dark:border-slate-100 pb-2">
                                                             <Database className="w-4 h-4 text-indigo-400" />
                                                             <h4 className="text-xs font-bold text-white">{table}</h4>
-                                                            {loading && <Loader2 className="w-3 h-3 text-pink-500 animate-spin" />}
+                                                            {loading && <Loader2 className="w-3 h-3 text-pink-500 dark:text-pink-400 animate-spin" />}
                                                         </div>
 
                                                         {cols.length === 0 && !loading && (
-                                                            <p className="text-slate-600 text-xs italic">Cargando campos...</p>
+                                                            <p className="text-slate-600 dark:text-slate-300 text-xs italic">Cargando campos...</p>
                                                         )}
 
                                                         <div className="space-y-3.5 max-h-96 overflow-y-auto pr-1">
@@ -936,7 +936,7 @@ export default function QueryDesignerPage() {
                                                                 const desc = currentSchema.fieldDescriptions[fieldKey] || '';
 
                                                                 return (
-                                                                    <div key={col.name} className="grid grid-cols-1 md:grid-cols-3 gap-2 items-start bg-slate-900/60 border border-slate-800 p-3 rounded-lg hover:border-slate-800 transition">
+                                                                    <div key={col.name} className="grid grid-cols-1 md:grid-cols-3 gap-2 items-start bg-slate-900/60 dark:bg-slate-50/60 border border-slate-800 dark:border-slate-200 p-3 rounded-lg hover:border-slate-800 dark:hover:border-slate-200 transition">
                                                                         <div className="space-y-1">
                                                                             <div className="flex items-center gap-1.5">
                                                                                 <span className="text-xs font-bold text-white font-mono">{col.name}</span>
@@ -947,7 +947,7 @@ export default function QueryDesignerPage() {
                                                                                     </span>
                                                                                 )}
                                                                             </div>
-                                                                            <span className="text-[10px] text-slate-500 font-mono">{col.type}</span>
+                                                                            <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono">{col.type}</span>
                                                                         </div>
 
                                                                         <div className="md:col-span-2">
@@ -956,7 +956,7 @@ export default function QueryDesignerPage() {
                                                                                 value={desc}
                                                                                 onChange={e => handleUpdateFieldDescription(table, col.name, e.target.value)}
                                                                                 placeholder="¿Reglas de negocio o significado de esta columna para la IA?..."
-                                                                                className="w-full bg-slate-950 border border-slate-800 focus:border-pink-500/40 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-700 focus:ring-0 outline-none transition"
+                                                                                className="w-full bg-slate-950 dark:bg-slate-50 border border-slate-800 dark:border-slate-200 focus:border-pink-500/40 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-700 focus:ring-0 outline-none transition"
                                                                             />
                                                                         </div>
                                                                     </div>

@@ -51,7 +51,7 @@ const TONO_TIPO: Readonly<Record<number, PillTone>> = {
 };
 
 const BOTON_HEADER =
-    'p-2.5 bg-white border border-slate-200 text-blue-600 hover:bg-slate-100 hover:border-slate-300 transition-all rounded-xl shadow-xs cursor-pointer flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500';
+    'p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-blue-600 dark:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600 transition-all rounded-xl shadow-xs cursor-pointer flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500';
 
 /** Elementos que reciben foco dentro del diálogo, para atrapar el Tab. */
 const ENFOCABLES =
@@ -65,16 +65,16 @@ function cantidad(value: unknown): string {
 
 function Signo({ value }: { value: number }) {
     const n = Number(value || 0);
-    if (n === 0) return <span className="text-slate-300">—</span>;
+    if (n === 0) return <span className="text-slate-300 dark:text-slate-700">—</span>;
     return n > 0
-        ? <span className="font-bold text-emerald-600">+{cantidad(n)}</span>
-        : <span className="font-bold text-amber-600">−{cantidad(Math.abs(n))}</span>;
+        ? <span className="font-bold text-emerald-600 dark:text-emerald-400">+{cantidad(n)}</span>
+        : <span className="font-bold text-amber-600 dark:text-amber-400">−{cantidad(Math.abs(n))}</span>;
 }
 
 function Saldo({ value }: { value: number }) {
     const n = Number(value || 0);
     return (
-        <span className={cn('font-black tabular-nums', n < 0 ? 'text-rose-600' : 'text-slate-900')}>
+        <span className={cn('font-black tabular-nums', n < 0 ? 'text-rose-600 dark:text-rose-400' : 'text-slate-900 dark:text-slate-50')}>
             {cantidad(n)}
         </span>
     );
@@ -85,12 +85,12 @@ const COLUMNAS: Column<MovimientoRow>[] = [
         key: 'FechaMovimiento',
         label: 'Fecha movimiento',
         render: r => (
-            <span className="whitespace-nowrap text-xs text-slate-600 inline-flex items-center gap-1.5">
+            <span className="whitespace-nowrap text-xs text-slate-600 dark:text-slate-300 inline-flex items-center gap-1.5">
                 {formatDateTime(r.FechaMovimiento)}
                 {r.Editado === 1 && (
                     <span
                         title={`Modificado: ${formatDateTime(r.FechaAct)}`}
-                        className="px-1 rounded bg-amber-50 text-amber-700 border border-amber-100 text-[9px] font-black uppercase"
+                        className="px-1 rounded bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-100 dark:border-amber-900/60 text-[9px] font-black uppercase"
                     >
                         Editado
                     </span>
@@ -108,7 +108,7 @@ const COLUMNAS: Column<MovimientoRow>[] = [
         key: 'Concepto',
         label: 'Concepto',
         render: r => (
-            <span className={cn('text-slate-700', r.TipoMovimiento === TIPO_CORTE && 'font-black text-blue-700')}>
+            <span className={cn('text-slate-700 dark:text-slate-200', r.TipoMovimiento === TIPO_CORTE && 'font-black text-blue-700 dark:text-blue-400')}>
                 {r.Concepto}
             </span>
         ),
@@ -118,7 +118,7 @@ const COLUMNAS: Column<MovimientoRow>[] = [
     {
         key: 'Usuario',
         label: 'Usuario',
-        render: r => (r.Usuario ? <span className="text-xs text-slate-600">{r.Usuario}</span> : <span className="text-slate-300">—</span>),
+        render: r => (r.Usuario ? <span className="text-xs text-slate-600 dark:text-slate-300">{r.Usuario}</span> : <span className="text-slate-300 dark:text-slate-700">—</span>),
     },
 ];
 
@@ -137,17 +137,17 @@ function Stat({
     tone?: 'blue' | 'emerald' | 'rose' | 'slate' | 'amber';
 }) {
     const color = {
-        blue: 'text-blue-700',
-        emerald: 'text-emerald-600',
-        rose: 'text-rose-600',
-        slate: 'text-slate-900',
-        amber: 'text-amber-600',
+        blue: 'text-blue-700 dark:text-blue-400',
+        emerald: 'text-emerald-600 dark:text-emerald-400',
+        rose: 'text-rose-600 dark:text-rose-400',
+        slate: 'text-slate-900 dark:text-slate-50',
+        amber: 'text-amber-600 dark:text-amber-400',
     }[tone];
     return (
-        <div className="bg-slate-50/70 border border-slate-100 rounded-xl px-4 py-3 min-w-0">
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider truncate">{label}</p>
+        <div className="bg-slate-50/70 dark:bg-slate-900/70 border border-slate-100 dark:border-slate-800 rounded-xl px-4 py-3 min-w-0">
+            <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider truncate">{label}</p>
             <p className={cn('text-xl font-black tabular-nums truncate', color)}>{value}</p>
-            {hint && <p className="text-[10px] font-semibold text-slate-400 truncate">{hint}</p>}
+            {hint && <p className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 truncate">{hint}</p>}
         </div>
     );
 }
@@ -155,14 +155,14 @@ function Stat({
 function SeccionTitulo({ titulo, sub }: { titulo: string; sub: string }) {
     return (
         <div>
-            <h3 className="text-sm font-extrabold text-slate-800 uppercase tracking-wider">{titulo}</h3>
-            <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-widest">{sub}</p>
+            <h3 className="text-sm font-extrabold text-slate-800 dark:text-slate-100 uppercase tracking-wider">{titulo}</h3>
+            <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-widest">{sub}</p>
         </div>
     );
 }
 
-const TH = 'py-2 px-3 text-[10px] font-black text-slate-400 uppercase tracking-wider whitespace-nowrap';
-const TD = 'py-2 px-3 text-sm text-slate-700';
+const TH = 'py-2 px-3 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider whitespace-nowrap';
+const TD = 'py-2 px-3 text-sm text-slate-700 dark:text-slate-200';
 
 /**
  * Réplica de la rejilla superior del ERP: un renglón por tipo, clic para filtrar
@@ -179,10 +179,10 @@ function ResumenTabla({
     onSelect: (tipo: number) => void;
 }) {
     return (
-        <div className="overflow-x-auto rounded-xl border border-slate-100">
+        <div className="overflow-x-auto rounded-xl border border-slate-100 dark:border-slate-800">
             <table className="w-full border-collapse">
                 <thead>
-                    <tr className="bg-slate-50 border-b border-slate-200 text-left">
+                    <tr className="bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 text-left">
                         <th className={TH}>Tipo movimiento</th>
                         <th className={cn(TH, 'text-right')}>Folios</th>
                         <th className={cn(TH, 'text-right')}>Cant.</th>
@@ -201,8 +201,8 @@ function ResumenTabla({
                                 key={r.TipoMovimiento}
                                 onClick={() => onSelect(r.TipoMovimiento)}
                                 className={cn(
-                                    'border-b border-slate-50 cursor-pointer transition-colors',
-                                    seleccionado ? 'bg-blue-50/70' : 'hover:bg-slate-50/70'
+                                    'border-b border-slate-50 dark:border-slate-800 cursor-pointer transition-colors',
+                                    seleccionado ? 'bg-blue-50/70 dark:bg-blue-950/40' : 'hover:bg-slate-50/70 dark:hover:bg-slate-900/70'
                                 )}
                             >
                                 <td className={TD}>
@@ -212,7 +212,7 @@ function ResumenTabla({
                                         className="inline-flex items-center gap-2 cursor-pointer rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                                     >
                                         <span className={cn('w-1 h-4 rounded', seleccionado ? 'bg-blue-600' : 'bg-transparent')} />
-                                        <span className={cn('font-bold uppercase text-xs tracking-wider', seleccionado ? 'text-blue-700' : 'text-slate-700')}>
+                                        <span className={cn('font-bold uppercase text-xs tracking-wider', seleccionado ? 'text-blue-700 dark:text-blue-400' : 'text-slate-700 dark:text-slate-200')}>
                                             {r.Etiqueta}
                                         </span>
                                     </button>
@@ -225,8 +225,8 @@ function ResumenTabla({
                                 <td className={cn(TD, 'text-xs whitespace-nowrap')}>{formatDateTime(r.FechaMax)}</td>
                                 <td className={cn(TD, 'text-right tabular-nums')}>
                                     {r.Editados > 0
-                                        ? <span className="font-bold text-amber-600">{formatInt(r.Editados)}</span>
-                                        : <span className="text-slate-300">0</span>}
+                                        ? <span className="font-bold text-amber-600 dark:text-amber-400">{formatInt(r.Editados)}</span>
+                                        : <span className="text-slate-300 dark:text-slate-700">0</span>}
                                 </td>
                             </tr>
                         );
@@ -339,7 +339,7 @@ export default function MovimientosArticuloModal({ articulo, onClose }: Props) {
 
     return (
         <div
-            className="fixed inset-0 z-[110] flex items-center justify-center bg-slate-950/40 backdrop-blur-sm p-3 md:p-6 animate-in fade-in duration-200"
+            className="fixed inset-0 z-[110] flex items-center justify-center bg-slate-950/40 dark:bg-slate-50/40 backdrop-blur-sm p-3 md:p-6 animate-in fade-in duration-200"
             onMouseDown={e => { clicEnFondo.current = e.target === e.currentTarget; }}
             onClick={e => {
                 if (clicEnFondo.current && e.target === e.currentTarget) onClose();
@@ -352,34 +352,34 @@ export default function MovimientosArticuloModal({ articulo, onClose }: Props) {
                 aria-labelledby="titulo-movimientos"
                 tabIndex={-1}
                 onKeyDown={atraparTab}
-                className="bg-white w-full max-w-6xl h-full max-h-[92vh] rounded-2xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 focus:outline-none"
+                className="bg-white dark:bg-slate-900 w-full max-w-6xl h-full max-h-[92vh] rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 focus:outline-none"
             >
-                <header className="flex flex-wrap items-start justify-between gap-4 px-6 py-4 border-b border-slate-100 bg-slate-50/60">
+                <header className="flex flex-wrap items-start justify-between gap-4 px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/60">
                     <div className="min-w-0">
                         <h2
                             id="titulo-movimientos"
-                            className="text-base font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-2.5"
+                            className="text-base font-extrabold text-slate-800 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2.5"
                         >
-                            <span className="p-2 bg-blue-50 text-blue-600 border border-blue-100 rounded-xl">
+                            <span className="p-2 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-900/60 rounded-xl">
                                 <History size={18} strokeWidth={2.2} />
                             </span>
                             Reporte de movimientos
                         </h2>
-                        <p className="mt-1.5 text-sm font-bold text-slate-800 truncate">{descripcion}</p>
-                        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider flex flex-wrap items-center gap-x-2">
-                            <span>Código <span className="font-mono text-blue-700">{codigo}</span></span>
-                            <span className="w-1 h-1 rounded-full bg-slate-300" />
-                            <span>Sucursal <span className="text-slate-600">{sucursal}</span></span>
+                        <p className="mt-1.5 text-sm font-bold text-slate-800 dark:text-slate-100 truncate">{descripcion}</p>
+                        <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider flex flex-wrap items-center gap-x-2">
+                            <span>Código <span className="font-mono text-blue-700 dark:text-blue-400">{codigo}</span></span>
+                            <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700" />
+                            <span>Sucursal <span className="text-slate-600 dark:text-slate-300">{sucursal}</span></span>
                         </p>
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <label className="flex items-center gap-2 text-xs font-semibold text-slate-600 cursor-pointer select-none whitespace-nowrap px-3 py-2 rounded-xl border border-slate-200 bg-white">
+                        <label className="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300 cursor-pointer select-none whitespace-nowrap px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
                             <input
                                 type="checkbox"
                                 checked={verTodos}
                                 onChange={e => setVerTodos(e.target.checked)}
-                                className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                                className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 cursor-pointer"
                             />
                             Ver todos
                         </label>
@@ -408,7 +408,7 @@ export default function MovimientosArticuloModal({ articulo, onClose }: Props) {
                             onClick={onClose}
                             title="Cerrar"
                             aria-label="Cerrar"
-                            className="p-2.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 border border-transparent hover:border-rose-100 rounded-xl transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                            className="p-2.5 text-slate-400 dark:text-slate-500 hover:text-rose-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 border border-transparent hover:border-rose-100 dark:hover:border-rose-900/60 rounded-xl transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                         >
                             <X size={18} />
                         </button>
@@ -423,7 +423,7 @@ export default function MovimientosArticuloModal({ articulo, onClose }: Props) {
                     {meta && !loading && !error && (
                         <>
                             {meta.truncado && (
-                                <p className="px-4 py-2.5 rounded-xl bg-amber-50 border border-amber-100 text-xs font-semibold text-amber-800">
+                                <p className="px-4 py-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-100 dark:border-amber-900/60 text-xs font-semibold text-amber-800 dark:text-amber-300">
                                     La historia de este artículo es muy larga: se muestran solo los{' '}
                                     {formatInt(movimientos.length)} movimientos más recientes. El saldo por renglón sigue
                                     siendo correcto; el resumen no incluye lo recortado.
@@ -463,7 +463,7 @@ export default function MovimientosArticuloModal({ articulo, onClose }: Props) {
                             <section className="space-y-2">
                                 <SeccionTitulo titulo="Resumen por tipo" sub="Clic en un renglón para filtrar el detalle" />
                                 {resumen.length === 0 ? (
-                                    <p className="py-6 text-center text-sm font-semibold text-slate-400">
+                                    <p className="py-6 text-center text-sm font-semibold text-slate-400 dark:text-slate-500">
                                         {verTodos
                                             ? 'El artículo no tiene movimientos en esta sucursal.'
                                             : 'Sin movimientos después del último ajuste físico. Activa "Ver todos" para la historia completa.'}
@@ -483,7 +483,7 @@ export default function MovimientosArticuloModal({ articulo, onClose }: Props) {
                                     rows={visibles}
                                     rowKey={llaveMovimiento}
                                     initialSort={{ key: 'FechaMovimiento', direction: 'desc' }}
-                                    rowClassName={r => (r.TipoMovimiento === TIPO_CORTE ? 'bg-blue-50/60' : '')}
+                                    rowClassName={r => (r.TipoMovimiento === TIPO_CORTE ? 'bg-blue-50/60 dark:bg-blue-950/40' : '')}
                                     emptyMessage="No hay renglones para este tipo de movimiento."
                                 />
                             </section>

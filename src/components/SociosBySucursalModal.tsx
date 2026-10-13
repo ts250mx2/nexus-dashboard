@@ -408,32 +408,32 @@ export default function SociosBySucursalModal({
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-            <div className="bg-white rounded-2xl shadow-xl w-full max-w-6xl max-h-[90vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/50 dark:bg-slate-50/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl w-full max-w-6xl max-h-[90vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
                 {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-slate-100 bg-slate-50">
+                <div className="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900">
                     <div>
-                        <div className="flex items-center gap-1 text-xs font-bold text-slate-400 select-none mb-1">
+                        <div className="flex items-center gap-1 text-xs font-bold text-slate-400 dark:text-slate-500 select-none mb-1">
                             <button
                                 onClick={onClose}
-                                className="hover:text-blue-600 hover:underline transition-colors duration-150"
+                                className="hover:text-blue-600 dark:hover:text-blue-400 hover:underline transition-colors duration-150"
                             >
                                 Sucursales
                             </button>
-                            <ChevronRight size={12} className="text-slate-300" />
+                            <ChevronRight size={12} className="text-slate-300 dark:text-slate-700" />
                             <span className="text-slate-850 font-extrabold">{sucursalName}</span>
                         </div>
-                        <h2 className="text-xl font-black text-slate-800 tracking-tight uppercase flex items-center gap-2 select-none">
-                            <Users className="text-blue-600" size={24} />
+                        <h2 className="text-xl font-black text-slate-800 dark:text-slate-100 tracking-tight uppercase flex items-center gap-2 select-none">
+                            <Users className="text-blue-600 dark:text-blue-400" size={24} />
                             Profesores de {sucursalName}
                         </h2>
-                        <p className="text-xs font-semibold text-slate-500 mt-1">Periodo: {startDate} al {endDate}</p>
+                        <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">Periodo: {startDate} al {endDate}</p>
                     </div>
                     <div className="flex items-center gap-2">
                         <button
                             onClick={handleExportExcel}
                             disabled={loading || data.length === 0}
-                            className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors border border-slate-200 disabled:opacity-40"
+                            className="p-2 text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-950/40 rounded-lg transition-colors border border-slate-200 dark:border-slate-700 disabled:opacity-40"
                             title="Exportar Excel (resumen de profesores)"
                         >
                             <FileSpreadsheet size={20} />
@@ -441,7 +441,7 @@ export default function SociosBySucursalModal({
                         <button
                             onClick={handleExportExcelDetalle}
                             disabled={loading || data.length === 0 || exportingDetalle}
-                            className="flex items-center gap-1.5 px-3 py-2 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-colors border border-emerald-200 text-xs font-bold disabled:opacity-40"
+                            className="flex items-center gap-1.5 px-3 py-2 text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 rounded-lg transition-colors border border-emerald-200 dark:border-emerald-800/60 text-xs font-bold disabled:opacity-40"
                             title="Exportar Excel con encabezado por profesor y desglose de sus ventas"
                         >
                             {exportingDetalle ? (
@@ -454,14 +454,14 @@ export default function SociosBySucursalModal({
                         <button
                             onClick={handleExportPDF}
                             disabled={loading || data.length === 0}
-                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors border border-slate-200 disabled:opacity-40"
+                            className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-lg transition-colors border border-slate-200 dark:border-slate-700 disabled:opacity-40"
                             title="Exportar PDF"
                         >
                             <FileText size={20} />
                         </button>
                         <button
                             onClick={onClose}
-                            className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors ml-2"
+                            className="p-2 text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-lg transition-colors ml-2"
                         >
                             <X size={24} />
                         </button>
@@ -469,61 +469,61 @@ export default function SociosBySucursalModal({
                 </div>
 
                 {/* Body */}
-                <div className="flex-1 overflow-auto bg-white">
+                <div className="flex-1 overflow-auto bg-white dark:bg-slate-900">
                     {loading ? (
-                        <div className="flex flex-col items-center justify-center h-64 text-slate-500">
-                            <Loader2 className="animate-spin mb-4 text-blue-600" size={32} />
+                        <div className="flex flex-col items-center justify-center h-64 text-slate-500 dark:text-slate-400">
+                            <Loader2 className="animate-spin mb-4 text-blue-600 dark:text-blue-400" size={32} />
                             <p className="font-medium">Cargando profesores...</p>
                         </div>
                     ) : error ? (
-                        <div className="flex flex-col items-center justify-center h-64 text-red-500">
+                        <div className="flex flex-col items-center justify-center h-64 text-red-500 dark:text-red-400">
                             <p className="font-medium">Error al cargar datos</p>
                             <p className="text-sm opacity-80 mt-1">{error}</p>
                         </div>
                     ) : (
                         <table className="w-full text-left text-sm whitespace-nowrap border-collapse">
-                            <thead className="bg-slate-50 sticky top-0 shadow-sm z-10 border-b border-slate-200">
+                            <thead className="bg-slate-50 dark:bg-slate-900 sticky top-0 shadow-sm z-10 border-b border-slate-200 dark:border-slate-700">
                                 <tr>
-                                    <th className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors select-none group" onClick={() => handleSort('Cliente')}>
+                                    <th className="px-6 py-4 font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors select-none group" onClick={() => handleSort('Cliente')}>
                                         <div className="flex items-center gap-1 justify-between">
                                             Profesor
-                                            <ArrowUpDown size={14} className={cn("text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig?.key === 'Cliente' && "opacity-100 text-blue-500")} />
+                                            <ArrowUpDown size={14} className={cn("text-slate-400 dark:text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig?.key === 'Cliente' && "opacity-100 text-blue-500 dark:text-blue-400")} />
                                         </div>
                                     </th>
-                                    <th className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider select-none">Teléfono</th>
-                                    <th className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider select-none">Correo</th>
-                                    <th className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors select-none group" onClick={() => handleSort('Sucursal')}>
+                                    <th className="px-6 py-4 font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider select-none">Teléfono</th>
+                                    <th className="px-6 py-4 font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider select-none">Correo</th>
+                                    <th className="px-6 py-4 font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors select-none group" onClick={() => handleSort('Sucursal')}>
                                         <div className="flex items-center gap-1 justify-between">
                                             Sucursal
-                                            <ArrowUpDown size={14} className={cn("text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig?.key === 'Sucursal' && "opacity-100 text-blue-500")} />
+                                            <ArrowUpDown size={14} className={cn("text-slate-400 dark:text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig?.key === 'Sucursal' && "opacity-100 text-blue-500 dark:text-blue-400")} />
                                         </div>
                                     </th>
-                                    <th className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors select-none group text-center" onClick={() => handleSort('TotalVentas')}>
+                                    <th className="px-6 py-4 font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors select-none group text-center" onClick={() => handleSort('TotalVentas')}>
                                         <div className="flex items-center gap-1 justify-center">
                                             # Ventas
-                                            <ArrowUpDown size={14} className={cn("text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig?.key === 'TotalVentas' && "opacity-100 text-blue-500")} />
+                                            <ArrowUpDown size={14} className={cn("text-slate-400 dark:text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig?.key === 'TotalVentas' && "opacity-100 text-blue-500 dark:text-blue-400")} />
                                         </div>
                                     </th>
-                                    <th className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors select-none group text-right" onClick={() => handleSort('TicketPromedio')}>
+                                    <th className="px-6 py-4 font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors select-none group text-right" onClick={() => handleSort('TicketPromedio')}>
                                         <div className="flex items-center gap-1 justify-end">
                                             Ticket Promedio
-                                            <ArrowUpDown size={14} className={cn("text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig?.key === 'TicketPromedio' && "opacity-100 text-blue-500")} />
+                                            <ArrowUpDown size={14} className={cn("text-slate-400 dark:text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig?.key === 'TicketPromedio' && "opacity-100 text-blue-500 dark:text-blue-400")} />
                                         </div>
                                     </th>
-                                    <th className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors select-none group text-right" onClick={() => handleSort('ImporteTotal')}>
+                                    <th className="px-6 py-4 font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors select-none group text-right" onClick={() => handleSort('ImporteTotal')}>
                                         <div className="flex items-center gap-1 justify-end">
                                             Importe Total
-                                            <ArrowUpDown size={14} className={cn("text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig?.key === 'ImporteTotal' && "opacity-100 text-blue-500")} />
+                                            <ArrowUpDown size={14} className={cn("text-slate-400 dark:text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig?.key === 'ImporteTotal' && "opacity-100 text-blue-500 dark:text-blue-400")} />
                                         </div>
                                     </th>
-                                    <th className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors select-none group text-center" onClick={() => handleSort('UltimaVenta')}>
+                                    <th className="px-6 py-4 font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors select-none group text-center" onClick={() => handleSort('UltimaVenta')}>
                                         <div className="flex items-center gap-1 justify-center">
                                             Última Venta
-                                            <ArrowUpDown size={14} className={cn("text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig?.key === 'UltimaVenta' && "opacity-100 text-blue-500")} />
+                                            <ArrowUpDown size={14} className={cn("text-slate-400 dark:text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity", sortConfig?.key === 'UltimaVenta' && "opacity-100 text-blue-500 dark:text-blue-400")} />
                                         </div>
                                     </th>
                                 </tr>
-                                <tr className="bg-slate-50/80 backdrop-blur border-b border-slate-200">
+                                <tr className="bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur border-b border-slate-200 dark:border-slate-700">
                                     <th className="px-3 py-2">
                                         <div className="relative">
                                             <input
@@ -531,9 +531,9 @@ export default function SociosBySucursalModal({
                                                 placeholder={`Filtrar...`}
                                                 value={filters['Cliente'] || ''}
                                                 onChange={(e) => handleFilterChange('Cliente', e.target.value)}
-                                                className="w-full pl-8 pr-3 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 bg-white font-normal"
+                                                className="w-full pl-8 pr-3 py-1.5 text-xs border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 bg-white dark:bg-slate-900 font-normal"
                                             />
-                                            <Filter size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                                            <Filter size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
                                         </div>
                                     </th>
                                     <th className="px-3 py-2"></th>
@@ -545,9 +545,9 @@ export default function SociosBySucursalModal({
                                                 placeholder={`Filtrar...`}
                                                 value={filters['Sucursal'] || ''}
                                                 onChange={(e) => handleFilterChange('Sucursal', e.target.value)}
-                                                className="w-full pl-8 pr-3 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 bg-white font-normal"
+                                                className="w-full pl-8 pr-3 py-1.5 text-xs border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 bg-white dark:bg-slate-900 font-normal"
                                             />
-                                            <Store size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                                            <Store size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
                                         </div>
                                     </th>
                                     <th className="px-3 py-2"></th>
@@ -556,10 +556,10 @@ export default function SociosBySucursalModal({
                                     <th className="px-3 py-2"></th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100">
+                            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                                 {sortedAndFilteredData.length === 0 ? (
                                     <tr>
-                                        <td colSpan={8} className="px-6 py-12 text-center text-slate-400">
+                                        <td colSpan={8} className="px-6 py-12 text-center text-slate-400 dark:text-slate-500">
                                             No se encontraron socios para esta sucursal.
                                         </td>
                                     </tr>
@@ -567,34 +567,34 @@ export default function SociosBySucursalModal({
                                     sortedAndFilteredData.map((row, idx) => (
                                         <tr
                                             key={idx}
-                                            className="hover:bg-blue-50/50 transition-colors group cursor-pointer"
+                                            className="hover:bg-blue-50/50 dark:hover:bg-blue-950/40 transition-colors group cursor-pointer"
                                             onClick={() => onSocioClick({ id: row.IdSocio, name: row.Cliente })}
                                         >
-                                            <td className="px-6 py-4 font-medium text-slate-900 group-hover:text-blue-600 transition-colors">
+                                            <td className="px-6 py-4 font-medium text-slate-900 dark:text-slate-50 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                                                 {row.Cliente}
                                             </td>
-                                            <td className="px-6 py-4 text-slate-500 text-xs tabular-nums">
-                                                {row.Telefono || <span className="text-slate-300">—</span>}
+                                            <td className="px-6 py-4 text-slate-500 dark:text-slate-400 text-xs tabular-nums">
+                                                {row.Telefono || <span className="text-slate-300 dark:text-slate-700">—</span>}
                                             </td>
-                                            <td className="px-6 py-4 text-slate-500 text-xs max-w-[220px] truncate" title={row.Correo || ''}>
-                                                {row.Correo || <span className="text-slate-300">—</span>}
+                                            <td className="px-6 py-4 text-slate-500 dark:text-slate-400 text-xs max-w-[220px] truncate" title={row.Correo || ''}>
+                                                {row.Correo || <span className="text-slate-300 dark:text-slate-700">—</span>}
                                             </td>
-                                            <td className="px-6 py-4 text-slate-500 italic">
+                                            <td className="px-6 py-4 text-slate-500 dark:text-slate-400 italic">
                                                 {row.Sucursal}
                                             </td>
-                                            <td className="px-6 py-4 text-center text-slate-600 font-mono">
+                                            <td className="px-6 py-4 text-center text-slate-600 dark:text-slate-300 font-mono">
                                                 {row.TotalVentas}
                                             </td>
-                                            <td className="px-6 py-4 text-right text-slate-500">
+                                            <td className="px-6 py-4 text-right text-slate-500 dark:text-slate-400">
                                                 {formatCurrency(row.TicketPromedio)}
                                             </td>
-                                            <td className="px-6 py-4 text-right font-bold text-blue-600">
+                                            <td className="px-6 py-4 text-right font-bold text-blue-600 dark:text-blue-400">
                                                 <div className="flex items-center justify-end gap-2">
-                                                    <TrendingUp size={14} className="text-green-500" />
+                                                    <TrendingUp size={14} className="text-green-500 dark:text-green-400" />
                                                     {formatCurrency(row.ImporteTotal)}
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 text-center text-slate-600 text-xs tabular-nums">
+                                            <td className="px-6 py-4 text-center text-slate-600 dark:text-slate-300 text-xs tabular-nums">
                                                 {formatShortDate(row.UltimaVenta)}
                                             </td>
                                         </tr>

@@ -252,7 +252,7 @@ function ReportContent() {
     const renderSortableHeader = (key: SortKey, label: string, align: 'left' | 'center' = 'left') => (
         <th
             className={cn(
-                'px-5 py-4 font-bold text-slate-600 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors select-none group',
+                'px-5 py-4 font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors select-none group',
                 align === 'center' && 'text-center'
             )}
             onClick={() => handleSort(key)}
@@ -262,8 +262,8 @@ function ReportContent() {
                 <ArrowUpDown
                     size={14}
                     className={cn(
-                        'text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity',
-                        sortConfig.key === key && 'opacity-100 text-blue-500'
+                        'text-slate-400 dark:text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity',
+                        sortConfig.key === key && 'opacity-100 text-blue-500 dark:text-blue-400'
                     )}
                 />
             </div>
@@ -273,13 +273,13 @@ function ReportContent() {
     return (
         <div className="space-y-6">
             {/* Header */}
-            <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white py-4 px-6 rounded-2xl shadow-sm border border-slate-100 animate-in fade-in duration-500">
+            <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white dark:bg-slate-900 py-4 px-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 animate-in fade-in duration-500">
                 <div>
-                    <h1 className="text-2xl font-black text-slate-800 tracking-tight uppercase flex items-center gap-3 select-none">
-                        <ContactRound className="text-blue-600" />
+                    <h1 className="text-2xl font-black text-slate-800 dark:text-slate-100 tracking-tight uppercase flex items-center gap-3 select-none">
+                        <ContactRound className="text-blue-600 dark:text-blue-400" />
                         Lista de Profesores
                     </h1>
-                    <p className="text-sm text-slate-500 mt-1">
+                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                         Directorio completo con datos de contacto, sucursal, alta y última compra.
                     </p>
                 </div>
@@ -287,7 +287,7 @@ function ReportContent() {
                 <div className="flex flex-wrap items-center gap-3">
                     <button
                         onClick={() => setReloadToken(t => t + 1)}
-                        className="p-2.5 bg-slate-50 border border-slate-200 text-blue-600 hover:bg-slate-100 hover:border-slate-300 transition-all rounded-xl shadow-sm"
+                        className="p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-blue-600 dark:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600 transition-all rounded-xl shadow-sm"
                         disabled={loading}
                         title="Actualizar Datos"
                     >
@@ -296,7 +296,7 @@ function ReportContent() {
                     <button
                         onClick={handleExportExcel}
                         disabled={loading || filteredData.length === 0}
-                        className="p-2.5 text-green-600 bg-green-50 hover:bg-green-100 rounded-xl transition-colors border border-green-200 disabled:opacity-40"
+                        className="p-2.5 text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/40 hover:bg-green-100 dark:hover:bg-green-900/40 rounded-xl transition-colors border border-green-200 dark:border-green-800/60 disabled:opacity-40"
                         title="Exportar Excel"
                     >
                         <FileSpreadsheet size={16} />
@@ -304,7 +304,7 @@ function ReportContent() {
                     <button
                         onClick={handleExportPDF}
                         disabled={loading || filteredData.length === 0}
-                        className="p-2.5 text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-xl transition-colors border border-rose-200 disabled:opacity-40"
+                        className="p-2.5 text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/40 rounded-xl transition-colors border border-rose-200 dark:border-rose-800/60 disabled:opacity-40"
                         title="Exportar PDF"
                     >
                         <FileText size={16} />
@@ -313,29 +313,29 @@ function ReportContent() {
             </div>
 
             {loading ? (
-                <div className="flex flex-col items-center justify-center h-64 text-slate-500">
-                    <Loader2 className="animate-spin mb-4 text-blue-600" size={40} />
+                <div className="flex flex-col items-center justify-center h-64 text-slate-500 dark:text-slate-400">
+                    <Loader2 className="animate-spin mb-4 text-blue-600 dark:text-blue-400" size={40} />
                     <p className="font-medium">Cargando profesores...</p>
                 </div>
             ) : error ? (
-                <div className="bg-red-50 border border-red-200 text-red-600 p-6 rounded-2xl flex flex-col items-center">
+                <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 text-red-600 dark:text-red-400 p-6 rounded-2xl flex flex-col items-center">
                     <p className="font-bold">Error al cargar datos</p>
                     <p className="text-sm mt-1">{error}</p>
                 </div>
             ) : (
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
                     {/* Toolbar */}
-                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 px-5 py-3 border-b border-slate-100 bg-slate-50/60">
-                        <div className="flex items-center gap-2 text-sm font-bold text-slate-700">
-                            <Users size={16} className="text-blue-600" />
+                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 px-5 py-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/60">
+                        <div className="flex items-center gap-2 text-sm font-bold text-slate-700 dark:text-slate-200">
+                            <Users size={16} className="text-blue-600 dark:text-blue-400" />
                             {filteredData.length} profesor{filteredData.length === 1 ? '' : 'es'}
                             {filteredData.length !== data.length && (
-                                <span className="text-[11px] font-semibold text-slate-400 ml-1">de {data.length}</span>
+                                <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 ml-1">de {data.length}</span>
                             )}
                         </div>
 
                         <div className="flex flex-wrap items-center gap-3">
-                            <div className="flex items-center bg-white border border-slate-200 rounded-xl p-0.5">
+                            <div className="flex items-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-0.5">
                                 {COMPRAS_OPTIONS.map(opt => (
                                     <button
                                         key={opt.value}
@@ -344,7 +344,7 @@ function ReportContent() {
                                             'px-3 py-1 text-xs font-bold rounded-lg transition-all',
                                             comprasFilter === opt.value
                                                 ? 'bg-blue-600 text-white shadow-sm'
-                                                : 'text-slate-500 hover:text-blue-600 hover:bg-blue-50'
+                                                : 'text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40'
                                         )}
                                     >
                                         {opt.label}
@@ -352,12 +352,12 @@ function ReportContent() {
                                 ))}
                             </div>
 
-                            <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-3 py-1.5">
-                                <Store size={15} className="text-blue-500" />
+                            <div className="flex items-center gap-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5">
+                                <Store size={15} className="text-blue-500 dark:text-blue-400" />
                                 <select
                                     value={sucursalFilter}
                                     onChange={e => setSucursalFilter(e.target.value)}
-                                    className="bg-transparent text-xs font-bold text-slate-700 outline-none border-none cursor-pointer max-w-[180px]"
+                                    className="bg-transparent text-xs font-bold text-slate-700 dark:text-slate-200 outline-none border-none cursor-pointer max-w-[180px]"
                                 >
                                     <option value="all">Todas las sucursales</option>
                                     {sucursalOptions.map(s => (
@@ -367,17 +367,17 @@ function ReportContent() {
                                 </select>
                             </div>
 
-                            <div className="relative flex items-center bg-white border border-slate-200 rounded-xl px-3 py-1.5 focus-within:ring-2 focus-within:ring-blue-500/10 focus-within:border-blue-500 transition-all w-full sm:w-60">
-                                <Search size={15} className="text-slate-400 mr-2 shrink-0" />
+                            <div className="relative flex items-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 focus-within:ring-2 focus-within:ring-blue-500/10 focus-within:border-blue-500 transition-all w-full sm:w-60">
+                                <Search size={15} className="text-slate-400 dark:text-slate-500 mr-2 shrink-0" />
                                 <input
                                     type="text"
                                     placeholder="Buscar nombre, teléfono o correo..."
                                     value={search}
                                     onChange={e => setSearch(e.target.value)}
-                                    className="bg-transparent text-xs font-semibold text-slate-700 outline-none p-0 border-none h-auto w-full"
+                                    className="bg-transparent text-xs font-semibold text-slate-700 dark:text-slate-200 outline-none p-0 border-none h-auto w-full"
                                 />
                                 {search && (
-                                    <button onClick={() => setSearch('')} className="p-1 hover:bg-slate-200/60 rounded-full text-slate-400">
+                                    <button onClick={() => setSearch('')} className="p-1 hover:bg-slate-200/60 dark:hover:bg-slate-800/60 rounded-full text-slate-400 dark:text-slate-500">
                                         <X size={12} />
                                     </button>
                                 )}
@@ -388,9 +388,9 @@ function ReportContent() {
                     {/* Table */}
                     <div className="overflow-auto max-h-[68vh] nice-scroll">
                         <table className="w-full text-left text-sm whitespace-nowrap border-collapse">
-                            <thead className="bg-slate-50 sticky top-0 shadow-sm z-10 border-b border-slate-200">
+                            <thead className="bg-slate-50 dark:bg-slate-900 sticky top-0 shadow-sm z-10 border-b border-slate-200 dark:border-slate-700">
                                 <tr>
-                                    <th className="px-5 py-4 font-bold text-slate-400 uppercase tracking-wider text-center w-14">#</th>
+                                    <th className="px-5 py-4 font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider text-center w-14">#</th>
                                     {renderSortableHeader('Profesor', 'Profesor')}
                                     {renderSortableHeader('Telefono', 'Teléfono')}
                                     {renderSortableHeader('Correo', 'Correo Electrónico')}
@@ -399,42 +399,42 @@ function ReportContent() {
                                     {renderSortableHeader('UltimaCompra', 'Última Compra', 'center')}
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100">
+                            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                                 {filteredData.length === 0 ? (
                                     <tr>
-                                        <td colSpan={7} className="px-6 py-12 text-center text-slate-400">
+                                        <td colSpan={7} className="px-6 py-12 text-center text-slate-400 dark:text-slate-500">
                                             No se encontraron profesores con los filtros seleccionados.
                                         </td>
                                     </tr>
                                 ) : (
                                     filteredData.map((row, idx) => (
-                                        <tr key={row.IdSocio} className="hover:bg-blue-50/50 transition-colors group">
-                                            <td className="px-5 py-3.5 text-center text-xs text-slate-400 tabular-nums">{idx + 1}</td>
-                                            <td className="px-5 py-3.5 font-medium text-slate-900">{row.Profesor}</td>
-                                            <td className="px-5 py-3.5 text-slate-600 tabular-nums">
+                                        <tr key={row.IdSocio} className="hover:bg-blue-50/50 dark:hover:bg-blue-950/40 transition-colors group">
+                                            <td className="px-5 py-3.5 text-center text-xs text-slate-400 dark:text-slate-500 tabular-nums">{idx + 1}</td>
+                                            <td className="px-5 py-3.5 font-medium text-slate-900 dark:text-slate-50">{row.Profesor}</td>
+                                            <td className="px-5 py-3.5 text-slate-600 dark:text-slate-300 tabular-nums">
                                                 {row.Telefono ? (
                                                     <a
                                                         href={`tel:${row.Telefono.replace(/[^\d+]/g, '')}`}
-                                                        className="inline-flex items-center gap-1.5 hover:text-blue-600 transition-colors"
+                                                        className="inline-flex items-center gap-1.5 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                                                     >
-                                                        <Phone size={13} className="text-slate-300 group-hover:text-blue-400 transition-colors" />
+                                                        <Phone size={13} className="text-slate-300 dark:text-slate-700 group-hover:text-blue-400 transition-colors" />
                                                         {row.Telefono}
                                                     </a>
                                                 ) : (
-                                                    <span className="text-slate-300">{EMPTY}</span>
+                                                    <span className="text-slate-300 dark:text-slate-700">{EMPTY}</span>
                                                 )}
                                             </td>
-                                            <td className="px-5 py-3.5 text-slate-600">
+                                            <td className="px-5 py-3.5 text-slate-600 dark:text-slate-300">
                                                 {row.Correo ? (
                                                     <a
                                                         href={`mailto:${row.Correo}`}
-                                                        className="inline-flex items-center gap-1.5 hover:text-blue-600 transition-colors"
+                                                        className="inline-flex items-center gap-1.5 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                                                     >
-                                                        <Mail size={13} className="text-slate-300 group-hover:text-blue-400 transition-colors" />
+                                                        <Mail size={13} className="text-slate-300 dark:text-slate-700 group-hover:text-blue-400 transition-colors" />
                                                         {row.Correo}
                                                     </a>
                                                 ) : (
-                                                    <span className="text-slate-300">{EMPTY}</span>
+                                                    <span className="text-slate-300 dark:text-slate-700">{EMPTY}</span>
                                                 )}
                                             </td>
                                             <td className="px-5 py-3.5">
@@ -443,8 +443,8 @@ function ReportContent() {
                                                         className={cn(
                                                             'text-xs font-bold px-2.5 py-1 rounded-full border',
                                                             row.SucursalInferida === 1
-                                                                ? 'bg-slate-50 text-slate-500 border-slate-200 border-dashed'
-                                                                : 'bg-blue-50 text-blue-700 border-blue-100'
+                                                                ? 'bg-slate-50 dark:bg-slate-900 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 border-dashed'
+                                                                : 'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border-blue-100 dark:border-blue-900/60'
                                                         )}
                                                         title={
                                                             row.SucursalInferida === 1
@@ -455,10 +455,10 @@ function ReportContent() {
                                                         {row.Sucursal}
                                                     </span>
                                                 ) : (
-                                                    <span className="text-xs text-slate-300 italic">Sin asignar</span>
+                                                    <span className="text-xs text-slate-300 dark:text-slate-700 italic">Sin asignar</span>
                                                 )}
                                             </td>
-                                            <td className="px-5 py-3.5 text-center text-slate-600 text-xs tabular-nums">
+                                            <td className="px-5 py-3.5 text-center text-slate-600 dark:text-slate-300 text-xs tabular-nums">
                                                 {formatLongDate(row.FechaAlta)}
                                             </td>
                                             <td
@@ -470,9 +470,9 @@ function ReportContent() {
                                                 }
                                             >
                                                 {row.UltimaCompra ? (
-                                                    <span className="text-slate-600">{formatLongDate(row.UltimaCompra)}</span>
+                                                    <span className="text-slate-600 dark:text-slate-300">{formatLongDate(row.UltimaCompra)}</span>
                                                 ) : (
-                                                    <span className="text-slate-300">Sin compras</span>
+                                                    <span className="text-slate-300 dark:text-slate-700">Sin compras</span>
                                                 )}
                                             </td>
                                         </tr>
@@ -483,8 +483,8 @@ function ReportContent() {
                     </div>
 
                     {/* Nota metodológica */}
-                    <div className="flex items-start gap-2 px-5 py-3 border-t border-slate-100 bg-slate-50/60 text-[11px] text-slate-500 leading-relaxed">
-                        <Info size={13} className="text-slate-400 shrink-0 mt-0.5" />
+                    <div className="flex items-start gap-2 px-5 py-3 border-t border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/60 text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                        <Info size={13} className="text-slate-400 dark:text-slate-500 shrink-0 mt-0.5" />
                         <p>
                             La <strong>fecha de alta</strong> es la más antigua entre el registro del socio y su primera compra.
                             Las sucursales con <span className="font-semibold">borde punteado</span> se infieren de la última compra,
@@ -502,7 +502,7 @@ export default function ListaProfesoresPage() {
         <Suspense
             fallback={
                 <div className="flex items-center justify-center min-h-[400px]">
-                    <Loader2 className="animate-spin text-blue-600" size={40} />
+                    <Loader2 className="animate-spin text-blue-600 dark:text-blue-400" size={40} />
                 </div>
             }
         >

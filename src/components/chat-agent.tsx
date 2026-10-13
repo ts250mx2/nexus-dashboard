@@ -720,7 +720,7 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
                                     return (
                                         <div
                                             key={pp.id}
-                                            className="relative bg-gradient-to-br from-amber-50 to-white border border-amber-200 rounded-2xl p-4 shadow-sm"
+                                            className="relative bg-gradient-to-br from-amber-50 to-white dark:to-slate-900 border border-amber-200 rounded-2xl p-4 shadow-sm"
                                         >
                                             <div className={cn('absolute left-0 top-3 bottom-3 w-1 rounded-full', sevBar)} />
                                             <div className="pl-2 space-y-2">

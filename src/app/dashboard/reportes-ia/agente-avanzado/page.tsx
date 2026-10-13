@@ -35,10 +35,10 @@ const CONSOLE_PATH = "/dashboard/reportes-ia/agente-avanzado";
 const REPORTS_PATH = "/dashboard/reportes-ia/mis-reportes";
 
 const KIND_STYLE: Record<LogKind, string> = {
-    user: "text-sky-300", system: "text-slate-500", phase: "text-cyan-400", reasoning: "text-slate-300",
+    user: "text-sky-300", system: "text-slate-500 dark:text-slate-400", phase: "text-cyan-400", reasoning: "text-slate-300 dark:text-slate-700",
     question: "text-yellow-200 font-bold", "tool-call": "text-amber-300", sql: "text-emerald-400/80",
-    "tool-result": "text-slate-400", "report-proposed": "text-indigo-300 font-bold", "report-saved": "text-emerald-300 font-bold",
-    error: "text-red-400", done: "text-slate-500",
+    "tool-result": "text-slate-400 dark:text-slate-500", "report-proposed": "text-indigo-300 font-bold", "report-saved": "text-emerald-300 font-bold",
+    error: "text-red-400", done: "text-slate-500 dark:text-slate-400",
 };
 const PREFIX: Record<LogKind, string> = {
     user: "$ ", system: "· ", phase: "» ", reasoning: "  ", question: "? ", "tool-call": "▸ ", sql: "  ",
@@ -430,18 +430,18 @@ export default function AgenteAvanzadoPage() {
         return (
             <div className="flex flex-col items-center justify-center h-[calc(100vh-10rem)] bg-[#0a0e14] rounded-2xl text-[#d6deeb] font-mono gap-3">
                 <ThinkingIndicator label="Cargando el Agente Avanzado" />
-                <p className="text-[11px] text-slate-600">Preparando tus conversaciones…</p>
+                <p className="text-[11px] text-slate-600 dark:text-slate-300">Preparando tus conversaciones…</p>
             </div>
         );
     }
 
     return (
-        <div className={`flex flex-col bg-[#0a0e14] text-[#d6deeb] font-mono text-[13px] ${maximized ? "fixed inset-0 z-[60]" : "h-[calc(100vh-10rem)] rounded-2xl overflow-hidden border border-slate-800 shadow-lg"}`}>
+        <div className={`flex flex-col bg-[#0a0e14] text-[#d6deeb] font-mono text-[13px] ${maximized ? "fixed inset-0 z-[60]" : "h-[calc(100vh-10rem)] rounded-2xl overflow-hidden border border-slate-800 dark:border-slate-200 shadow-lg"}`}>
             {/* Pestañas de agentes */}
             <div className="flex items-center gap-1 px-2 pt-2 bg-[#0d1320] border-b border-white/10 shrink-0 overflow-x-auto">
                 {sessions.map((s) => (
                     <div key={s.id} onClick={() => setActiveId(s.id)}
-                        className={`group flex items-center gap-2 px-3 py-2 rounded-t-lg cursor-pointer whitespace-nowrap text-[12px] ${s.id === activeId ? "bg-[#0a0e14] text-emerald-300" : "bg-white/5 text-slate-400 hover:text-slate-200"}`}>
+                        className={`group flex items-center gap-2 px-3 py-2 rounded-t-lg cursor-pointer whitespace-nowrap text-[12px] ${s.id === activeId ? "bg-[#0a0e14] text-emerald-300" : "bg-white/5 dark:bg-slate-900/5 text-slate-400 dark:text-slate-500 hover:text-slate-200 dark:hover:text-slate-800"}`}>
                         {s.busy && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />}
                         <span>{s.title}</span>
                         {sessions.length > 1 && (
@@ -451,15 +451,15 @@ export default function AgenteAvanzadoPage() {
                         )}
                     </div>
                 ))}
-                <button onClick={addSession} className="px-2 py-2 text-slate-400 hover:text-emerald-300" title="Nuevo agente">
+                <button onClick={addSession} className="px-2 py-2 text-slate-400 dark:text-slate-500 hover:text-emerald-300" title="Nuevo agente">
                     <Plus className="w-4 h-4" />
                 </button>
                 <div className="flex-1" />
-                <button onClick={clearChat} title="Limpiar este chat" className="text-slate-400 hover:text-amber-300 text-[12px] px-2 self-center inline-flex items-center gap-1">
+                <button onClick={clearChat} title="Limpiar este chat" className="text-slate-400 dark:text-slate-500 hover:text-amber-300 text-[12px] px-2 self-center inline-flex items-center gap-1">
                     <Eraser className="w-3.5 h-3.5" /> Limpiar
                 </button>
                 <Link href={REPORTS_PATH} className="text-sky-400 hover:text-sky-300 text-[12px] px-3 self-center">Mis Reportes →</Link>
-                <button onClick={() => setMaximized((m) => !m)} title={maximized ? "Restaurar (Esc)" : "Maximizar"} className="text-slate-400 hover:text-emerald-300 px-2 self-center">
+                <button onClick={() => setMaximized((m) => !m)} title={maximized ? "Restaurar (Esc)" : "Maximizar"} className="text-slate-400 dark:text-slate-500 hover:text-emerald-300 px-2 self-center">
                     {maximized ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
                 </button>
             </div>
@@ -492,9 +492,9 @@ export default function AgenteAvanzadoPage() {
             <div className="border-t border-white/10 bg-[#0d1320] px-4 py-3 shrink-0">
                 {active.suggestions.length > 0 && !active.busy && (
                     <div className="flex flex-wrap gap-2 mb-2.5">
-                        <span className="text-[11px] text-slate-500 self-center select-none">Sugerencias:</span>
+                        <span className="text-[11px] text-slate-500 dark:text-slate-400 self-center select-none">Sugerencias:</span>
                         {active.suggestions.map((s, i) => (
-                            <button key={i} onClick={() => handleSend(s)} className="px-3 py-1.5 rounded-full text-[12px] bg-white/5 border border-white/15 text-sky-200 hover:bg-sky-500/15 hover:border-sky-400/50 transition-colors">{s}</button>
+                            <button key={i} onClick={() => handleSend(s)} className="px-3 py-1.5 rounded-full text-[12px] bg-white/5 dark:bg-slate-900/5 border border-white/15 text-sky-200 hover:bg-sky-500/15 hover:border-sky-400/50 transition-colors">{s}</button>
                         ))}
                     </div>
                 )}
@@ -512,8 +512,8 @@ export default function AgenteAvanzadoPage() {
                     <button onClick={() => handleSend()} disabled={active.busy || !active.input.trim()} className="px-4 py-1.5 rounded bg-emerald-500/90 hover:bg-emerald-400 text-[#0a0e14] font-bold disabled:opacity-40 disabled:cursor-not-allowed transition-colors">Enviar</button>
                 </div>
                 <div className="flex items-center justify-between gap-3 mt-1.5 flex-wrap">
-                    <p className="text-[11px] text-slate-600">Enter envía · Shift+Enter salto · pestañas persistentes</p>
-                    <label className="flex items-center gap-2 text-[11px] text-slate-500">
+                    <p className="text-[11px] text-slate-600 dark:text-slate-300">Enter envía · Shift+Enter salto · pestañas persistentes</p>
+                    <label className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400">
                         Conversación:
                         <select
                             value={convModel}
@@ -533,18 +533,18 @@ export default function AgenteAvanzadoPage() {
                     <div className="w-full max-w-lg bg-[#0d1320] border border-white/15 rounded-xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
                         <div className="px-5 py-4 border-b border-white/10">
                             <h3 className="text-indigo-300 font-bold tracking-wide">Crear reporte</h3>
-                            <p className="text-slate-500 text-[12px] mt-1">{active.proposal.description || "Confirma cómo llamarlo y con qué modelo generarlo."}</p>
+                            <p className="text-slate-500 dark:text-slate-400 text-[12px] mt-1">{active.proposal.description || "Confirma cómo llamarlo y con qué modelo generarlo."}</p>
                         </div>
                         <div className="p-5 space-y-4 overflow-auto">
                             {/* Resumen del reporte a crear */}
-                            <div className="bg-white/5 rounded-lg p-3 space-y-1.5">
-                                <div className="text-[11px] text-slate-500 uppercase tracking-wider">Resumen del reporte</div>
+                            <div className="bg-white/5 dark:bg-slate-900/5 rounded-lg p-3 space-y-1.5">
+                                <div className="text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Resumen del reporte</div>
                                 {Array.isArray(active.proposal.blocks) && active.proposal.blocks.length > 0 ? (
                                     <>
                                         <div className="text-[13px] text-[#d6deeb]">
                                             Tablero: <b className="text-indigo-300">{active.proposal.blocks.length} bloque(s)</b>
                                         </div>
-                                        <div className="text-[12px] text-slate-400">
+                                        <div className="text-[12px] text-slate-400 dark:text-slate-500">
                                             {active.proposal.blocks.map((b: any, i: number) => {
                                                 const label = b?.type === "kpis" ? "KPIs"
                                                     : b?.type === "table" ? "Tabla"
@@ -560,27 +560,27 @@ export default function AgenteAvanzadoPage() {
                                             Gráfica: <b className="text-indigo-300">{VIZ_LABELS[active.proposal.visualization || "table"] || active.proposal.visualization}</b>
                                         </div>
                                         {Array.isArray(active.proposal.expectedColumns) && active.proposal.expectedColumns.length > 0 && (
-                                            <div className="text-[12px] text-slate-400">Columnas: {active.proposal.expectedColumns.map((c: any) => c.label || c.key).join(", ")}</div>
+                                            <div className="text-[12px] text-slate-400 dark:text-slate-500">Columnas: {active.proposal.expectedColumns.map((c: any) => c.label || c.key).join(", ")}</div>
                                         )}
                                     </>
                                 )}
-                                <div className="text-[12px] text-slate-400">
+                                <div className="text-[12px] text-slate-400 dark:text-slate-500">
                                     Filtros: {Array.isArray(active.proposal.params) && active.proposal.params.length
                                         ? active.proposal.params.map((p: any) => `${p.label} (${PARAM_KIND_LABELS[p.kind] || p.kind})`).join(" · ")
                                         : "ninguno"}
                                 </div>
                                 {Array.isArray(active.proposal.insights) && active.proposal.insights.length > 0 && (
-                                    <div className="text-[12px] text-slate-400">Incluye {active.proposal.insights.length} hallazgo(s) y {active.proposal.recommendations?.length || 0} recomendación(es).</div>
+                                    <div className="text-[12px] text-slate-400 dark:text-slate-500">Incluye {active.proposal.insights.length} hallazgo(s) y {active.proposal.recommendations?.length || 0} recomendación(es).</div>
                                 )}
                             </div>
 
                             <label className="block">
-                                <span className="text-[11px] text-slate-500 uppercase tracking-wider">Nombre del reporte</span>
+                                <span className="text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Nombre del reporte</span>
                                 <input value={buildName} onChange={(e) => setBuildName(e.target.value)} placeholder={active.proposal.title || "Nombre"}
                                     className="mt-1 w-full bg-[#0a0e14] border border-white/15 rounded-lg px-3 py-2 text-[#d6deeb] outline-none focus:border-indigo-400" />
                             </label>
                             <label className="block">
-                                <span className="text-[11px] text-slate-500 uppercase tracking-wider">Modelo a usar</span>
+                                <span className="text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Modelo a usar</span>
                                 <select value={buildModel} onChange={(e) => setBuildModel(e.target.value)}
                                     className="mt-1 w-full bg-[#0a0e14] border border-white/15 rounded-lg px-3 py-2 text-[#d6deeb] outline-none focus:border-indigo-400 cursor-pointer">
                                     {models.length === 0 && <option value="">(cargando…)</option>}
@@ -594,11 +594,11 @@ export default function AgenteAvanzadoPage() {
                             )}
                             {/* Agregar más parámetros / filtros (re-propone con el agente) */}
                             <div className="border-t border-white/10 pt-3 space-y-2">
-                                <div className="text-[11px] text-slate-500 uppercase tracking-wider">¿Agregar más filtros o parámetros?</div>
+                                <div className="text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">¿Agregar más filtros o parámetros?</div>
                                 <div className="flex flex-wrap gap-1.5">
                                     {QUICK_PARAMS.map((q) => (
                                         <button key={q} onClick={() => refineProposal(q)} disabled={building}
-                                            className="px-2.5 py-1 rounded-full text-[11px] bg-white/5 border border-white/15 text-sky-200 hover:bg-sky-500/15 hover:border-sky-400/50 disabled:opacity-50 transition-colors">
+                                            className="px-2.5 py-1 rounded-full text-[11px] bg-white/5 dark:bg-slate-900/5 border border-white/15 text-sky-200 hover:bg-sky-500/15 hover:border-sky-400/50 disabled:opacity-50 transition-colors">
                                             + {q}
                                         </button>
                                     ))}
@@ -612,17 +612,17 @@ export default function AgenteAvanzadoPage() {
                                         className="flex-1 bg-[#0a0e14] border border-white/15 rounded-lg px-3 py-2 text-[#d6deeb] outline-none focus:border-indigo-400 text-[13px] placeholder:text-slate-600"
                                     />
                                     <button onClick={() => refineProposal(refineText)} disabled={building || !refineText.trim()}
-                                        className="px-3 py-2 rounded-lg bg-white/10 hover:bg-white/15 text-slate-200 text-sm disabled:opacity-50 transition-colors">
+                                        className="px-3 py-2 rounded-lg bg-white/10 dark:bg-slate-900/10 hover:bg-white/15 dark:hover:bg-slate-900/15 text-slate-200 dark:text-slate-800 text-sm disabled:opacity-50 transition-colors">
                                         Ajustar
                                     </button>
                                 </div>
-                                <p className="text-[10px] text-slate-600">Ajustar reabre la conversación para rehacer la propuesta con el cambio.</p>
+                                <p className="text-[10px] text-slate-600 dark:text-slate-300">Ajustar reabre la conversación para rehacer la propuesta con el cambio.</p>
                             </div>
 
                             {buildError && <div className="bg-red-500/10 border border-red-500/30 text-red-300 rounded-lg p-3 text-sm">{buildError}</div>}
                         </div>
                         <div className="px-5 py-4 flex justify-end gap-2 border-t border-white/10 flex-wrap">
-                            <button onClick={() => updateSession(active.id, (s) => ({ ...s, proposal: null }))} disabled={building} className="px-4 py-2 rounded text-slate-300 hover:bg-white/5 transition-colors disabled:opacity-50">Cancelar</button>
+                            <button onClick={() => updateSession(active.id, (s) => ({ ...s, proposal: null }))} disabled={building} className="px-4 py-2 rounded text-slate-300 dark:text-slate-700 hover:bg-white/5 dark:hover:bg-slate-900/5 transition-colors disabled:opacity-50">Cancelar</button>
                             <button onClick={() => buildReport()} disabled={building || !buildName.trim()} className="px-4 py-2 rounded bg-indigo-500 hover:bg-indigo-400 text-white font-bold transition-colors disabled:opacity-50">{building ? "Creando…" : "Crear reporte"}</button>
                         </div>
                     </div>
