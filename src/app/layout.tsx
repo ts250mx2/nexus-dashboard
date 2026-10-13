@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { SCRIPT_TEMA_INICIAL } from "@/lib/tema";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,7 +24,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    // suppressHydrationWarning: el script de abajo le agrega la clase `dark` al
+    // <html> antes de que React hidrate, así que el marcado del servidor y el
+    // del cliente difieren a propósito en ese atributo.
+    <html lang="es" suppressHydrationWarning>
+      <head>
+        {/* Antes del primer pintado, para que no haya un destello blanco. */}
+        <script dangerouslySetInnerHTML={{ __html: SCRIPT_TEMA_INICIAL }} />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

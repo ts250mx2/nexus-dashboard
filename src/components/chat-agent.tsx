@@ -641,7 +641,7 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
             {!isEmbedded && !isOpen && (
                 <button
                     onClick={() => setIsOpen(true)}
-                    className="group relative flex items-center justify-center w-16 h-16 bg-white border border-slate-200 text-blue-600 rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 animate-in zoom-in"
+                    className="group relative flex items-center justify-center w-16 h-16 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-blue-600 rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 animate-in zoom-in"
                 >
                     <div className="absolute inset-0 bg-blue-600 rounded-full animate-ping opacity-10 pointer-events-none" />
                     <img src="/nexus-ai-logo.png" alt="Nexus AI" className="w-10 h-10 group-hover:rotate-12 transition-transform" />
@@ -651,22 +651,22 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
 
             {isOpen && (
                 <div className={cn(
-                    'bg-slate-50 flex flex-col overflow-hidden',
+                    'bg-slate-50 dark:bg-slate-900 flex flex-col overflow-hidden',
                     isEmbedded
                         ? 'w-full h-full'
-                        : 'border border-slate-200 shadow-2xl mb-4 transition-all duration-300 ease-in-out w-[380px] md:w-[850px] h-[500px] md:h-[85vh] rounded-[32px]'
+                        : 'border border-slate-200 dark:border-slate-700 shadow-2xl mb-4 transition-all duration-300 ease-in-out w-[380px] md:w-[850px] h-[500px] md:h-[85vh] rounded-[32px]'
                 )}>
                     {/* Header */}
-                    <div className="p-5 bg-white border-b border-slate-100 flex items-center justify-between">
+                    <div className="p-5 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
                         <div className="flex items-center space-x-4">
-                            <div className="w-12 h-12 bg-white border border-slate-100 rounded-2xl shadow-sm flex items-center justify-center overflow-hidden">
+                            <div className="w-12 h-12 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl shadow-sm flex items-center justify-center overflow-hidden">
                                 <img src="/nexus-ai-logo.png" alt="Nexus AI" className="w-8 h-8 pointer-events-none select-none" />
                             </div>
                             <div>
-                                <h3 className="font-black text-slate-900 tracking-tight leading-none uppercase text-xs">Agente Nexus IA</h3>
+                                <h3 className="font-black text-slate-900 dark:text-slate-50 tracking-tight leading-none uppercase text-xs">Agente Nexus IA</h3>
                                 <div className="flex items-center space-x-1.5 mt-1">
                                     <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
                                         {iaActiva ? `En línea (${iaActiva.modelo})` : 'En línea'}
                                     </span>
                                 </div>
@@ -679,7 +679,7 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
                                 onNew={startNewConversation}
                                 refreshKey={conversationsRefreshKey}
                             />
-                            <button onClick={handleClear} className="p-2 hover:bg-slate-100 rounded-xl transition-colors text-slate-400" title="Nueva conversación">
+                            <button onClick={handleClear} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors text-slate-400 dark:text-slate-500" title="Nueva conversación">
                                 <Trash2 className="w-5 h-5" />
                             </button>
                             {!isEmbedded && (
@@ -689,12 +689,12 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
                                             setIsOpen(false);
                                             router.push('/dashboard/reports/ai-agent');
                                         }}
-                                        className="p-2 hover:bg-slate-100 rounded-xl transition-colors text-slate-400"
+                                        className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors text-slate-400 dark:text-slate-500"
                                         title="Abrir en pantalla completa"
                                     >
                                         <Maximize2 className="w-5 h-5" />
                                     </button>
-                                    <button onClick={() => setIsOpen(false)} className="p-2 hover:bg-slate-100 rounded-xl transition-colors text-slate-400">
+                                    <button onClick={() => setIsOpen(false)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors text-slate-400 dark:text-slate-500">
                                         <X className="w-6 h-6" />
                                     </button>
                                 </>
@@ -724,9 +724,9 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
                                         >
                                             <div className={cn('absolute left-0 top-3 bottom-3 w-1 rounded-full', sevBar)} />
                                             <div className="pl-2 space-y-2">
-                                                <p className="text-sm font-bold text-slate-800 leading-snug">{pp.message}</p>
+                                                <p className="text-sm font-bold text-slate-800 dark:text-slate-100 leading-snug">{pp.message}</p>
                                                 {pp.context && (
-                                                    <p className="text-[11px] text-slate-600 leading-snug">{pp.context}</p>
+                                                    <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-snug">{pp.context}</p>
                                                 )}
                                                 <div className="flex gap-2 pt-1">
                                                     <button
@@ -734,13 +734,13 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
                                                             resolveProactivePrompt(pp.id, 'accepted');
                                                             handleSend(pp.suggestedAction);
                                                         }}
-                                                        className="flex-1 px-3 py-1.5 bg-slate-900 hover:bg-blue-600 text-white rounded-full text-[11px] font-bold transition-colors active:scale-95"
+                                                        className="flex-1 px-3 py-1.5 bg-slate-900 dark:bg-slate-800 hover:bg-blue-600 text-white rounded-full text-[11px] font-bold transition-colors active:scale-95"
                                                     >
                                                         Investigar
                                                     </button>
                                                     <button
                                                         onClick={() => resolveProactivePrompt(pp.id, 'dismissed')}
-                                                        className="px-3 py-1.5 bg-white hover:bg-slate-100 border border-slate-200 text-slate-500 rounded-full text-[11px] font-bold transition-colors active:scale-95"
+                                                        className="px-3 py-1.5 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 rounded-full text-[11px] font-bold transition-colors active:scale-95"
                                                     >
                                                         Descartar
                                                     </button>
@@ -756,30 +756,30 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
                             <div className="flex flex-col h-full animate-in fade-in slide-in-from-bottom-4 duration-700">
                                 {/* Briefing */}
                                 {briefing ? (
-                                    <div className="bg-white rounded-[28px] border border-slate-100 shadow-sm overflow-hidden mb-6">
+                                    <div className="bg-white dark:bg-slate-900 rounded-[28px] border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden mb-6">
                                         <div className="px-6 pt-5 pb-2 flex items-center gap-2">
                                             <Sparkles className="w-4 h-4 text-blue-500" />
                                             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600">Briefing del día</span>
-                                            <span className="ml-auto text-[10px] text-slate-400 font-medium">
+                                            <span className="ml-auto text-[10px] text-slate-400 dark:text-slate-500 font-medium">
                                                 {new Date().toLocaleDateString('es-MX', { day: 'numeric', month: 'long' })}
                                             </span>
                                         </div>
                                         <div className="px-6 pb-6">
                                             <InlineMarkdown
                                                 text={briefing}
-                                                className="text-[15px] leading-relaxed text-slate-700 font-medium"
+                                                className="text-[15px] leading-relaxed text-slate-700 dark:text-slate-200 font-medium"
                                             />
                                         </div>
                                     </div>
                                 ) : (
                                     <div className="flex flex-col items-center text-center mb-6 py-6">
-                                        <div className="p-6 bg-white rounded-[32px] shadow-sm border border-slate-100 mb-4">
+                                        <div className="p-6 bg-white dark:bg-slate-900 rounded-[32px] shadow-sm border border-slate-100 dark:border-slate-800 mb-4">
                                             <img src="/nexus-ai-logo.png" alt="Nexus" className={cn('w-12 h-12 object-contain', loadingInsights && 'animate-pulse')} />
                                         </div>
-                                        <h2 className="text-2xl font-black tracking-tight text-slate-900">
+                                        <h2 className="text-2xl font-black tracking-tight text-slate-900 dark:text-slate-50">
                                             {loadingInsights ? 'Preparando briefing...' : '¿Qué analizamos hoy?'}
                                         </h2>
-                                        <p className="text-slate-500 max-w-sm font-medium mt-2 text-sm">
+                                        <p className="text-slate-500 dark:text-slate-400 max-w-sm font-medium mt-2 text-sm">
                                             {loadingInsights
                                                 ? 'Analizando los datos del día para tu resumen ejecutivo'
                                                 : 'Estoy listo para explorar tus datos de ventas, sucursales, margen y operación.'}
@@ -791,13 +791,13 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
                                 {dailyInsights.length > 0 && (
                                     <div className="space-y-3">
                                         <div className="flex items-center justify-between px-2">
-                                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">
                                                 Hallazgos del día · {dailyInsights.length}
                                             </span>
                                             <button
                                                 onClick={() => fetchDailyInsights(true)}
                                                 disabled={loadingInsights}
-                                                className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 hover:text-blue-600 transition-colors disabled:opacity-50"
+                                                className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 dark:text-slate-400 hover:text-blue-600 transition-colors disabled:opacity-50"
                                                 title="Actualizar hallazgos"
                                             >
                                                 <RefreshCw className={cn('w-3 h-3', loadingInsights && 'animate-spin')} />
@@ -812,7 +812,7 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
                                                     <button
                                                         key={insight.id || i}
                                                         onClick={() => handleSend(insight.question)}
-                                                        className="group relative flex items-start gap-3 p-4 text-left bg-white border border-slate-100 rounded-2xl hover:border-blue-300 hover:shadow-md transition-all animate-in fade-in slide-in-from-left-2 duration-300"
+                                                        className="group relative flex items-start gap-3 p-4 text-left bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl hover:border-blue-300 hover:shadow-md transition-all animate-in fade-in slide-in-from-left-2 duration-300"
                                                         style={{ animationDelay: `${i * 50}ms` }}
                                                     >
                                                         <div className={cn('absolute left-0 top-3 bottom-3 w-1 rounded-full', sev.bar)} />
@@ -824,20 +824,20 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
                                                                 insight.severity === 'info' && 'text-blue-400'
                                                             )} />
                                                             <div className="flex-1 min-w-0">
-                                                                <p className="text-sm font-bold text-slate-800 group-hover:text-blue-700 leading-snug">
+                                                                <p className="text-sm font-bold text-slate-800 dark:text-slate-100 group-hover:text-blue-700 leading-snug">
                                                                     {insight.question}
                                                                 </p>
                                                                 {insight.summary && (
-                                                                    <p className="text-[11px] text-slate-500 mt-1 leading-snug line-clamp-2">
+                                                                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-snug line-clamp-2">
                                                                         {insight.summary}
                                                                     </p>
                                                                 )}
                                                                 <div className="flex items-center gap-2 mt-2">
-                                                                    <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400">
+                                                                    <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                                                                         {insight.area}
                                                                     </span>
-                                                                    <span className="text-[9px] text-slate-300">·</span>
-                                                                    <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400">
+                                                                    <span className="text-[9px] text-slate-300 dark:text-slate-600">·</span>
+                                                                    <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                                                                         {sev.label}
                                                                     </span>
                                                                 </div>
@@ -853,7 +853,7 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
                                 {/* Default suggestions si no hay insights */}
                                 {dailyInsights.length === 0 && !loadingInsights && defaultSuggestions.length > 0 && (
                                     <div className="space-y-3">
-                                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 px-2">
+                                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 px-2">
                                             Para empezar
                                         </span>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -861,9 +861,9 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
                                                 <button
                                                     key={i}
                                                     onClick={() => handleSend(s)}
-                                                    className="p-4 text-left bg-white border border-slate-100 rounded-2xl hover:border-blue-300 hover:shadow-md transition-all"
+                                                    className="p-4 text-left bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl hover:border-blue-300 hover:shadow-md transition-all"
                                                 >
-                                                    <p className="text-sm font-bold text-slate-700 leading-snug">{s}</p>
+                                                    <p className="text-sm font-bold text-slate-700 dark:text-slate-200 leading-snug">{s}</p>
                                                 </button>
                                             ))}
                                         </div>
@@ -877,8 +877,8 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
                                 <div className={cn(
                                     'max-w-[90%] rounded-[32px] overflow-hidden shadow-sm',
                                     message.role === 'user'
-                                        ? 'bg-slate-900 text-white rounded-tr-none px-6 py-4'
-                                        : 'bg-white border border-slate-200 rounded-tl-none w-full md:w-auto'
+                                        ? 'bg-slate-900 dark:bg-slate-800 text-white rounded-tr-none px-6 py-4'
+                                        : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-tl-none w-full md:w-auto'
                                 )}>
                                     {message.role === 'assistant' ? (
                                         <div className="flex flex-col">
@@ -886,7 +886,7 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
                                                 {/* Indicador de fase streaming */}
                                                 {message.streaming && message.streamPhase && !message.content && (
                                                     <div className="flex flex-col gap-1 animate-in fade-in duration-200">
-                                                        <div className="flex items-center gap-2 text-slate-500">
+                                                        <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
                                                             <div className="flex space-x-1">
                                                                 <div className={cn(
                                                                     'w-1.5 h-1.5 rounded-full animate-bounce [animation-delay:-0.3s]',
@@ -911,13 +911,13 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
                                                                 'text-[11px] font-bold uppercase tracking-[0.15em]',
                                                                 message.streamPhase === 'investigating' ? 'text-amber-600'
                                                                     : message.streamPhase === 'reasoning-causal' ? 'text-purple-600'
-                                                                    : 'text-slate-400'
+                                                                    : 'text-slate-400 dark:text-slate-500'
                                                             )}>
                                                                 {STREAM_PHASE_LABELS[message.streamPhase]}
                                                             </span>
                                                         </div>
                                                         {message.streamPhaseDetail && (
-                                                            <p className="text-[12px] text-slate-500 italic pl-5 mt-1 leading-snug">
+                                                            <p className="text-[12px] text-slate-500 dark:text-slate-400 italic pl-5 mt-1 leading-snug">
                                                                 {message.streamPhaseDetail}
                                                             </p>
                                                         )}
@@ -927,7 +927,7 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
                                                 {/* Modelo */}
                                                 {message.ai_model && (
                                                     <div className="flex items-center justify-end mb-2">
-                                                        <span className="px-2 py-0.5 bg-slate-100 border border-slate-200 rounded-md text-[9px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                                                        <span className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1">
                                                             <Sparkles className="w-2.5 h-2.5 text-blue-400" />
                                                             {message.ai_model}
                                                         </span>
@@ -939,7 +939,7 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
                                                     <div className="relative">
                                                         <InlineMarkdown
                                                             text={message.content}
-                                                            className="text-[15px] leading-relaxed text-slate-700"
+                                                            className="text-[15px] leading-relaxed text-slate-700 dark:text-slate-200"
                                                             onCite={
                                                                 message.results && message.results.length > 0
                                                                     ? () => {
@@ -993,9 +993,9 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
                                                             {message.results && message.results.length > 0 && !(message.results.length === 1 && Object.keys(message.results[0]).length === 1) && (
                                                                 <button
                                                                     onClick={() => toggleData(index)}
-                                                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold rounded-full transition-all border bg-white border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50 active:scale-95"
+                                                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold rounded-full transition-all border bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-900 active:scale-95"
                                                                 >
-                                                                    <BarChart3 className="w-3.5 h-3.5 text-slate-500" />
+                                                                    <BarChart3 className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
                                                                     <span>{expandedData[index] ? 'Ocultar datos' : 'Ver datos'}</span>
                                                                     {expandedData[index] ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
                                                                 </button>
@@ -1003,7 +1003,7 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
                                                             {message.forecast && (
                                                                 <button
                                                                     onClick={() => toggleForecast(index)}
-                                                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold rounded-full transition-all border bg-white border-blue-200 text-blue-700 hover:bg-blue-50 active:scale-95"
+                                                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold rounded-full transition-all border bg-white dark:bg-slate-900 border-blue-200 text-blue-700 hover:bg-blue-50 active:scale-95"
                                                                 >
                                                                     <LineChart className="w-3.5 h-3.5" />
                                                                     <span>Proyección</span>
@@ -1013,7 +1013,7 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
                                                             {message.key_insights && message.key_insights.length > 0 && (
                                                                 <button
                                                                     onClick={() => toggleInsights(index)}
-                                                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold rounded-full transition-all border bg-white border-blue-200 text-blue-700 hover:bg-blue-50 active:scale-95"
+                                                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold rounded-full transition-all border bg-white dark:bg-slate-900 border-blue-200 text-blue-700 hover:bg-blue-50 active:scale-95"
                                                                 >
                                                                     <Lightbulb className="w-3.5 h-3.5" />
                                                                     <span>Hallazgos</span>
@@ -1026,7 +1026,7 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
                                                             {message.recommendations && message.recommendations.length > 0 && (
                                                                 <button
                                                                     onClick={() => toggleRecommendations(index)}
-                                                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold rounded-full transition-all border bg-white border-emerald-200 text-emerald-700 hover:bg-emerald-50 active:scale-95"
+                                                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold rounded-full transition-all border bg-white dark:bg-slate-900 border-emerald-200 text-emerald-700 hover:bg-emerald-50 active:scale-95"
                                                                 >
                                                                     <Target className="w-3.5 h-3.5" />
                                                                     <span>Acciones</span>
@@ -1060,7 +1060,7 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
                                                         <div className="absolute left-0 top-3 bottom-3 w-1 bg-blue-500 rounded-full" />
                                                         <ul className="space-y-2 pl-2">
                                                             {message.key_insights.map((insight, idx) => (
-                                                                <li key={idx} className="text-[13px] text-slate-700 leading-snug flex items-start">
+                                                                <li key={idx} className="text-[13px] text-slate-700 dark:text-slate-200 leading-snug flex items-start">
                                                                     <span className="inline-block w-1 h-1 bg-blue-500 rounded-full mr-2.5 mt-2 flex-shrink-0" />
                                                                     <InlineMarkdown text={insight} className="flex-1" />
                                                                 </li>
@@ -1075,7 +1075,7 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
                                                         <div className="absolute left-0 top-3 bottom-3 w-1 bg-emerald-500 rounded-full" />
                                                         <ul className="space-y-2 pl-2">
                                                             {message.recommendations.map((rec, idx) => (
-                                                                <li key={idx} className="text-[13px] text-slate-700 leading-snug flex items-start">
+                                                                <li key={idx} className="text-[13px] text-slate-700 dark:text-slate-200 leading-snug flex items-start">
                                                                     <span className="inline-block w-1 h-1 bg-emerald-500 rounded-full mr-2.5 mt-2 flex-shrink-0" />
                                                                     <InlineMarkdown text={rec} className="flex-1" />
                                                                 </li>
@@ -1095,11 +1095,11 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
                                                                     Proyección · Confianza {message.forecast.confidence} · R²={message.forecast.r2.toFixed(2)}
                                                                 </span>
                                                             </div>
-                                                            <p className="text-[12px] text-slate-600 leading-snug">{message.forecast.summary}</p>
+                                                            <p className="text-[12px] text-slate-600 dark:text-slate-300 leading-snug">{message.forecast.summary}</p>
                                                             <div className="overflow-x-auto">
                                                                 <table className="text-[11px] w-full">
                                                                     <thead>
-                                                                        <tr className="text-slate-400 border-b border-blue-100">
+                                                                        <tr className="text-slate-400 dark:text-slate-500 border-b border-blue-100">
                                                                             <th className="text-left py-1 font-bold">Fecha</th>
                                                                             <th className="text-right py-1 font-bold">Estimado</th>
                                                                             <th className="text-right py-1 font-bold">Rango</th>
@@ -1108,9 +1108,9 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
                                                                     <tbody>
                                                                         {message.forecast.forecast.slice(0, 14).map((p, i) => (
                                                                             <tr key={i} className="border-b border-blue-50 last:border-0">
-                                                                                <td className="py-1 text-slate-600">{p.date}</td>
-                                                                                <td className="py-1 text-right font-bold text-slate-900">{p.pointEstimate.toLocaleString('es-MX')}</td>
-                                                                                <td className="py-1 text-right text-slate-500">{p.lowerBound.toLocaleString('es-MX')}–{p.upperBound.toLocaleString('es-MX')}</td>
+                                                                                <td className="py-1 text-slate-600 dark:text-slate-300">{p.date}</td>
+                                                                                <td className="py-1 text-right font-bold text-slate-900 dark:text-slate-50">{p.pointEstimate.toLocaleString('es-MX')}</td>
+                                                                                <td className="py-1 text-right text-slate-500 dark:text-slate-400">{p.lowerBound.toLocaleString('es-MX')}–{p.upperBound.toLocaleString('es-MX')}</td>
                                                                             </tr>
                                                                         ))}
                                                                     </tbody>
@@ -1130,7 +1130,7 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
                                                                 'p-1.5 rounded-full transition-colors',
                                                                 message.feedback === 'up'
                                                                     ? 'bg-emerald-100 text-emerald-700'
-                                                                    : 'text-slate-400 hover:bg-slate-100 hover:text-emerald-600'
+                                                                    : 'text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-emerald-600'
                                                             )}
                                                             title="Buena respuesta"
                                                         >
@@ -1143,14 +1143,14 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
                                                                 'p-1.5 rounded-full transition-colors',
                                                                 message.feedback === 'down'
                                                                     ? 'bg-rose-100 text-rose-700'
-                                                                    : 'text-slate-400 hover:bg-slate-100 hover:text-rose-600'
+                                                                    : 'text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-rose-600'
                                                             )}
                                                             title="Necesita mejorar"
                                                         >
                                                             <ThumbsDown className="w-3.5 h-3.5" />
                                                         </button>
                                                         {message.feedback && (
-                                                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider ml-1">
+                                                            <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider ml-1">
                                                                 Gracias
                                                             </span>
                                                         )}
@@ -1161,10 +1161,10 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
                                             {/* Footer: reportes sugeridos + preguntas */}
                                             {((message.suggested_reports && message.suggested_reports.length > 0) ||
                                                 (message.suggestedQuestions && message.suggestedQuestions.length > 0)) && (
-                                                    <div className="bg-slate-50/50 border-t border-slate-100 px-6 py-4 space-y-4">
+                                                    <div className="bg-slate-50/50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-800 px-6 py-4 space-y-4">
                                                         {message.suggested_reports && message.suggested_reports.length > 0 && (
                                                             <div className="space-y-2">
-                                                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                                                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">
                                                                     Reportes relacionados
                                                                 </span>
                                                                 <div className="flex flex-wrap gap-2">
@@ -1173,7 +1173,7 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
                                                                             key={idx}
                                                                             onClick={() => navigateToReport(report.path)}
                                                                             disabled={!report.path}
-                                                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold rounded-full transition-all border bg-white border-slate-200 text-slate-700 hover:border-blue-300 hover:text-blue-700 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+                                                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold rounded-full transition-all border bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-blue-300 hover:text-blue-700 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
                                                                             title={report.reason}
                                                                         >
                                                                             <span>{report.report_name}</span>
@@ -1186,7 +1186,7 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
 
                                                         {message.suggestedQuestions && message.suggestedQuestions.length > 0 && (
                                                             <div className="space-y-2">
-                                                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                                                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">
                                                                     Continuar
                                                                 </span>
                                                                 <div className="flex flex-wrap gap-2">
@@ -1194,7 +1194,7 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
                                                                         <button
                                                                             key={i}
                                                                             onClick={() => handleSend(q)}
-                                                                            className="px-3 py-1.5 text-[11px] font-bold text-slate-700 bg-white hover:bg-slate-900 hover:text-white rounded-full transition-all border border-slate-200 hover:border-slate-900 active:scale-95"
+                                                                            className="px-3 py-1.5 text-[11px] font-bold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-900 hover:bg-slate-900 dark:hover:bg-slate-800 hover:text-white rounded-full transition-all border border-slate-200 dark:border-slate-700 hover:border-slate-900 active:scale-95"
                                                                         >
                                                                             {q}
                                                                         </button>
@@ -1209,7 +1209,7 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
                                         <p className="text-[16px] font-bold leading-relaxed whitespace-pre-wrap">{message.content}</p>
                                     )}
                                 </div>
-                                <span className="text-[10px] font-bold text-slate-400 mt-2 px-2 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
+                                <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 mt-2 px-2 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
                                     {new Date(message.timestamp || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                 </span>
                             </div>
@@ -1217,13 +1217,13 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
 
                         {loading && !messages.some(m => m.streaming) && (
                             <div className="flex items-start space-x-3 animate-in fade-in duration-300">
-                                <div className="p-4 bg-white border border-slate-200 rounded-[24px] rounded-tl-none shadow-xl flex items-center space-x-4">
+                                <div className="p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-[24px] rounded-tl-none shadow-xl flex items-center space-x-4">
                                     <div className="flex space-x-1">
                                         <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce [animation-delay:-0.3s]" />
                                         <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce [animation-delay:-0.15s]" />
                                         <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" />
                                     </div>
-                                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Analizando datos...</span>
+                                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Analizando datos...</span>
                                 </div>
                             </div>
                         )}
@@ -1231,9 +1231,9 @@ export function ChatAgent({ mode = 'floating' }: ChatAgentProps = {}) {
                     </div>
 
                     {/* Input */}
-                    <div className="p-6 bg-white border-t border-slate-100 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.05)]">
+                    <div className="p-6 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.05)]">
                         <ChatInput onSend={handleSend} isLoading={loading} />
-                        <p className="text-[9px] text-center text-slate-400 mt-4 uppercase tracking-[0.3em] font-bold">Powered by Nexus Engine Analytics</p>
+                        <p className="text-[9px] text-center text-slate-400 dark:text-slate-500 mt-4 uppercase tracking-[0.3em] font-bold">Powered by Nexus Engine Analytics</p>
                     </div>
                 </div>
             )}

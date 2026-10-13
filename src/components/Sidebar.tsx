@@ -49,77 +49,77 @@ type SidebarItem = {
 };
 
 const sidebarItems: SidebarItem[] = [
-    { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, color: 'text-blue-900' },
-    { name: 'Agente IA', href: '/dashboard/reports/ai-agent', icon: Bot, color: 'text-blue-900' },
+    { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, color: 'text-blue-900 dark:text-blue-400' },
+    { name: 'Agente IA', href: '/dashboard/reports/ai-agent', icon: Bot, color: 'text-blue-900 dark:text-blue-400' },
     {
         name: 'Ventas',
         icon: ShoppingBag,
-        color: 'text-blue-900',
+        color: 'text-blue-900 dark:text-blue-400',
         subItems: [
-            { name: 'Tendencias de Venta', href: '/dashboard/ventas/tendencias', icon: TrendingUp, color: 'text-blue-900' },
-            { name: 'Mapa de Calor', href: '/dashboard/ventas/mapadecalor', icon: Flame, color: 'text-blue-900' },
-            { name: 'Categorías Global', href: '/dashboard/ventas/categorias-global', icon: LayoutGrid, color: 'text-blue-900' },
-            { name: 'Operaciones', href: '/dashboard/ventas/operaciones', icon: LayoutGrid, color: 'text-blue-900' },
-            { name: 'Reporte Ventas', href: '/dashboard/reportes/ventas', icon: FileText, color: 'text-blue-900' },
-            { name: 'Profesores Global', href: '/dashboard/ventas/profesores-global', icon: Users, color: 'text-blue-900' },
-            { name: 'Productos Global', href: '/dashboard/ventas/productos-global', icon: Package, color: 'text-blue-900' },
-            { name: 'Profesores', href: '/dashboard/reportes/profesores', icon: FileText, color: 'text-blue-900' },
-            { name: 'Lista de Profesores', href: '/dashboard/ventas/lista-profesores', icon: ContactRound, color: 'text-blue-900' },
-            { name: 'Profesores Última Venta', href: '/dashboard/ventas/profesores-ultima-venta', icon: UserX, color: 'text-blue-900' },
-            { name: 'Comparativo Profesores', href: '/dashboard/ventas/comparativo-profesores', icon: BarChart3, color: 'text-blue-900' },
-            { name: 'Ventas por Usuario', href: '/dashboard/ventas/ventas-por-usuario', icon: UserRound, color: 'text-blue-900' },
-            { name: 'Margen & Rentabilidad', href: '/dashboard/reportes/margen', icon: DollarSign, color: 'text-blue-900' },
-            { name: 'Retiros', href: '/dashboard/ventas/retiros', icon: DollarSign, color: 'text-blue-900' }
+            { name: 'Tendencias de Venta', href: '/dashboard/ventas/tendencias', icon: TrendingUp, color: 'text-blue-900 dark:text-blue-400' },
+            { name: 'Mapa de Calor', href: '/dashboard/ventas/mapadecalor', icon: Flame, color: 'text-blue-900 dark:text-blue-400' },
+            { name: 'Categorías Global', href: '/dashboard/ventas/categorias-global', icon: LayoutGrid, color: 'text-blue-900 dark:text-blue-400' },
+            { name: 'Operaciones', href: '/dashboard/ventas/operaciones', icon: LayoutGrid, color: 'text-blue-900 dark:text-blue-400' },
+            { name: 'Reporte Ventas', href: '/dashboard/reportes/ventas', icon: FileText, color: 'text-blue-900 dark:text-blue-400' },
+            { name: 'Profesores Global', href: '/dashboard/ventas/profesores-global', icon: Users, color: 'text-blue-900 dark:text-blue-400' },
+            { name: 'Productos Global', href: '/dashboard/ventas/productos-global', icon: Package, color: 'text-blue-900 dark:text-blue-400' },
+            { name: 'Profesores', href: '/dashboard/reportes/profesores', icon: FileText, color: 'text-blue-900 dark:text-blue-400' },
+            { name: 'Lista de Profesores', href: '/dashboard/ventas/lista-profesores', icon: ContactRound, color: 'text-blue-900 dark:text-blue-400' },
+            { name: 'Profesores Última Venta', href: '/dashboard/ventas/profesores-ultima-venta', icon: UserX, color: 'text-blue-900 dark:text-blue-400' },
+            { name: 'Comparativo Profesores', href: '/dashboard/ventas/comparativo-profesores', icon: BarChart3, color: 'text-blue-900 dark:text-blue-400' },
+            { name: 'Ventas por Usuario', href: '/dashboard/ventas/ventas-por-usuario', icon: UserRound, color: 'text-blue-900 dark:text-blue-400' },
+            { name: 'Margen & Rentabilidad', href: '/dashboard/reportes/margen', icon: DollarSign, color: 'text-blue-900 dark:text-blue-400' },
+            { name: 'Retiros', href: '/dashboard/ventas/retiros', icon: DollarSign, color: 'text-blue-900 dark:text-blue-400' }
         ]
     },
     {
         name: 'Compras',
         icon: ShoppingBag,
-        color: 'text-blue-900',
+        color: 'text-blue-900 dark:text-blue-400',
         subItems: [
-            { name: 'Compras Global', href: '/dashboard/compras/global', icon: LayoutGrid, color: 'text-blue-900' },
-            { name: 'Órdenes de Compra', href: '/dashboard/compras/ordenes', icon: FileText, color: 'text-blue-900' },
-            { name: 'Traspasos', href: '/dashboard/compras/traspasos', icon: ArrowRightLeft, color: 'text-blue-900' },
-            { name: 'Kanban de Traspasos', href: '/dashboard/compras/traspasos/kanban', icon: Kanban, color: 'text-blue-900' }
+            { name: 'Compras Global', href: '/dashboard/compras/global', icon: LayoutGrid, color: 'text-blue-900 dark:text-blue-400' },
+            { name: 'Órdenes de Compra', href: '/dashboard/compras/ordenes', icon: FileText, color: 'text-blue-900 dark:text-blue-400' },
+            { name: 'Traspasos', href: '/dashboard/compras/traspasos', icon: ArrowRightLeft, color: 'text-blue-900 dark:text-blue-400' },
+            { name: 'Kanban de Traspasos', href: '/dashboard/compras/traspasos/kanban', icon: Kanban, color: 'text-blue-900 dark:text-blue-400' }
         ]
     },
     {
         name: 'Inventarios',
         icon: Layers,
-        color: 'text-blue-900',
+        color: 'text-blue-900 dark:text-blue-400',
         subItems: [
-            { name: 'Existencias', href: '/dashboard/inventarios/existencias', icon: PackageSearch, color: 'text-blue-900' },
-            { name: 'Cierres de Inventario', href: '/dashboard/inventarios/cierres', icon: CalendarCheck, color: 'text-blue-900' },
-            { name: 'Costo de Inventario', href: '/dashboard/inventarios/costo', icon: DollarSign, color: 'text-blue-900' },
-            { name: 'Inventario por Sucursal', href: '/dashboard/inventarios/por-sucursal', icon: Warehouse, color: 'text-blue-900' },
-            { name: 'Quiebres de Stock', href: '/dashboard/inventarios/quiebres', icon: PackageX, color: 'text-blue-900' },
-            { name: 'Sobre-Inventario', href: '/dashboard/inventarios/sobre-inventario', icon: Boxes, color: 'text-blue-900' },
-            { name: 'Sugerencia de Pedidos', href: '/dashboard/inventarios/sugerencia-pedidos', icon: ClipboardList, color: 'text-blue-900' }
+            { name: 'Existencias', href: '/dashboard/inventarios/existencias', icon: PackageSearch, color: 'text-blue-900 dark:text-blue-400' },
+            { name: 'Cierres de Inventario', href: '/dashboard/inventarios/cierres', icon: CalendarCheck, color: 'text-blue-900 dark:text-blue-400' },
+            { name: 'Costo de Inventario', href: '/dashboard/inventarios/costo', icon: DollarSign, color: 'text-blue-900 dark:text-blue-400' },
+            { name: 'Inventario por Sucursal', href: '/dashboard/inventarios/por-sucursal', icon: Warehouse, color: 'text-blue-900 dark:text-blue-400' },
+            { name: 'Quiebres de Stock', href: '/dashboard/inventarios/quiebres', icon: PackageX, color: 'text-blue-900 dark:text-blue-400' },
+            { name: 'Sobre-Inventario', href: '/dashboard/inventarios/sobre-inventario', icon: Boxes, color: 'text-blue-900 dark:text-blue-400' },
+            { name: 'Sugerencia de Pedidos', href: '/dashboard/inventarios/sugerencia-pedidos', icon: ClipboardList, color: 'text-blue-900 dark:text-blue-400' }
         ]
     },
     {
         name: 'Precios y Costos',
         icon: Tags,
-        color: 'text-blue-900',
+        color: 'text-blue-900 dark:text-blue-400',
         subItems: [
-            { name: 'Lista de Precios', href: '/dashboard/precios/lista-precios', icon: Tag, color: 'text-blue-900' }
+            { name: 'Lista de Precios', href: '/dashboard/precios/lista-precios', icon: Tag, color: 'text-blue-900 dark:text-blue-400' }
         ]
     },
     {
         name: 'Reportes IA',
         icon: Sparkles,
-        color: 'text-blue-900',
+        color: 'text-blue-900 dark:text-blue-400',
         subItems: [
-            { name: 'Agente Avanzado', href: '/dashboard/reportes-ia/agente-avanzado', icon: Terminal, color: 'text-blue-900' },
-            { name: 'Mis Reportes', href: '/dashboard/reportes-ia/mis-reportes', icon: FolderOpen, color: 'text-blue-900' }
+            { name: 'Agente Avanzado', href: '/dashboard/reportes-ia/agente-avanzado', icon: Terminal, color: 'text-blue-900 dark:text-blue-400' },
+            { name: 'Mis Reportes', href: '/dashboard/reportes-ia/mis-reportes', icon: FolderOpen, color: 'text-blue-900 dark:text-blue-400' }
         ]
     },
     {
         name: 'Configuración',
         icon: Settings,
-        color: 'text-blue-900',
+        color: 'text-blue-900 dark:text-blue-400',
         subItems: [
-            { name: 'Correo y Cierres', href: '/dashboard/configuracion/correo', icon: Mail, color: 'text-blue-900' }
+            { name: 'Correo y Cierres', href: '/dashboard/configuracion/correo', icon: Mail, color: 'text-blue-900 dark:text-blue-400' }
         ]
     },
 ];
@@ -165,7 +165,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, isMobileOpen, set
     return (
         <>
             <aside className={cn(
-                "fixed left-0 top-16 h-[calc(100vh-4rem)] bg-[#F1F5F9] text-slate-800 transition-all duration-300 z-20 flex flex-col border-r border-slate-200/60 shadow-xs",
+                "fixed left-0 top-16 h-[calc(100vh-4rem)] bg-[#F1F5F9] dark:bg-slate-950 text-slate-800 dark:text-slate-100 transition-all duration-300 z-20 flex flex-col border-r border-slate-200/60 dark:border-slate-700/60 shadow-xs",
                 isCollapsed ? "w-20" : "w-64",
                 isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
             )}>
@@ -185,14 +185,14 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, isMobileOpen, set
                                         className={cn(
                                             "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-150 group w-full text-left cursor-pointer",
                                             hasActiveChild
-                                                ? "bg-white text-blue-900 font-bold border-l-2 border-blue-900 shadow-xs"
-                                                : "text-slate-600 font-semibold hover:bg-slate-200/50 hover:text-slate-900"
+                                                ? "bg-white dark:bg-slate-900 text-blue-900 dark:text-blue-400 font-bold border-l-2 border-blue-900 dark:border-blue-500 shadow-xs"
+                                                : "text-slate-600 dark:text-slate-300 font-semibold hover:bg-slate-200/50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-50"
                                         )}
                                     >
-                                        <item.icon size={18} className={cn(hasActiveChild ? "text-blue-900" : "text-slate-400 group-hover:text-slate-600", "shrink-0 transition-transform duration-200 group-hover:scale-105")} />
+                                        <item.icon size={18} className={cn(hasActiveChild ? "text-blue-900 dark:text-blue-400" : "text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300", "shrink-0 transition-transform duration-200 group-hover:scale-105")} />
                                         {!isCollapsed && <span className="text-sm flex-1 truncate">{item.name}</span>}
                                         {!isCollapsed && (
-                                            isExpanded ? <ChevronDown size={14} className="shrink-0 text-slate-400" /> : <ChevronRight size={14} className="shrink-0 text-slate-400" />
+                                            isExpanded ? <ChevronDown size={14} className="shrink-0 text-slate-400 dark:text-slate-500" /> : <ChevronRight size={14} className="shrink-0 text-slate-400 dark:text-slate-500" />
                                         )}
                                     </button>
                                 ) : (
@@ -201,19 +201,19 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, isMobileOpen, set
                                         className={cn(
                                             "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-150 group",
                                             isActive
-                                                ? "bg-white text-blue-900 font-bold border-l-2 border-blue-900 shadow-xs"
-                                                : "text-slate-600 font-semibold hover:bg-slate-200/50 hover:text-slate-900"
+                                                ? "bg-white dark:bg-slate-900 text-blue-900 dark:text-blue-400 font-bold border-l-2 border-blue-900 dark:border-blue-500 shadow-xs"
+                                                : "text-slate-600 dark:text-slate-300 font-semibold hover:bg-slate-200/50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-50"
                                         )}
                                         title={isCollapsed ? item.name : undefined}
                                     >
-                                        <item.icon size={18} className={cn(isActive ? "text-blue-900" : "text-slate-400 group-hover:text-slate-600", "shrink-0 transition-transform duration-200 group-hover:scale-105")} />
+                                        <item.icon size={18} className={cn(isActive ? "text-blue-900 dark:text-blue-400" : "text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300", "shrink-0 transition-transform duration-200 group-hover:scale-105")} />
                                         {!isCollapsed && <span className="text-sm truncate">{item.name}</span>}
                                     </Link>
                                 )}
 
                                 {/* SubItems Section */}
                                 {hasSubItems && !isCollapsed && isExpanded && (
-                                    <div className="ml-5 mt-1.5 flex flex-col gap-1 border-l border-slate-200/60 pl-3.5">
+                                    <div className="ml-5 mt-1.5 flex flex-col gap-1 border-l border-slate-200/60 dark:border-slate-700/60 pl-3.5">
                                         {item.subItems!.map((sub) => {
                                             const isSubActive = pathname === sub.href;
                                             return (
@@ -223,11 +223,11 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, isMobileOpen, set
                                                     className={cn(
                                                         "flex items-center gap-2.5 px-3 py-2 rounded-lg transition-all duration-150 text-xs group",
                                                         isSubActive
-                                                            ? "bg-white text-blue-900 font-bold border-l-2 border-blue-900 shadow-xs"
-                                                            : "text-slate-600 font-medium hover:text-slate-900 hover:bg-slate-200/40"
+                                                            ? "bg-white dark:bg-slate-900 text-blue-900 dark:text-blue-400 font-bold border-l-2 border-blue-900 dark:border-blue-500 shadow-xs"
+                                                            : "text-slate-600 dark:text-slate-300 font-medium hover:text-slate-900 dark:hover:text-slate-50 hover:bg-slate-200/40 dark:hover:bg-slate-800/40"
                                                     )}
                                                 >
-                                                    <sub.icon size={14} className={cn(isSubActive ? "text-blue-900" : "text-slate-400 group-hover:text-slate-600", "shrink-0")} />
+                                                    <sub.icon size={14} className={cn(isSubActive ? "text-blue-900 dark:text-blue-400" : "text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300", "shrink-0")} />
                                                     <span className="truncate">{sub.name}</span>
                                                 </Link>
                                             )
@@ -240,11 +240,11 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, isMobileOpen, set
                 </nav>
 
                 {/* Footer Collapse Toggle at the Bottom */}
-                <div className="p-3 border-t border-slate-200 bg-slate-200/20">
+                <div className="p-3 border-t border-slate-200 dark:border-slate-700 bg-slate-200/20 dark:bg-slate-800/20">
                     <button
                         onClick={() => setIsCollapsed(!isCollapsed)}
                         className={cn(
-                            "flex items-center gap-3 w-full px-3 py-2.5 text-slate-450 hover:text-blue-900 hover:bg-slate-200/50 rounded-lg transition-all duration-150 cursor-pointer text-xs font-bold uppercase tracking-wider",
+                            "flex items-center gap-3 w-full px-3 py-2.5 text-slate-450 hover:text-blue-900 dark:hover:text-blue-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 rounded-lg transition-all duration-150 cursor-pointer text-xs font-bold uppercase tracking-wider",
                             isCollapsed ? "justify-center" : "justify-between"
                         )}
                         title={isCollapsed ? "Expandir menú" : "Contraer menú"}

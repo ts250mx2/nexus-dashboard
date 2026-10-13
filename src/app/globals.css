@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+/*
+ * Modo oscuro por clase en el elemento raíz, no por preferencia del sistema:
+ * el usuario lo elige con el interruptor del encabezado y la elección se
+ * guarda. Tailwind 4 necesita declararlo así para que funcionen las variantes
+ * `dark:`.
+ */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
@@ -127,6 +135,14 @@ body {
 .nice-scroll {
   scrollbar-width: auto;
   scrollbar-color: #94a3b8 #eef2f6;
+}
+
+.dark .nice-scroll {
+  scrollbar-color: #475569 #1e293b;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.35);
 }
 .nice-scroll::-webkit-scrollbar {
   height: 14px;
