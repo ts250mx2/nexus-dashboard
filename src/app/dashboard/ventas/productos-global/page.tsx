@@ -7,6 +7,8 @@ import {
     Calendar,
     FileText,
     LayoutGrid,
+    Rows3,
+    Sheet,
     Loader2,
     Store,
     Package,
@@ -32,6 +34,7 @@ import {
 import DatePresetsProfesores from '@/components/DatePresetsProfesores';
 import VentasItemDetailModal from '@/components/VentasItemDetailModal';
 import { cn } from '@/lib/utils';
+import { colMoneda, colNumero, colTexto, exportarExcel } from '@/lib/excel-report';
 
 interface Branch {
     IdSucursal: string | number;
@@ -192,6 +195,8 @@ export default function ProductosGlobalPage() {
     const [initialArticuloId, setInitialArticuloId] = useState<string | null>(null);
 
     const [searchTerm, setSearchTerm] = useState('');
+    /** Cómo se listan los artículos. Filas por defecto: caben más de un vistazo. */
+    const [vistaArticulos, setVistaArticulos] = useState<'filas' | 'tarjetas'>('filas');
 
     const filteredBranches = useMemo(() => {
         return branches.filter(b => b.Nombre.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -529,6 +534,57 @@ export default function ProductosGlobalPage() {
         return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(num);
     };
 
+    /**
+     * Baja lo que está en pantalla: los artículos ya filtrados por la búsqueda y
+     * en el orden en que se ven. Sin sucursal elegida exporta el resumen por
+     * sucursal, que es lo que se está mirando en ese momento.
+     */
+    const handleExportExcel = () => {
+        const periodo = `${startDate} a ${endDate}`;
+
+        if (!selectedSucursal) {
+            exportarExcel({
+                archivo: 'productos_global_sucursales',
+                hoja: 'Sucursales',
+                titulo: 'Venta por Sucursal',
+                meta: [
+                    { label: 'Periodo', value: periodo },
+                    { label: 'Sucursales', value: String(filteredBranches.length) },
+                ],
+                columnas: [
+                    colTexto('Sucursal', 'Nombre', 28),
+                    colNumero('Artículos distintos', 'TotalProductos', 18),
+                    colMoneda('Total de venta', 'TotalVenta', 18),
+                ],
+                filas: filteredBranches as unknown as Record<string, unknown>[],
+            });
+            return;
+        }
+
+        exportarExcel({
+            archivo: `productos_${selectedSucursal.Nombre}`,
+            hoja: 'Artículos',
+            titulo: `Artículos vendidos · ${selectedSucursal.Nombre}`,
+            meta: [
+                { label: 'Periodo', value: periodo },
+                { label: 'Artículos', value: String(filteredArticulos.length) },
+                ...(searchTerm ? [{ label: 'Búsqueda', value: searchTerm }] : []),
+            ],
+            columnas: [
+                colTexto('Código', 'CodigoTexto', 14),
+                colTexto('Artículo', 'Articulo', 42),
+                colNumero('Cantidad', 'Cantidad', 12),
+                colMoneda('Total de venta', 'Total', 18),
+                colNumero('Tickets', 'NumeroTickets', 12),
+                colMoneda('Ticket promedio', 'TicketPromedio', 18),
+            ],
+            filas: filteredArticulos.map(art => ({
+                ...art,
+                CodigoTexto: art.Codigo || String(art.IdArticulo),
+            })),
+        });
+    };
+
     const handleExportPDF = async () => {
         setExporting(true);
         try {
@@ -701,6 +757,14 @@ export default function ProductosGlobalPage() {
                         <FileText size={16} className={cn(exporting && "animate-pulse")} />
                         <span className="hidden sm:inline">{exporting ? 'Exportando...' : 'Exportar PDF'}</span>
                     </button>
+                    <button
+                        onClick={handleExportExcel}
+                        className="flex items-center gap-2 px-4 py-2.5 bg-emerald-50 border border-emerald-200 text-emerald-700 hover:bg-emerald-100 hover:border-emerald-300 transition-all rounded-xl shadow-sm text-xs font-bold"
+                        title="Exportar a Excel lo que se está viendo"
+                    >
+                        <Sheet size={16} />
+                        <span className="hidden sm:inline">Exportar Excel</span>
+                    </button>
                 </div>
             </div>
 
@@ -863,24 +927,49 @@ export default function ProductosGlobalPage() {
                             <h2 className="text-lg font-black text-slate-800 tracking-tight uppercase mt-0.5">Artículos en {selectedSucursal.Nombre}</h2>
                         </div>
 
-                        {/* Search Bar */}
-                        <div className="relative flex items-center bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 focus-within:ring-2 focus-within:ring-blue-500/10 focus-within:border-blue-500 transition-all w-full md:w-64 max-w-sm">
-                            <Search size={16} className="text-slate-400 mr-2 shrink-0" />
-                            <input
-                                type="text"
-                                placeholder="Buscar artículo..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="bg-transparent text-xs font-semibold text-slate-700 outline-none p-0 border-none h-auto w-full"
-                            />
-                            {searchTerm && (
+                        {/* Buscador + selector de vista */}
+                        <div className="flex items-center gap-2 w-full md:w-auto">
+                            <div className="relative flex items-center bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 focus-within:ring-2 focus-within:ring-blue-500/10 focus-within:border-blue-500 transition-all w-full md:w-64 max-w-sm">
+                                <Search size={16} className="text-slate-400 mr-2 shrink-0" />
+                                <input
+                                    type="text"
+                                    placeholder="Buscar artículo..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="bg-transparent text-xs font-semibold text-slate-700 outline-none p-0 border-none h-auto w-full"
+                                />
+                                {searchTerm && (
+                                    <button
+                                        onClick={() => setSearchTerm('')}
+                                        className="p-1 hover:bg-slate-200/60 rounded-full transition-colors text-slate-400 hover:text-slate-650"
+                                    >
+                                        <X size={12} />
+                                    </button>
+                                )}
+                            </div>
+
+                            <div className="flex items-center gap-1 bg-slate-100 border border-slate-200 rounded-xl p-1 shrink-0">
                                 <button
-                                    onClick={() => setSearchTerm('')}
-                                    className="p-1 hover:bg-slate-200/60 rounded-full transition-colors text-slate-400 hover:text-slate-650"
+                                    onClick={() => setVistaArticulos('filas')}
+                                    title="Ver como filas"
+                                    className={cn(
+                                        'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all',
+                                        vistaArticulos === 'filas' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'
+                                    )}
                                 >
-                                    <X size={12} />
+                                    <Rows3 size={12} /> Filas
                                 </button>
-                            )}
+                                <button
+                                    onClick={() => setVistaArticulos('tarjetas')}
+                                    title="Ver como tarjetas"
+                                    className={cn(
+                                        'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all',
+                                        vistaArticulos === 'tarjetas' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'
+                                    )}
+                                >
+                                    <LayoutGrid size={12} /> Tarjetas
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -892,6 +981,55 @@ export default function ProductosGlobalPage() {
                         <div className="rounded-3xl bg-red-50 border border-red-200 text-red-700 p-6">{errorArticulos}</div>
                     ) : filteredArticulos.length === 0 ? (
                         <div className="rounded-3xl bg-slate-50 border border-slate-200 text-slate-500 p-6">No se encontraron artículos vendidos para su búsqueda.</div>
+                    ) : vistaArticulos === 'filas' ? (
+                        <div className="bg-white rounded-2xl border border-slate-200/60 shadow-xs overflow-hidden animate-in fade-in duration-300">
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr className="bg-slate-50 text-slate-500 border-b border-slate-100">
+                                            <th className="px-5 py-3.5 text-[10px] font-black uppercase tracking-widest">Código</th>
+                                            <th className="px-5 py-3.5 text-[10px] font-black uppercase tracking-widest">Artículo</th>
+                                            <th className="px-5 py-3.5 text-[10px] font-black uppercase tracking-widest text-right">Cantidad</th>
+                                            <th className="px-5 py-3.5 text-[10px] font-black uppercase tracking-widest text-right">Total</th>
+                                            <th className="px-5 py-3.5 text-[10px] font-black uppercase tracking-widest text-right">Tickets</th>
+                                            <th className="px-5 py-3.5 text-[10px] font-black uppercase tracking-widest text-right">Ticket prom.</th>
+                                            <th className="px-5 py-3.5 text-[10px] font-black uppercase tracking-widest text-center w-20">Tendencia</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-100">
+                                        {filteredArticulos.map((art) => {
+                                            const isSelected = selectedArticleForSales?.IdArticulo === art.IdArticulo;
+                                            return (
+                                                <tr
+                                                    key={art.IdArticulo}
+                                                    onClick={() => handleArticleSelect(art)}
+                                                    className={cn(
+                                                        'cursor-pointer transition-colors',
+                                                        isSelected ? 'bg-amber-50/40' : 'hover:bg-slate-50/70'
+                                                    )}
+                                                >
+                                                    <td className="px-5 py-3 text-xs font-bold text-slate-500 tabular-nums whitespace-nowrap">{art.Codigo || art.IdArticulo}</td>
+                                                    <td className="px-5 py-3 text-sm font-semibold text-slate-800">{art.Articulo}</td>
+                                                    <td className="px-5 py-3 text-right text-sm font-bold text-slate-700 tabular-nums">{art.Cantidad}</td>
+                                                    <td className="px-5 py-3 text-right text-sm font-extrabold text-slate-900 tabular-nums">{formatCurrency(art.Total)}</td>
+                                                    <td className="px-5 py-3 text-right text-sm text-slate-500 font-semibold tabular-nums">{art.NumeroTickets}</td>
+                                                    <td className="px-5 py-3 text-right text-sm text-slate-500 font-semibold tabular-nums">{formatCurrency(art.TicketPromedio)}</td>
+                                                    <td className="px-5 py-3 text-center" onClick={(e) => e.stopPropagation()}>
+                                                        <button
+                                                            onClick={(e) => handleTrendsSelect(e, art)}
+                                                            className="p-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-700 rounded-lg transition-all border border-blue-100 hover:border-blue-200 cursor-pointer"
+                                                            title="Ver tendencias de ventas"
+                                                        >
+                                                            <TrendingUp size={13} />
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     ) : (
                         <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 animate-in fade-in duration-300">
                             {filteredArticulos.map((art) => {
