@@ -83,6 +83,8 @@ interface DetalleRow {
     Cobertura: number | null;
     Estado: 'quiebre' | 'bajo_minimo' | 'sin_rotacion' | 'exceso' | 'sano';
     Fuente: 'movimientos' | 'costo';
+    /** Fecha del último ticket en que se vendió este artículo en esta sucursal. */
+    UltimaVenta: string | null;
 }
 
 interface PorSucursalResponse {
@@ -403,6 +405,25 @@ export default function InventarioPorSucursalPage() {
             align: 'right',
             sortValue: r => (r.Cobertura === null ? Number.MAX_SAFE_INTEGER : Number(r.Cobertura)),
             render: r => formatCobertura(r.Cobertura),
+        },
+        {
+            key: 'UltimaVenta',
+            label: 'Última venta',
+            align: 'right',
+            // Lo nunca vendido se va al fondo, en vez de mezclarse con lo reciente.
+            sortValue: r => (r.UltimaVenta ? new Date(r.UltimaVenta).getTime() : 0),
+            render: r => {
+                if (!r.UltimaVenta) return <span className="text-slate-300 font-semibold">Nunca</span>;
+                const dias = diasDesde(r.UltimaVenta) ?? 0;
+                return (
+                    <div className="flex flex-col items-end leading-tight">
+                        <span className="font-semibold text-slate-700">{formatDate(r.UltimaVenta)}</span>
+                        <span className={`text-[10px] font-bold uppercase tracking-wider ${dias >= 30 ? 'text-amber-600' : 'text-slate-400'}`}>
+                            {formatHora(r.UltimaVenta)} · {formatAntiguedad(r.UltimaVenta)}
+                        </span>
+                    </div>
+                );
+            },
         },
         { key: 'CostoUnitario', label: 'Costo unit.', align: 'right', render: r => formatCurrency(r.CostoUnitario) },
         { key: 'ValorInventario', label: 'Valor', align: 'right', render: r => <span className="font-bold text-slate-800">{formatCurrency(r.ValorInventario)}</span> },

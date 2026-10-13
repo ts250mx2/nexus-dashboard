@@ -71,6 +71,8 @@ interface ItemDetailRow {
     CostoTotal: number;
     ExiMinRes: number;
     EnAlerta: number;
+    /** Fecha del último ticket en que se vendió este artículo en esta sucursal. */
+    UltimaVenta: string | null;
 }
 
 export default function CostoInventarioPage() {
@@ -269,6 +271,7 @@ export default function CostoInventarioPage() {
             'Costo Unitario': item.CostoUnitario,
             'Costo Total': item.CostoTotal,
             'Existencia Mínima': item.ExiMinRes,
+            'Última Venta': item.UltimaVenta ? `${formatDate(item.UltimaVenta)} ${formatHora(item.UltimaVenta)}` : 'Nunca',
             'Estatus': item.EnAlerta ? 'Bajo Mínimo' : (item.Exi < 0 ? 'Negativo' : (item.Exi === 0 ? 'Sin Stock' : 'Correcto'))
         }));
 
@@ -306,8 +309,10 @@ export default function CostoInventarioPage() {
                     : valB.localeCompare(valA);
             }
 
-            const numA = Number(valA || 0);
-            const numB = Number(valB || 0);
+            // Las fechas se comparan como tiempo, y lo nunca vendido va al fondo.
+            const esFecha = detailSort.key === 'UltimaVenta';
+            const numA = esFecha ? (valA ? new Date(String(valA)).getTime() : 0) : Number(valA || 0);
+            const numB = esFecha ? (valB ? new Date(String(valB)).getTime() : 0) : Number(valB || 0);
             if (numA < numB) return detailSort.direction === 'asc' ? -1 : 1;
             if (numA > numB) return detailSort.direction === 'asc' ? 1 : -1;
             return 0;
@@ -816,6 +821,12 @@ export default function CostoInventarioPage() {
                                             >
                                                 <div className="flex items-center justify-end gap-1">Costo Total <ArrowUpDown size={12} /></div>
                                             </th>
+                                            <th
+                                                onClick={() => handleSortDetail('UltimaVenta')}
+                                                className="px-6 py-3.5 text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-slate-100 hover:text-slate-800 transition-colors text-right"
+                                            >
+                                                <div className="flex items-center justify-end gap-1">Última Venta <ArrowUpDown size={12} /></div>
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-100">
@@ -841,6 +852,21 @@ export default function CostoInventarioPage() {
                                                 </td>
                                                 <td className="px-6 py-3 text-right text-xs font-bold text-slate-500 tabular-nums">{formatCurrency(item.CostoUnitario)}</td>
                                                 <td className="px-6 py-3 text-right text-sm font-extrabold text-slate-900 tabular-nums">{formatCurrency(item.CostoTotal)}</td>
+                                                <td className="px-6 py-3 text-right">
+                                                    {item.UltimaVenta ? (
+                                                        <div className="flex flex-col items-end leading-tight">
+                                                            <span className="text-xs font-semibold text-slate-700 tabular-nums">{formatDate(item.UltimaVenta)}</span>
+                                                            <span className={cn(
+                                                                'text-[10px] font-bold uppercase tracking-wider',
+                                                                (diasDesde(item.UltimaVenta) ?? 0) >= 30 ? 'text-amber-600' : 'text-slate-400'
+                                                            )}>
+                                                                {formatHora(item.UltimaVenta)} · {formatAntiguedad(item.UltimaVenta)}
+                                                            </span>
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-xs text-slate-300 font-semibold">Nunca</span>
+                                                    )}
+                                                </td>
                                             </tr>
                                         ))}
                                     </tbody>

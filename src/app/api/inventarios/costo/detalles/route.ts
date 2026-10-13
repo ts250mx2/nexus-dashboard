@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
+import { conUltimaVenta } from '@/lib/inventory/ultima-venta';
 
 export async function GET(req: NextRequest) {
     try {
@@ -59,11 +60,11 @@ export async function GET(req: NextRequest) {
             LIMIT 500
         `;
 
-        const results = await query(sql, params);
+        const results = (await query(sql, params)) as { IdArticulo: number; IdSucursal: number }[];
 
         return NextResponse.json({
             success: true,
-            data: results
+            data: await conUltimaVenta(results),
         });
 
     } catch (error: any) {

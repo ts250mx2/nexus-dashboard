@@ -3,6 +3,7 @@ import { query } from '@/lib/db';
 import { getErrorMessage } from '@/lib/errors';
 import { buildBaseQuery } from '@/lib/inventory/base-query';
 import { parseFilters } from '@/lib/inventory/params';
+import { conUltimaVenta } from '@/lib/inventory/ultima-venta';
 
 /**
  * INVENTARIO POR SUCURSAL
@@ -130,7 +131,10 @@ ORDER BY Valorizado DESC`;
 SELECT
     IdArticulo, IdSucursal, Sucursal, Producto, Codigo, Depto, Marca,
     Exi, CostoUnitario, ValorInventario, DemandaDiaria, UnidadesPeriodo,
-    Minimo, Cobertura, UltimaVenta, Fuente,
+    -- Sin UltimaVenta: la del CTE de demanda solo mira la ventana del periodo,
+    -- así que un artículo sin venta en 90 días saldría vacío como si nunca se
+    -- hubiera vendido. La real se agrega después, con conUltimaVenta().
+    Minimo, Cobertura, Fuente,
     CASE
         WHEN EsQuiebre     = 1 THEN 'quiebre'
         WHEN EsBajoMinimo  = 1 THEN 'bajo_minimo'
@@ -141,7 +145,10 @@ SELECT
 FROM clasificado
 ORDER BY ValorInventario DESC
 LIMIT ${filters.limit}`;
-            rows = (await query(detalleSql, params)) as unknown[];
+            // La última venta se pide aparte y solo de lo que se va a mostrar:
+            // agregarla dentro del reporte costaría segundos de más.
+            const detalle = (await query(detalleSql, params)) as { IdArticulo: number; IdSucursal: number }[];
+            rows = await conUltimaVenta(detalle);
         }
 
         return NextResponse.json({
