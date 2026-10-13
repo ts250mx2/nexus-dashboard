@@ -37,34 +37,39 @@ export default function LoginPage() {
     };
     return (
         <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC] p-4 relative">
-            <div className="w-full max-w-md bg-white border border-slate-200/60 rounded-2xl shadow-xl overflow-hidden relative z-10 hover-premium transition-all duration-300">
+            <div className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-700/60 rounded-2xl shadow-xl overflow-hidden relative z-10 hover-premium transition-all duration-300">
                 <div className="p-8">
                     <div className="flex flex-col items-center mb-8 select-none">
                         <div className="relative w-48 h-20 mb-6 flex items-center justify-center">
-                            <div className="flex bg-slate-50 border border-slate-100 shadow-xs rounded-2xl p-2.5 items-center justify-center shrink-0 w-full h-full hover:scale-[1.02] transition-transform duration-300">
+                            <div className="flex bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-xs rounded-2xl p-2.5 items-center justify-center shrink-0 w-full h-full hover:scale-[1.02] transition-transform duration-300">
                                 <img
-                                    src="/logo.webp"
+                                    src="/logo.png"
                                     alt="Nexus Logo"
-                                    className="object-contain w-auto h-full max-h-[50px]"
+                                    className="object-contain w-auto h-full max-h-[50px] dark:hidden"
+                                />
+                                <img
+                                    src="/logo-dark.png"
+                                    alt="Nexus Logo"
+                                    className="object-contain w-auto h-full max-h-[50px] hidden dark:block"
                                 />
                             </div>
                         </div>
-                        <h1 className="text-xl font-bold text-slate-900 tracking-tight">Plataforma Nexus</h1>
-                        <p className="text-xs text-slate-500 font-semibold tracking-wide mt-1.5 text-center">Ingresa tus credenciales para acceder</p>
+                        <h1 className="text-xl font-bold text-slate-900 dark:text-slate-50 tracking-tight">Plataforma Nexus</h1>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold tracking-wide mt-1.5 text-center">Ingresa tus credenciales para acceder</p>
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="relative">
-                            <label className="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2 block">Usuario</label>
+                            <label className="text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-2 block">Usuario</label>
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                                    <User className="h-4 w-4 text-slate-400" />
+                                    <User className="h-4 w-4 text-slate-400 dark:text-slate-500" />
                                 </div>
                                 <input
                                     type="text"
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)}
-                                    className="block w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-600 focus:border-indigo-600 sm:text-sm font-semibold transition-all hover:border-slate-300"
+                                    className="block w-full pl-11 pr-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-50 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-600 focus:border-indigo-600 sm:text-sm font-semibold transition-all hover:border-slate-300 dark:hover:border-slate-600"
                                     placeholder="usuario"
                                     required
                                 />
@@ -72,16 +77,16 @@ export default function LoginPage() {
                         </div>
 
                         <div className="relative">
-                            <label className="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2 block">Contraseña</label>
+                            <label className="text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-2 block">Contraseña</label>
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                                    <Lock className="h-4 w-4 text-slate-400" />
+                                    <Lock className="h-4 w-4 text-slate-400 dark:text-slate-500" />
                                 </div>
                                 <input
                                     type="password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="block w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-600 focus:border-indigo-600 sm:text-sm font-semibold transition-all hover:border-slate-300"
+                                    className="block w-full pl-11 pr-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-50 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-600 focus:border-indigo-600 sm:text-sm font-semibold transition-all hover:border-slate-300 dark:hover:border-slate-600"
                                     placeholder="••••••••"
                                     required
                                 />
@@ -97,7 +102,7 @@ export default function LoginPage() {
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className={`w-full flex justify-center py-3.5 px-4 border border-transparent rounded-lg shadow-sm text-xs font-bold uppercase tracking-wider text-white bg-slate-900 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-900 transition-all cursor-pointer active:scale-95 ${isLoading ? 'opacity-75 cursor-not-allowed' : ''}`}
+                            className={`w-full flex justify-center py-3.5 px-4 border border-transparent rounded-lg shadow-sm text-xs font-bold uppercase tracking-wider text-white bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-900 transition-all cursor-pointer active:scale-95 ${isLoading ? 'opacity-75 cursor-not-allowed' : ''}`}
                         >
                             {isLoading ? (
                                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -107,11 +112,11 @@ export default function LoginPage() {
                         </button>
                     </form>
                 </div>
-                <div className="px-8 py-4 bg-slate-50 border-t border-slate-100 flex justify-between items-center relative z-10">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">© 2026 Nexus Superior Equipment</span>
+                <div className="px-8 py-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center relative z-10">
+                    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">© 2026 Nexus Superior Equipment</span>
                     <div className="flex space-x-2.5">
                         <div className="w-2 h-2 rounded-full bg-indigo-500 shadow-sm animate-pulse"></div>
-                        <div className="w-2 h-2 rounded-full bg-slate-300 shadow-sm animate-pulse"></div>
+                        <div className="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-700 shadow-sm animate-pulse"></div>
                     </div>
                 </div>
             </div>
