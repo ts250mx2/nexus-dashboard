@@ -13,9 +13,11 @@ interface BranchTrend {
 
 interface SalesTrendsDetailsProps {
     data: BranchTrend[];
+    /** Fechas contra las que se compara, en corto ("15-30 sep"). */
+    rangoComparado?: string;
 }
 
-export function SalesTrendsDetails({ data }: SalesTrendsDetailsProps) {
+export function SalesTrendsDetails({ data, rangoComparado }: SalesTrendsDetailsProps) {
     const formatCurrency = (val: number) => {
         return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', maximumFractionDigits: 0 }).format(val);
     };
@@ -34,7 +36,12 @@ export function SalesTrendsDetails({ data }: SalesTrendsDetailsProps) {
                         <tr className="bg-slate-50/50 dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800">
                             <th className="px-6 py-3 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Sucursal</th>
                             <th className="px-6 py-3 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 text-right">Período Actual</th>
-                            <th className="px-6 py-3 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 text-right">Período Anterior</th>
+                            <th className="px-6 py-3 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 text-right">
+                                Período Anterior
+                                {rangoComparado && (
+                                    <span className="block text-[9px] font-bold normal-case text-slate-400 dark:text-slate-500">{rangoComparado}</span>
+                                )}
+                            </th>
                             <th className="px-6 py-3 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 text-right w-32">Tendencia</th>
                         </tr>
                     </thead>

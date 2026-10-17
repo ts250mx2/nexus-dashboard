@@ -99,6 +99,64 @@ export function aFechaLocal(valor: string | Date): Date {
     return new Date(Number(soloFecha[1]), Number(soloFecha[2]) - 1, Number(soloFecha[3]));
 }
 
+
+/** Contra qué se compara el periodo consultado. */
+export type BaseComparativa = 'anterior' | 'mes' | 'anio';
+
+export interface RangoFechas {
+    inicio: string;
+    fin: string;
+}
+
+/** YYYY-MM-DD de unos componentes de calendario, recortando el día al mes real. */
+function aTexto(anio: number, mes: number, dia: number): string {
+    // El dia 0 del mes siguiente es el ultimo del actual: asi se recorta un
+    // 31 de octubre que viaja a septiembre, o un 29 de febrero bisiesto.
+    const ultimoDia = new Date(Date.UTC(anio, mes + 1, 0)).getUTCDate();
+    const d = new Date(Date.UTC(anio, mes, Math.min(dia, ultimoDia)));
+    return d.toISOString().slice(0, 10);
+}
+
+/** Suma (o resta) días a una fecha de calendario. */
+function sumarDias(fecha: string, dias: number): string {
+    return new Date(aUtc(fecha) + dias * MS_POR_DIA).toISOString().slice(0, 10);
+}
+
+/** Mueve una fecha `meses` hacia atrás, recortando el día si el mes destino es más corto. */
+function restarMeses(fecha: string, meses: number): string {
+    const anio = Number(fecha.slice(0, 4));
+    const mes = Number(fecha.slice(5, 7)) - 1;
+    const dia = Number(fecha.slice(8, 10));
+    const destino = new Date(Date.UTC(anio, mes - meses, 1));
+    return aTexto(destino.getUTCFullYear(), destino.getUTCMonth(), dia);
+}
+
+/**
+ * Rango contra el que se compara el periodo consultado.
+ *
+ *   anterior  el bloque de los mismos días inmediatamente antes. Es una ventana
+ *             deslizante: "lo que va del mes" se compara contra la segunda
+ *             quincena del mes pasado, no contra el mes pasado completo.
+ *   mes       las mismas fechas del mes anterior.
+ *   anio      las mismas fechas del año anterior.
+ */
+export function periodoComparativo(inicio: string, fin: string, base: BaseComparativa): RangoFechas {
+    if (base === 'mes') {
+        return { inicio: restarMeses(inicio, 1), fin: restarMeses(fin, 1) };
+    }
+    if (base === 'anio') {
+        return { inicio: restarMeses(inicio, 12), fin: restarMeses(fin, 12) };
+    }
+    const dias = Math.round((aUtc(fin) - aUtc(inicio)) / MS_POR_DIA) + 1;
+    const finAnterior = sumarDias(inicio, -1);
+    return { inicio: sumarDias(finAnterior, -(dias - 1)), fin: finAnterior };
+}
+
+/** Lee el parámetro de la petición; cualquier cosa rara cae en el deslizante. */
+export function baseComparativa(valor: string | null): BaseComparativa {
+    return valor === 'mes' || valor === 'anio' ? valor : 'anterior';
+}
+
 /** Hoy en YYYY-MM-DD, en la zona del servidor. */
 export function hoyCalendario(): string {
     return aFechaCalendario(new Date());

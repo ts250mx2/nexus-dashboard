@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SalesTrendsChart } from '@/components/dashboard/sales-trends-chart';
-import { aFechaLocal } from '@/lib/periodos';
+import { aFechaLocal, periodoComparativo, type BaseComparativa } from '@/lib/periodos';
 import { SalesTrendsDetails } from '@/components/dashboard/sales-trends-details';
 import MultiSelect from '@/components/MultiSelect';
 import jsPDF from 'jspdf';
@@ -75,6 +75,8 @@ export default function SalesTrendsPage() {
     /** Solo con `sumarSucursales`: en vez de la suma, una línea por sucursal. */
     const [compararSucursales, setCompararSucursales] = useState(false);
     const [metric, setMetric] = useState<'venta' | 'operaciones' | 'ticket'>('venta');
+    /** Contra qué se compara el periodo: bloque anterior, mes pasado o año pasado. */
+    const [comparativa, setComparativa] = useState<BaseComparativa>('anterior');
     /** Comparación de verdad: varias sucursales marcadas y pedidas por separado. */
     const comparando = sumarSucursales && compararSucursales && selectedStoreIds.length > 1;
     const [loading, setLoading] = useState(true);
@@ -121,6 +123,7 @@ export default function SalesTrendsPage() {
             let url = `/api/dashboard/sales/trends?fechaInicio=${fechaInicio}&fechaFin=${fechaFin}&idTienda=${idTiendaParam}&groupBy=${groupBy}`;
             // Sin desglose el API suma las sucursales en una sola serie.
             if (comparando) url += '&desglose=1';
+            url += `&comparativa=${comparativa}`;
             if (selectedDeptos.length > 0) url += `&idDepto=${encodeURIComponent(selectedDeptos.join(','))}`;
             if (selectedArticulos.length > 0) url += `&codigoInterno=${selectedArticulos.join(',')}`;
 
@@ -134,7 +137,7 @@ export default function SalesTrendsPage() {
         } finally {
             setLoading(false);
         }
-    }, [fechaInicio, fechaFin, selectedStoreIds, groupBy, selectedDeptos, selectedArticulos, comparando]);
+    }, [fechaInicio, fechaFin, selectedStoreIds, groupBy, selectedDeptos, selectedArticulos, comparando, comparativa]);
 
     useEffect(() => {
         fetchData();
@@ -389,6 +392,23 @@ export default function SalesTrendsPage() {
         return parts.length > 0 ? ` / ${parts.join(' - ')}` : '';
     }, [selectedDeptos, selectedArticulos]);
 
+    /**
+     * Qué fechas se están comparando, en corto. Se calcula aquí con la misma
+     * función del servidor en vez de esperar la respuesta: así la etiqueta no
+     * parpadea al cambiar de base ni queda desfasada mientras carga.
+     */
+    const rangoComparado = useMemo(() => {
+        const { inicio, fin } = periodoComparativo(fechaInicio, fechaFin, comparativa);
+        const corto = (f: string) => aFechaLocal(f).toLocaleDateString('es-MX', { day: '2-digit', month: 'short' });
+        const mismoMes = inicio.slice(0, 7) === fin.slice(0, 7);
+        const anio = aFechaLocal(inicio).getFullYear();
+        const distintoAnio = anio !== aFechaLocal(fechaInicio).getFullYear();
+        const texto = mismoMes
+            ? `${aFechaLocal(inicio).getDate()}–${corto(fin)}`
+            : `${corto(inicio)} – ${corto(fin)}`;
+        return distintoAnio ? `${texto} ${anio}` : texto;
+    }, [fechaInicio, fechaFin, comparativa]);
+
     const storeColor = useMemo(() => {
         if (selectedStoreIds.length === 1) {
             const name = stores.find(s => s.IdTienda.toString() === selectedStoreIds[0])?.Tienda;
@@ -443,6 +463,28 @@ export default function SalesTrendsPage() {
                                 </button>
                             );
                         })}
+                    </div>
+
+                    <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-1 overflow-x-auto no-scrollbar">
+                        {([
+                            { base: 'anterior', etiqueta: 'Periodo anterior', ayuda: 'Los mismos días, justo antes del rango' },
+                            { base: 'mes', etiqueta: 'Mes anterior', ayuda: 'Las mismas fechas del mes pasado' },
+                            { base: 'anio', etiqueta: 'Año anterior', ayuda: 'Las mismas fechas del año pasado' },
+                        ] as const).map(({ base, etiqueta, ayuda }) => (
+                            <button
+                                key={base}
+                                onClick={() => setComparativa(base)}
+                                title={ayuda}
+                                className={cn(
+                                    'px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap',
+                                    comparativa === base
+                                        ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-50 shadow-sm'
+                                        : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100'
+                                )}
+                            >
+                                {etiqueta}
+                            </button>
+                        ))}
                     </div>
                 </div>
 
@@ -614,7 +656,10 @@ export default function SalesTrendsPage() {
                         </h2>
                     </div>
                     <div className="flex justify-between items-center text-xs font-bold border-t border-slate-50 dark:border-slate-800 pt-4 mt-2">
-                        <span className="text-slate-500 dark:text-slate-400">Vs. Periodo Anterior</span>
+                        <span className="text-slate-500 dark:text-slate-400 flex flex-col leading-tight">
+                            Vs. periodo anterior
+                            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 normal-case">{rangoComparado}</span>
+                        </span>
                         <span className={cn(globalTrend >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400")}>
                             {formatCurrency(currentTotal - prevTotal)}
                         </span>
@@ -881,7 +926,7 @@ export default function SalesTrendsPage() {
             {/* Sucursales performance Details Grid */}
             {!loading && data?.branchTrends && (
                 <div className="animate-in fade-in duration-700">
-                    <SalesTrendsDetails data={data.branchTrends} />
+                    <SalesTrendsDetails data={data.branchTrends} rangoComparado={rangoComparado} />
                 </div>
             )}
         </div>

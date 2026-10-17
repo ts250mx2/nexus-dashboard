@@ -2,8 +2,10 @@ import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import {
     aFechaCalendario,
+    baseComparativa,
     coberturaDelPeriodo,
     hoyCalendario,
+    periodoComparativo,
     type GroupBy,
 } from '@/lib/periodos';
 
@@ -94,15 +96,13 @@ export async function GET(req: Request) {
             ORDER BY Fecha ASC
         `;
 
-        // 2. Comparison Period Calculations
-        const diffDays = Math.ceil((new Date(fechaFin).getTime() - new Date(fechaInicio).getTime()) / (1000 * 60 * 60 * 24)) + 1;
-        const prevStart = new Date(fechaInicio);
-        prevStart.setDate(prevStart.getDate() - diffDays);
-        const prevEnd = new Date(fechaInicio);
-        prevEnd.setDate(prevEnd.getDate() - 1);
-
-        const prevStartStr = prevStart.toISOString().split('T')[0];
-        const prevEndStr = prevEnd.toISOString().split('T')[0];
+        // 2. Periodo contra el que se compara. Lo elige quien consulta: el bloque
+        //    deslizante de los mismos días (por defecto), las mismas fechas del
+        //    mes anterior o las del año anterior. El cálculo vive en lib/periodos
+        //    porque la aritmética de meses tiene aristas (un 31 que viaja a un mes
+        //    de 30, un 29 de febrero bisiesto) y esta probada aparte.
+        const comparativa = baseComparativa(searchParams.get('comparativa'));
+        const { inicio: prevStartStr, fin: prevEndStr } = periodoComparativo(fechaInicio, fechaFin, comparativa);
 
         // 3. Branch performance variance query (MySQL compatible)
         const branchTrendsSql = `
@@ -157,6 +157,7 @@ export async function GET(req: Request) {
             timeSeries: timeSeriesConCobertura,
             branchTrends,
             comparisonPeriod: {
+                base: comparativa,
                 start: prevStartStr,
                 end: prevEndStr
             }
