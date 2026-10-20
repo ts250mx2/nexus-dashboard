@@ -19,7 +19,9 @@
  *       consignaciones −CantidadSalida   Status = 0, Cerrada = 0 (abiertas)
  *     más las REVERSIONES: documentos anteriores al corte que se cancelaron o
  *     cerraron después (FechaAct > corte). El corte los incluía y el ERP los
- *     descartará en su próxima corrida, así que se deshacen aquí.
+ *     descartará en su próxima corrida, así que se deshacen aquí. La reversión de
+ *     una consignación se mide contra los renglones tipo 6 del propio corte, no
+ *     contra el documento: ver cteDocumentosPosteriores().
  *   ExiFinal = ExiInicial + Entradas − Salidas
  *
  * Por qué no basta tblReporteMovimientos: es una foto que el ERP borra y repuebla
@@ -33,6 +35,13 @@
  * 22-ago + documentos con esta regla en (22-ago 00:00, 25-ago 00:00] = existencia
  * del 25-ago en 3,747 / 3,747 artículos (ver tests/lib/inventory si existen).
  *
+ * VALIDACIÓN (2026-10-20, consignación 633 de MONTERREY): el documento tenía 367
+ * renglones al cerrarse, pero el corte vivo en ese momento solo había descargado
+ * 156 (los otros 211 se agregaron al evento después de la corrida). Reversar el
+ * documento completo devolvía 1,223 unidades donde solo habían salido 426, e
+ * inventaba 797 unidades en 211 artículos: exactamente las diferencias que
+ * reportaron los cierres. Con la regla de arriba la reversión da 426.
+ *
  * NOTA DE DESEMPEÑO: las tablas origen no tienen índice por fecha; el barrido va
  * por el índice de IdSucursal de cada cabecera (~1 s en MONTERREY con un día de
  * documentos). El costo crece con los días transcurridos desde el corte.
@@ -40,7 +49,7 @@
  * Todas las consultas son SOLO LECTURA.
  */
 
-import { SUCURSAL_EXCLUSION, cteCorte } from './source';
+import { SUCURSAL_EXCLUSION, TIPO_MOVIMIENTO_CONSIGNACION, cteCorte } from './source';
 
 /**
  * Tope de ejecución en el servidor MySQL. La consulta no se puede cancelar desde
@@ -290,10 +299,29 @@ documentos AS (
       AND B.FechaDevolucion <= ${hasta} AND B.FechaAct > ${desde} AND B.FechaAct <= ${hasta}
 
     UNION ALL
-    -- REVERSIÓN: consignaciones abiertas al corte que se cerraron o cancelaron después
-    SELECT A.IdArticulo, B.FechaAct, B.FechaConsignacion, A.CantidadSalida, 1
+    -- REVERSIÓN: consignaciones que el corte descargó y que se cerraron o cancelaron
+    -- después. La cantidad sale de los renglones tipo 6 del CORTE, no del documento:
+    -- a una consignación se le siguen agregando renglones mientras está abierta, y un
+    -- renglón que nació después del corte nunca se descargó, así que devolverlo
+    -- inventaría mercancía que jamás salió. Así también se respetan los renglones que
+    -- el corte decidió no contar (EfectoInventario = 0 cuando la consignación es
+    -- anterior al último conteo físico del artículo: ese conteo ya la absorbió).
+    -- Si la sucursal no tiene corte en la tabla no hay nada que reversar, que es
+    -- justo cuando la base cae a tblCostoInventario y ningún documento cuenta.
+    -- Se entra por el renglón del documento para que el corte se lea por la llave
+    -- (IdArticulo, IdSucursal, TipoMovimiento): buscarlo solo por tipo obliga a
+    -- recorrer los ~80 mil renglones tipo 6 de todas las sucursales (+400 ms).
+    SELECT M.IdArticulo, B.FechaAct, B.FechaConsignacion, -M.Mov, 1
     FROM tblConsignaciones B
-    INNER JOIN tblDetalleConsignaciones A ON A.IdConsignacion = B.IdConsignacion AND A.IdSucursal = B.IdSucursal
+    INNER JOIN tblDetalleConsignaciones A
+            ON A.IdConsignacion = B.IdConsignacion AND A.IdSucursal = B.IdSucursal
+    INNER JOIN tblReporteMovimientos M
+            ON M.IdArticulo        = A.IdArticulo
+           AND M.IdSucursal        = B.IdSucursal
+           AND M.TipoMovimiento    = ${TIPO_MOVIMIENTO_CONSIGNACION}
+           AND M.Folio             = B.IdConsignacion
+           AND M.Status            = 0
+           AND M.EfectoInventario  = 1
     WHERE B.IdSucursal = ${s} AND (B.Cerrada > 0 OR B.Status <> 0)
       AND B.FechaConsignacion <= ${hasta} AND B.FechaAct > ${desde} AND B.FechaAct <= ${hasta}
 )`;
