@@ -227,6 +227,33 @@ describe('compararCierres · consignaciones', () => {
         assert.equal(r.filas[0].estado, 'diferencia');
         assert.equal(r.transiciones[0].porConsignacion, 0);
         assert.equal(r.kpis.conDiferencia, 1);
+        // Pero la nota de que se movio consignacion se queda.
+        assert.equal(r.filas[0].celdas[1].movConsignacion, 40);
+    });
+
+    it('deja la nota de consignacion aunque la transicion cuadre', () => {
+        // Arrange: el ERP abre el 25 con lo mismo que dejo el cierre del 24, y ese
+        // dia se movieron 5 unidades en consignacion.
+        const d24 = cierre('2026-08-24', [articulo(1, { ExiInicial: 8, ExiFinal: 8 })]);
+        const hoy = {
+            fecha: '2026-08-25',
+            calculadoEn: '2026-08-25T18:00:00.000Z',
+            fechaCorteERP: '2026-08-25T06:00:00.000Z',
+            detalle: [articulo(1, { ExiInicial: 8, ExiFinal: 8 })],
+        };
+        const consignaciones = new Map([['2026-08-24', new Map([[1, -5]])]]);
+
+        // Act
+        const r = compararCierres([d24], hoy, consignaciones);
+
+        // Assert: cuadra, sin marca de explicada, con la nota y el conteo.
+        const celda = r.filas[0].celdas[1];
+        assert.equal(celda.estado, 'cuadra');
+        assert.equal(celda.consignacion, undefined);
+        assert.equal(celda.movConsignacion, 5);
+        assert.equal(r.filas[0].estado, 'cuadra');
+        assert.equal(r.transiciones[0].conMovConsignacion, 1);
+        assert.equal(r.transiciones[0].unidadesMovConsignacion, 5);
     });
 
     it('sin datos de consignacion se comporta como antes', () => {

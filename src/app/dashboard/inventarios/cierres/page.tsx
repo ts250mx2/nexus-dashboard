@@ -50,11 +50,11 @@ function Verificada({ valor, celda, primera = false }: { valor: number | null; c
     if (primera) return cifra;
 
     // Una diferencia que explica por completo una consignación movida ese día no
-    // es un faltante: la mercancía está, lo que no coincide es cómo la cuentan el
-    // portal y el ERP. Se marca aparte para no mandar a nadie a buscarla.
+    // es un faltante: la mercancía está, lo que no coincidía era el cálculo del
+    // portal. Se marca aparte para no mandar a nadie a buscarla.
     const esConsignacion = celda.estado === 'diferencia' && celda.consignacion !== undefined;
     const pillDiferencia = esConsignacion ? (
-        <span title={`Explicada por ${formatDecimal(celda.consignacion, 0)} unidades en consignación movidas ese día`}>
+        <span title={`Explicada por ${formatDecimal(celda.consignacion, 0)} unidades de una consignación que creció después del corte y se cerró ese día. La mercancía está completa.`}>
             <StatusPill tone="amber">
                 {celda.diferencia !== null && celda.diferencia > 0 ? '+' : ''}{formatDecimal(celda.diferencia, 0)} · consignación
             </StatusPill>
@@ -71,8 +71,17 @@ function Verificada({ valor, celda, primera = false }: { valor: number | null; c
         sin_dato: null,
     }[celda.estado];
 
+    // La nota de consignación va siempre que se movió una ese día, cuadre o no,
+    // salvo cuando la pastilla ya dice que la consignación explica la diferencia.
+    const nota = celda.movConsignacion !== undefined && !esConsignacion ? (
+        <span title={`Ese día se movieron ${formatDecimal(celda.movConsignacion, 0)} unidades de este artículo en consignación`}>
+            <StatusPill tone="amber">consig. {formatDecimal(celda.movConsignacion, 0)}</StatusPill>
+        </span>
+    ) : null;
+
     return (
         <span className="inline-flex items-center gap-1.5 justify-end">
+            {nota}
             {pill}
             {cifra}
         </span>
@@ -307,7 +316,7 @@ export default function CierresInventarioPage() {
                                         <span className="font-semibold text-slate-700 dark:text-slate-200">{etiquetaColumna(t.de)} → {etiquetaColumna(t.a)}</span>
                                         {t.corteRenovado ? (
                                             <>
-                                                <StatusPill tone={t.conDiferencia === 0 ? 'emerald' : 'rose'}>
+                                                <StatusPill tone={t.conDiferencia === 0 ? 'emerald' : t.conDiferencia === t.porConsignacion ? 'amber' : 'rose'}>
                                                     {formatInt(t.cuadran)} / {formatInt(t.comparados)} cuadran
                                                 </StatusPill>
                                                 {t.conDiferencia - t.porConsignacion > 0 && (
@@ -318,9 +327,17 @@ export default function CierresInventarioPage() {
                                                 {t.porConsignacion > 0 && (
                                                     <span
                                                         className="text-xs font-semibold text-amber-600 dark:text-amber-400"
-                                                        title="El portal mueve la mercancía en consignación y el ERP no siempre; la mercancía está completa"
+                                                        title="Renglones agregados a una consignación después del corte y cerrados antes del siguiente: el ERP nunca los descargó y el portal los devolvía. La mercancía está completa."
                                                     >
                                                         {formatInt(t.porConsignacion)} por consignación · {formatInt(t.unidadesConsignacion)} unidades
+                                                    </span>
+                                                )}
+                                                {t.conMovConsignacion > 0 && (
+                                                    <span
+                                                        className="text-xs text-amber-700/80 dark:text-amber-300/80"
+                                                        title="Artículos que salieron o regresaron de consignación ese día, cuadren o no"
+                                                    >
+                                                        consignación movida en {formatInt(t.conMovConsignacion)} artículos · {formatInt(t.unidadesMovConsignacion)} unidades
                                                     </span>
                                                 )}
                                                 {t.conConteo > 0 && (

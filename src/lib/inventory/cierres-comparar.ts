@@ -99,6 +99,12 @@ export interface CeldaComparacion {
      * verdad y se deja como tal, en lugar de taparla.
      */
     consignacion?: number;
+    /**
+     * Unidades de consignación que se movieron el día que se verifica (salida o
+     * regreso), cuadre o no. Es una nota para quien revisa: se llena siempre que
+     * hubo movimiento, aunque la transición cuadre.
+     */
+    movConsignacion?: number;
 }
 
 export type EstadoFila = 'cuadra' | 'diferencia' | 'consignacion' | 'sin_verificacion';
@@ -127,6 +133,10 @@ export interface ResumenTransicion {
     porConsignacion: number;
     /** Unidades de los explicados por consignación. */
     unidadesConsignacion: number;
+    /** Artículos comparados que movieron consignación ese día, cuadren o no. */
+    conMovConsignacion: number;
+    /** Unidades de consignación movidas ese día en esos artículos. */
+    unidadesMovConsignacion: number;
     /** Artículos con conteo físico ese día (base = conteo, no comparable). */
     conConteo: number;
     unidadesDiferencia: number;
@@ -244,15 +254,18 @@ function celda(
     if (!columna.corteRenovado) return { ...base, estado: 'sin_verificacion' };
     if (actual.Fuente === 'conteo') return { ...base, estado: 'conteo' };
 
+    const nota = efectoConsignacion !== 0 ? { movConsignacion: Math.abs(efectoConsignacion) } : {};
     const diferencia = num(actual.ExiInicial) - num(previo.ExiFinal);
-    if (Math.abs(diferencia) < EPSILON) return { ...base, diferencia, estado: 'cuadra' };
+    if (Math.abs(diferencia) < EPSILON) return { ...base, ...nota, diferencia, estado: 'cuadra' };
 
-    // El portal mueve la consignación y el ERP no siempre, así que la diferencia
-    // del día siguiente es ese efecto con el signo cambiado. Cuando coincide
-    // exacto, la mercancía está completa y lo que sobra es la regla, no el stock.
+    // Una consignación que creció después del corte y se cerró antes del siguiente
+    // nunca la descargó el ERP; el portal la devolvía completa y el cierre del día
+    // quedaba inflado justo por ese efecto. Cuando coincide exacto, la mercancía
+    // está completa y lo que sobra es el cálculo, no el stock.
     const explicada = efectoConsignacion !== 0 && Math.abs(diferencia + efectoConsignacion) < EPSILON;
     return {
         ...base,
+        ...nota,
         diferencia,
         estado: 'diferencia',
         ...(explicada ? { consignacion: Math.abs(efectoConsignacion) } : {}),
@@ -325,6 +338,8 @@ export function compararCierres(
             conDiferencia: verificables.filter(c => c.estado === 'diferencia').length,
             porConsignacion: verificables.filter(c => c.consignacion !== undefined).length,
             unidadesConsignacion: verificables.reduce((acc, c) => acc + (c.consignacion ?? 0), 0),
+            conMovConsignacion: verificables.filter(c => c.movConsignacion !== undefined).length,
+            unidadesMovConsignacion: verificables.reduce((acc, c) => acc + (c.movConsignacion ?? 0), 0),
             conConteo: celdasCol.filter(c => c.estado === 'conteo').length,
             unidadesDiferencia: verificables.reduce((acc, c) => acc + Math.abs(c.diferencia ?? 0), 0),
         };

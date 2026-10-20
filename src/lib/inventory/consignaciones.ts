@@ -54,7 +54,7 @@ export async function consignacionesPorDia(sucursal: number, desde: string): Pro
     if (!/^\d{4}-\d{2}-\d{2}$/.test(desde)) return new Map();
 
     const sql = `
-        SELECT Fecha, IdArticulo, SUM(Unidades) AS Unidades
+        SELECT DATE_FORMAT(Fecha, '%Y-%m-%d') AS Fecha, IdArticulo, SUM(Unidades) AS Unidades
         FROM (
             -- Cerradas o canceladas: el portal devuelve la mercancía ese día.
             SELECT DATE(B.FechaAct) AS Fecha, A.IdArticulo, A.CantidadSalida AS Unidades
