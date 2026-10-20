@@ -26,6 +26,7 @@ import {
 } from './cierres-comparar';
 import { fechaCorteComun, fechaGeneracionMovimientos } from './erp';
 import { ExistenciaRow, buildExistenciasQuery } from './existencias';
+import { consignacionesPorDia } from './consignaciones';
 import { totalizar } from './existencias-view';
 import { SucursalInventario, listarSucursalesInventario } from './sucursales';
 
@@ -537,6 +538,12 @@ export async function compararConHoy(sucursal: number): Promise<ComparacionConHo
         fechaGeneracionMovimientos(),
     ]);
 
+    // Las consignaciones movidas en el periodo que se está comparando: con ellas
+    // la vista distingue un faltante de una diferencia que solo refleja que el
+    // portal y el ERP no tratan igual la mercancía consignada.
+    const desdeConsignaciones = dias.length > 0 ? dias[0].fecha : fechaLocal(new Date());
+    const consignaciones = await consignacionesPorDia(sucursal, desdeConsignaciones);
+
     const ahora = new Date();
     const hoy: HoyEnVivo = {
         fecha: fechaLocal(ahora),
@@ -555,6 +562,6 @@ export async function compararConHoy(sucursal: number): Promise<ComparacionConHo
         corteGeneradoEn,
         hoy: { fecha: hoy.fecha, calculadoEn: hoy.calculadoEn, fechaCorteERP: hoy.fechaCorteERP, articulos: rows.length },
         cierres: dias.map(d => ({ fecha: d.fecha, generadoEn: d.generadoEn, articulos: d.detalle.length })),
-        comparacion: compararCierres(diasPrevios, hoy),
+        comparacion: compararCierres(diasPrevios, hoy, consignaciones),
     };
 }

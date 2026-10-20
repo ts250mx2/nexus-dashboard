@@ -49,9 +49,23 @@ function Verificada({ valor, celda, primera = false }: { valor: number | null; c
     );
     if (primera) return cifra;
 
+    // Una diferencia que explica por completo una consignación movida ese día no
+    // es un faltante: la mercancía está, lo que no coincide es cómo la cuentan el
+    // portal y el ERP. Se marca aparte para no mandar a nadie a buscarla.
+    const esConsignacion = celda.estado === 'diferencia' && celda.consignacion !== undefined;
+    const pillDiferencia = esConsignacion ? (
+        <span title={`Explicada por ${formatDecimal(celda.consignacion, 0)} unidades en consignación movidas ese día`}>
+            <StatusPill tone="amber">
+                {celda.diferencia !== null && celda.diferencia > 0 ? '+' : ''}{formatDecimal(celda.diferencia, 0)} · consignación
+            </StatusPill>
+        </span>
+    ) : (
+        <StatusPill tone="rose">{celda.diferencia !== null && celda.diferencia > 0 ? '+' : ''}{formatDecimal(celda.diferencia, 0)}</StatusPill>
+    );
+
     const pill = {
         cuadra: <StatusPill tone="emerald">✔</StatusPill>,
-        diferencia: <StatusPill tone="rose">{celda.diferencia !== null && celda.diferencia > 0 ? '+' : ''}{formatDecimal(celda.diferencia, 0)}</StatusPill>,
+        diferencia: pillDiferencia,
         conteo: <span title="La existencia inicial viene de un conteo físico, no del corte del ERP"><StatusPill tone="violet">conteo</StatusPill></span>,
         sin_verificacion: <StatusPill tone="slate">sin verificar</StatusPill>,
         sin_dato: null,
@@ -262,7 +276,9 @@ export default function CierresInventarioPage() {
                         <KpiCard
                             label="Con diferencia"
                             value={formatInt(kpis.conDiferencia)}
-                            hint={soloDiferencias ? 'Mostrando solo diferencias · clic para quitar' : 'Clic para ver solo estos artículos'}
+                            hint={kpis.porConsignacion > 0
+                                ? `${formatInt(kpis.porConsignacion)} los explica una consignación · clic para filtrar`
+                                : soloDiferencias ? 'Mostrando solo diferencias · clic para quitar' : 'Clic para ver solo estos artículos'}
                             icon={XCircle}
                             tone={kpis.conDiferencia > 0 ? 'rose' : 'slate'}
                             onClick={() => setSoloDiferencias(v => !v)}
@@ -294,9 +310,17 @@ export default function CierresInventarioPage() {
                                                 <StatusPill tone={t.conDiferencia === 0 ? 'emerald' : 'rose'}>
                                                     {formatInt(t.cuadran)} / {formatInt(t.comparados)} cuadran
                                                 </StatusPill>
-                                                {t.conDiferencia > 0 && (
+                                                {t.conDiferencia - t.porConsignacion > 0 && (
                                                     <span className="text-xs font-semibold text-rose-600 dark:text-rose-400">
-                                                        {formatInt(t.conDiferencia)} con diferencia · {formatInt(t.unidadesDiferencia)} unidades
+                                                        {formatInt(t.conDiferencia - t.porConsignacion)} con diferencia · {formatInt(t.unidadesDiferencia - t.unidadesConsignacion)} unidades
+                                                    </span>
+                                                )}
+                                                {t.porConsignacion > 0 && (
+                                                    <span
+                                                        className="text-xs font-semibold text-amber-600 dark:text-amber-400"
+                                                        title="El portal mueve la mercancía en consignación y el ERP no siempre; la mercancía está completa"
+                                                    >
+                                                        {formatInt(t.porConsignacion)} por consignación · {formatInt(t.unidadesConsignacion)} unidades
                                                     </span>
                                                 )}
                                                 {t.conConteo > 0 && (
@@ -325,7 +349,11 @@ export default function CierresInventarioPage() {
                             rows={filas}
                             rowKey={r => String(r.IdArticulo)}
                             initialSort={{ key: 'diferenciaTotal', direction: 'desc' }}
-                            rowClassName={r => (r.estado === 'diferencia' ? 'bg-rose-50/40 dark:bg-rose-950/40' : '')}
+                            rowClassName={r =>
+                                r.estado === 'diferencia' ? 'bg-rose-50/40 dark:bg-rose-950/40'
+                                    : r.estado === 'consignacion' ? 'bg-amber-50/40 dark:bg-amber-950/40'
+                                        : ''
+                            }
                             emptyMessage="Ningún artículo coincide con los filtros."
                         />
                     </Panel>

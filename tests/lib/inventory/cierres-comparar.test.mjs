@@ -187,3 +187,60 @@ describe('compararCierres · adyacencia y conteo', () => {
         assert.equal(r.kpis.conDiferencia, 0);
     });
 });
+
+describe('compararCierres · consignaciones', () => {
+    // El cierre del 24 dejo 8; el ERP abre el 25 con 68 porque el portal devolvio
+    // 60 unidades de una consignacion cerrada ese dia y el ERP nunca las resto.
+    const escenario = (consignadas) => {
+        const d24 = cierre('2026-08-24', [articulo(1, { ExiInicial: 8, ExiFinal: 8 })]);
+        const hoy = {
+            fecha: '2026-08-25',
+            calculadoEn: '2026-08-25T18:00:00.000Z',
+            fechaCorteERP: '2026-08-25T06:00:00.000Z',
+            detalle: [articulo(1, { ExiInicial: -52, ExiFinal: -52 })],
+        };
+        const consignaciones = new Map([['2026-08-24', new Map([[1, consignadas]])]]);
+        return compararCierres([d24], hoy, consignaciones);
+    };
+
+    it('marca la diferencia que una consignacion explica por completo', () => {
+        // Arrange / Act: el cierre devolvio 60, asi que la diferencia es -60.
+        const r = escenario(60);
+
+        // Assert: sigue siendo diferencia, pero señalada y fuera de los faltantes.
+        const celda = r.filas[0].celdas[1];
+        assert.equal(celda.diferencia, -60);
+        assert.equal(celda.consignacion, 60);
+        assert.equal(r.filas[0].estado, 'consignacion');
+        assert.equal(r.transiciones[0].porConsignacion, 1);
+        assert.equal(r.transiciones[0].unidadesConsignacion, 60);
+        assert.equal(r.kpis.porConsignacion, 1);
+        assert.equal(r.kpis.conDiferencia, 0);
+    });
+
+    it('no la marca cuando la consignacion no cuadra con la diferencia', () => {
+        // Arrange / Act: se movieron 40, pero la diferencia es de 60.
+        const r = escenario(40);
+
+        // Assert: un faltante de verdad no se tapa.
+        assert.equal(r.filas[0].celdas[1].consignacion, undefined);
+        assert.equal(r.filas[0].estado, 'diferencia');
+        assert.equal(r.transiciones[0].porConsignacion, 0);
+        assert.equal(r.kpis.conDiferencia, 1);
+    });
+
+    it('sin datos de consignacion se comporta como antes', () => {
+        const d24 = cierre('2026-08-24', [articulo(1, { ExiInicial: 8, ExiFinal: 8 })]);
+        const hoy = {
+            fecha: '2026-08-25',
+            calculadoEn: '2026-08-25T18:00:00.000Z',
+            fechaCorteERP: '2026-08-25T06:00:00.000Z',
+            detalle: [articulo(1, { ExiInicial: -52, ExiFinal: -52 })],
+        };
+
+        const r = compararCierres([d24], hoy);
+
+        assert.equal(r.filas[0].estado, 'diferencia');
+        assert.equal(r.kpis.porConsignacion, 0);
+    });
+});

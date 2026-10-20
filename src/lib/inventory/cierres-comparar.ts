@@ -62,6 +62,8 @@ export interface HoyEnVivo {
     detalle: DetalleCierre[];
 }
 
+import type { ConsignacionesPorDia } from './consignaciones';
+
 export type EstadoTransicion = 'cuadra' | 'diferencia' | 'conteo' | 'sin_verificacion' | 'sin_dato';
 
 const HORA_MS = 3_600_000;
@@ -91,9 +93,15 @@ export interface CeldaComparacion {
     estado: EstadoTransicion;
     /** exiInicial de esta columna − exiFinal de la anterior (null si no se puede). */
     diferencia: number | null;
+    /**
+     * Unidades de consignación que explican la diferencia por completo. Solo se
+     * llena cuando coincide al dedillo: si no cuadra exacto es una diferencia de
+     * verdad y se deja como tal, en lugar de taparla.
+     */
+    consignacion?: number;
 }
 
-export type EstadoFila = 'cuadra' | 'diferencia' | 'sin_verificacion';
+export type EstadoFila = 'cuadra' | 'diferencia' | 'consignacion' | 'sin_verificacion';
 
 export interface FilaComparacion {
     IdArticulo: number;
@@ -115,6 +123,10 @@ export interface ResumenTransicion {
     comparados: number;
     cuadran: number;
     conDiferencia: number;
+    /** De los anteriores, los que explica una consignación movida ese día. */
+    porConsignacion: number;
+    /** Unidades de los explicados por consignación. */
+    unidadesConsignacion: number;
     /** Artículos con conteo físico ese día (base = conteo, no comparable). */
     conConteo: number;
     unidadesDiferencia: number;
@@ -128,8 +140,10 @@ export interface Comparacion {
         articulos: number;
         cuadran: number;
         conDiferencia: number;
+        porConsignacion: number;
         sinVerificacion: number;
         unidadesDiferencia: number;
+        unidadesConsignacion: number;
         valorDiferencia: number;
     };
 }
@@ -214,7 +228,9 @@ function celda(
     actual: DetalleCierre | undefined,
     previo: DetalleCierre | undefined,
     columna: ColumnaInterna,
-    esPrimera: boolean
+    esPrimera: boolean,
+    /** Efecto de la consignación sobre el cierre del día que se está verificando. */
+    efectoConsignacion = 0
 ): CeldaComparacion {
     const base: CeldaComparacion = {
         exiInicial: actual ? num(actual.ExiInicial) : null,
@@ -229,21 +245,37 @@ function celda(
     if (actual.Fuente === 'conteo') return { ...base, estado: 'conteo' };
 
     const diferencia = num(actual.ExiInicial) - num(previo.ExiFinal);
+    if (Math.abs(diferencia) < EPSILON) return { ...base, diferencia, estado: 'cuadra' };
+
+    // El portal mueve la consignación y el ERP no siempre, así que la diferencia
+    // del día siguiente es ese efecto con el signo cambiado. Cuando coincide
+    // exacto, la mercancía está completa y lo que sobra es la regla, no el stock.
+    const explicada = efectoConsignacion !== 0 && Math.abs(diferencia + efectoConsignacion) < EPSILON;
     return {
         ...base,
         diferencia,
-        estado: Math.abs(diferencia) < EPSILON ? 'cuadra' : 'diferencia',
+        estado: 'diferencia',
+        ...(explicada ? { consignacion: Math.abs(efectoConsignacion) } : {}),
     };
 }
 
 function estadoFila(celdas: CeldaComparacion[]): EstadoFila {
-    if (celdas.some(c => c.estado === 'diferencia')) return 'diferencia';
+    const diferencias = celdas.filter(c => c.estado === 'diferencia');
+    if (diferencias.length > 0) {
+        // Si TODAS se explican por consignación, la fila no es un faltante.
+        return diferencias.every(c => c.consignacion !== undefined) ? 'consignacion' : 'diferencia';
+    }
     if (celdas.some(c => c.estado === 'cuadra')) return 'cuadra';
     return 'sin_verificacion';
 }
 
 /** Pone en fila los cierres (ascendente por fecha) y el inventario de hoy. */
-export function compararCierres(dias: CierreDia[], hoy: HoyEnVivo | null): Comparacion {
+export function compararCierres(
+    dias: CierreDia[],
+    hoy: HoyEnVivo | null,
+    /** Efecto de la consignación por fecha y artículo; sin él nada se marca. */
+    consignaciones: ConsignacionesPorDia = new Map()
+): Comparacion {
     const columnas = armarColumnas(dias, hoy);
 
     const catalogo = new Map<number, DetalleCierre>();
@@ -254,9 +286,19 @@ export function compararCierres(dias: CierreDia[], hoy: HoyEnVivo | null): Compa
     const filas: FilaComparacion[] = [...catalogo.values()]
         .sort((a, b) => a.Descripcion.localeCompare(b.Descripcion, 'es-MX') || a.Codigo.localeCompare(b.Codigo))
         .map(ref => {
-            const celdas = columnas.map((col, i) =>
-                celda(col.porArticulo.get(ref.IdArticulo), i > 0 ? columnas[i - 1].porArticulo.get(ref.IdArticulo) : undefined, col, i === 0)
-            );
+            const celdas = columnas.map((col, i) => {
+                // La consignación que desajusta esta transición se movió el día de
+                // la columna ANTERIOR: es el día que se está cerrando.
+                const diaCerrado = i > 0 ? columnas[i - 1].fecha : '';
+                const efecto = consignaciones.get(diaCerrado)?.get(ref.IdArticulo) ?? 0;
+                return celda(
+                    col.porArticulo.get(ref.IdArticulo),
+                    i > 0 ? columnas[i - 1].porArticulo.get(ref.IdArticulo) : undefined,
+                    col,
+                    i === 0,
+                    efecto
+                );
+            });
             return {
                 IdArticulo: ref.IdArticulo,
                 Codigo: ref.Codigo,
@@ -281,6 +323,8 @@ export function compararCierres(dias: CierreDia[], hoy: HoyEnVivo | null): Compa
             comparados: verificables.length,
             cuadran: verificables.filter(c => c.estado === 'cuadra').length,
             conDiferencia: verificables.filter(c => c.estado === 'diferencia').length,
+            porConsignacion: verificables.filter(c => c.consignacion !== undefined).length,
+            unidadesConsignacion: verificables.reduce((acc, c) => acc + (c.consignacion ?? 0), 0),
             conConteo: celdasCol.filter(c => c.estado === 'conteo').length,
             unidadesDiferencia: verificables.reduce((acc, c) => acc + Math.abs(c.diferencia ?? 0), 0),
         };
@@ -290,8 +334,11 @@ export function compararCierres(dias: CierreDia[], hoy: HoyEnVivo | null): Compa
         articulos: filas.length,
         cuadran: filas.filter(f => f.estado === 'cuadra').length,
         conDiferencia: filas.filter(f => f.estado === 'diferencia').length,
+        porConsignacion: filas.filter(f => f.estado === 'consignacion').length,
         sinVerificacion: filas.filter(f => f.estado === 'sin_verificacion').length,
         unidadesDiferencia: filas.reduce((acc, f) => acc + f.diferenciaTotal, 0),
+        unidadesConsignacion: filas.reduce(
+            (acc, f) => acc + f.celdas.reduce((a, c) => a + (c.consignacion ?? 0), 0), 0),
         valorDiferencia: filas.reduce((acc, f) => acc + f.diferenciaTotal * f.Costo, 0),
     };
 
