@@ -103,6 +103,55 @@ export function existenciaActual(
 }
 
 /**
+ * Junta la historia de tblReporteMovimientos (que el ERP solo reescribe en su
+ * corrida nocturna) con los documentos posteriores al corte leídos en vivo.
+ *
+ * - De la historia se quita lo posterior al corte (menos el corte mismo): lo en
+ *   vivo lo reemplaza y así nada se cuenta dos veces.
+ * - Lo en vivo se ordena por fecha y va después del corte.
+ * - Un conteo físico en vivo llega con `ExiConteo` (lo contado); su `Mov` se
+ *   calcula aquí como la diferencia contra el saldo de ese momento, que es lo
+ *   que el ERP guardará como ajuste en su siguiente corrida.
+ *
+ * Sin corte no hay contra qué anclar lo en vivo y la historia se deja igual.
+ * Devuelve copias nuevas; no toca la entrada.
+ */
+export function combinarConEnVivo<T extends MovimientoBase & { ExiConteo?: number | null }>(
+    historia: readonly T[],
+    enVivo: readonly T[],
+    corte: CorteInfo
+): T[] {
+    if (corte.ExiCorte === null || !corte.FechaCorte) return [...historia];
+    const tCorte = Date.parse(corte.FechaCorte);
+
+    const hastaElCorte = historia.filter(
+        r => r.TipoMovimiento === TIPO_CORTE || Date.parse(r.FechaMovimiento) <= tCorte
+    );
+
+    // A la misma hora, los documentos van antes que el conteo que los absorbió.
+    const esConteo = (r: T) => r.ExiConteo !== undefined && r.ExiConteo !== null;
+    const ordenados = [...enVivo].sort(
+        (a, b) =>
+            Date.parse(a.FechaMovimiento) - Date.parse(b.FechaMovimiento) ||
+            Number(esConteo(a)) - Number(esConteo(b))
+    );
+
+    let saldo = num(corte.ExiCorte);
+    const ajustados = ordenados.map(r => {
+        if (!esConteo(r)) {
+            saldo = redondear(saldo + num(r.Mov));
+            return { ...r };
+        }
+        const contado = num(r.ExiConteo);
+        const ajuste = redondear(contado - saldo);
+        saldo = contado;
+        return { ...r, Mov: ajuste };
+    });
+
+    return [...hastaElCorte, ...ajustados];
+}
+
+/**
  * Saldo DESPUÉS de cada movimiento. Recorre la lista (ordenada por fecha
  * ascendente) de atrás hacia adelante partiendo de la existencia actual, que
  * es exactamente lo que hace el ERP (`rs.MoveLast` … `vlExi = vlExi - Mov`).

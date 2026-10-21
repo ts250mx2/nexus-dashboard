@@ -87,6 +87,14 @@ const COLUMNAS: Column<MovimientoRow>[] = [
         render: r => (
             <span className="whitespace-nowrap text-xs text-slate-600 dark:text-slate-300 inline-flex items-center gap-1.5">
                 {formatDateTime(r.FechaMovimiento)}
+                {r.EnVivo !== undefined && (
+                    <span
+                        title="Posterior al corte del ERP: se lee en vivo y entrará a su reporte en la corrida de la madrugada"
+                        className="px-1 rounded bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-400 border border-sky-100 dark:border-sky-900/60 text-[9px] font-black uppercase"
+                    >
+                        En vivo
+                    </span>
+                )}
                 {r.Editado === 1 && (
                     <span
                         title={`Modificado: ${formatDateTime(r.FechaAct)}`}
@@ -122,8 +130,9 @@ const COLUMNAS: Column<MovimientoRow>[] = [
     },
 ];
 
-/** Llave primaria del renglón en tblReporteMovimientos. */
-const llaveMovimiento = (r: MovimientoRow) => `${r.IdComputadora}-${r.TipoMovimiento}-${r.Folio}-${r.Iteracion}`;
+/** Llave primaria del renglón en tblReporteMovimientos (más el origen, si es en vivo). */
+const llaveMovimiento = (r: MovimientoRow) =>
+    `${r.EnVivo ?? 0}-${r.IdComputadora}-${r.TipoMovimiento}-${r.Folio}-${r.Iteracion}`;
 
 function Stat({
     label,
@@ -311,6 +320,7 @@ export default function MovimientosArticuloModal({ articulo, onClose }: Props) {
                 Tipo: etiquetaTipo(r.TipoMovimiento),
                 Usuario: r.Usuario ?? '',
                 EditadoTexto: r.Editado ? 'Sí' : '',
+                EnVivoTexto: r.EnVivo !== undefined ? 'Sí' : '',
             }));
         exportarExcel({
             archivo: `movimientos_${codigo}_${sucursal}`,
@@ -332,6 +342,7 @@ export default function MovimientosArticuloModal({ articulo, onClose }: Props) {
                 colNumero('Exi', 'Exi', 10),
                 colTexto('Usuario', 'Usuario', 24),
                 colTexto('Editado', 'EditadoTexto', 10),
+                colTexto('En vivo', 'EnVivoTexto', 10),
             ],
             filas,
         });
@@ -476,7 +487,7 @@ export default function MovimientosArticuloModal({ articulo, onClose }: Props) {
                             <section className="space-y-2">
                                 <SeccionTitulo
                                     titulo={`Detalle · ${etiquetaTipo(tipoActivo)}`}
-                                    sub={`${formatInt(visibles.length)} renglones · Exi = existencia después del movimiento`}
+                                    sub={`${formatInt(visibles.length)} renglones · Exi = existencia después del movimiento · "en vivo" = posterior al corte del ERP`}
                                 />
                                 <DataTable
                                     columns={COLUMNAS}

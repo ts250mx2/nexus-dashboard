@@ -8,9 +8,10 @@ import {
     MovimientoRow,
     MovimientosMeta,
     buildArticuloSucursalQuery,
+    buildMovimientosEnVivoQuery,
     buildMovimientosQuery,
 } from '@/lib/inventory/movimientos';
-import { calcularSaldos, existenciaActual, resumirPorTipo } from '@/lib/inventory/movimientos-view';
+import { calcularSaldos, combinarConEnVivo, existenciaActual, resumirPorTipo } from '@/lib/inventory/movimientos-view';
 import { parseEntero } from '@/lib/inventory/params';
 
 /**
@@ -22,6 +23,10 @@ import { parseEntero } from '@/lib/inventory/params';
  *
  * Parámetros: `articulo` y `sucursal` (obligatorios) y `todos=1` para ver la
  * historia completa en vez de solo lo posterior al último ajuste físico.
+ *
+ * La historia sale de tblReporteMovimientos y lo posterior al corte se lee en
+ * vivo de las tablas origen: así lo de hoy aparece en cuanto llega a la base, y
+ * la existencia final es la misma que la de la pantalla de existencias.
  */
 
 type Fila = Record<string, unknown>;
@@ -43,6 +48,17 @@ function normalizarInfo(fila: Fila): ArticuloSucursalInfo {
         ExiCorte: numOrNull(fila.ExiCorte),
         FechaCorte: toIso(fila.FechaCorte),
         ExiCosto: numOrNull(fila.ExiCosto),
+    };
+}
+
+type MovimientoSinSaldo = Omit<MovimientoRow, 'Exi'> & { ExiConteo?: number | null };
+
+/** Renglón leído en vivo: marca su origen y trae lo contado si es un conteo físico. */
+function normalizarEnVivo(fila: Fila): MovimientoSinSaldo {
+    return {
+        ...normalizarMovimiento(fila),
+        EnVivo: num(fila.Reversion) === 1 ? 2 : 1,
+        ExiConteo: numOrNull(fila.ExiConteo),
     };
 }
 
@@ -94,10 +110,15 @@ export async function GET(req: NextRequest) {
         const movRows = (await query(detalle.sql, detalle.params)) as Fila[];
         const t2 = performance.now();
 
+        const enVivo = buildMovimientosEnVivoQuery(articulo, sucursal);
+        const vivoRows = (await query(enVivo.sql, enVivo.params)) as Fila[];
+        const t2b = performance.now();
+
         const info = normalizarInfo(infoRows[0]);
         // La consulta viene del más reciente al más antiguo (por el LIMIT); el
         // cálculo de saldos espera orden cronológico.
-        const base = movRows.map(normalizarMovimiento).reverse();
+        const historia: MovimientoSinSaldo[] = movRows.map(normalizarMovimiento).reverse();
+        const base = combinarConEnVivo(historia, vivoRows.map(normalizarEnVivo), info);
         const exiFinal = existenciaActual(base, info, info.ExiCosto);
         const movimientos: MovimientoRow[] = calcularSaldos(base, exiFinal);
         const resumen = resumirPorTipo(movimientos);
@@ -115,7 +136,7 @@ export async function GET(req: NextRequest) {
         // Desglose de tiempos visible en las DevTools del navegador (pestaña Timing).
         respuesta.headers.set(
             'Server-Timing',
-            `encabezado;dur=${(t1 - t0).toFixed(0)}, detalle;dur=${(t2 - t1).toFixed(0)}, calculo;dur=${(t3 - t2).toFixed(0)}`
+            `encabezado;dur=${(t1 - t0).toFixed(0)}, detalle;dur=${(t2 - t1).toFixed(0)}, envivo;dur=${(t2b - t2).toFixed(0)}, calculo;dur=${(t3 - t2b).toFixed(0)}`
         );
         return respuesta;
     } catch (error: unknown) {

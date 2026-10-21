@@ -4,6 +4,7 @@ import {
     TIPO_CORTE,
     TIPO_TODOS,
     calcularSaldos,
+    combinarConEnVivo,
     diasEntre,
     etiquetaTipo,
     existenciaActual,
@@ -165,5 +166,70 @@ describe('etiquetaTipo', () => {
 
     it('describe los tipos desconocidos', () => {
         assert.equal(etiquetaTipo(7), 'TIPO 7');
+    });
+});
+
+describe('combinarConEnVivo', () => {
+    // Corte del ERP del 21-oct 00:00 (06:00Z) con 15 piezas, como la MALETA NEXUS
+    // KARATE NEGRO CH de HERMOSILLO.
+    const corte = { ExiCorte: 15, FechaCorte: '2026-10-21T06:00:00.000Z' };
+    const historia = [
+        mov({ Mov: -1, FechaMovimiento: '2026-10-20T22:12:36.000Z', Dia: '2026-10-20' }),
+        mov({ TipoMovimiento: TIPO_CORTE, Mov: 0, FechaMovimiento: corte.FechaCorte, Dia: '2026-10-21' }),
+    ];
+    const ventaHoy = mov({ Mov: -3, FechaMovimiento: '2026-10-21T20:59:32.000Z', Dia: '2026-10-21' });
+
+    it('agrega lo de hoy después del corte y la existencia baja con eso', () => {
+        // Act
+        const r = combinarConEnVivo(historia, [ventaHoy], corte);
+
+        // Assert: la venta de hoy queda al final y la existencia es 15 - 3.
+        assert.equal(r.length, 3);
+        assert.equal(r[2].Mov, -3);
+        assert.equal(existenciaActual(r, corte, null), 12);
+    });
+
+    it('descarta lo que la historia trae después del corte, porque lo en vivo lo reemplaza', () => {
+        // Arrange: el ERP alcanzó a guardar la venta (sin efecto) si corrió tarde.
+        const conDuplicado = [...historia, { ...ventaHoy }];
+
+        // Act
+        const r = combinarConEnVivo(conDuplicado, [ventaHoy], corte);
+
+        // Assert: la venta aparece una sola vez.
+        assert.equal(r.filter(x => x.Mov === -3).length, 1);
+        assert.equal(existenciaActual(r, corte, null), 12);
+    });
+
+    it('ordena lo en vivo por fecha', () => {
+        const temprano = mov({ Mov: 10, FechaMovimiento: '2026-10-21T15:00:00.000Z', Dia: '2026-10-21' });
+
+        const r = combinarConEnVivo(historia, [ventaHoy, temprano], corte);
+
+        assert.deepEqual(r.slice(2).map(x => x.Mov), [10, -3]);
+    });
+
+    it('un conteo físico posterior al corte ajusta a lo contado', () => {
+        // Arrange: se vendieron 2 antes del conteo (absorbidas), se contaron 11
+        // y después se vendieron 3.
+        const antes = mov({ Mov: -2, FechaMovimiento: '2026-10-21T15:00:00.000Z', Dia: '2026-10-21' });
+        const conteo = mov({ TipoMovimiento: 0, Mov: 0, ExiConteo: 11, FechaMovimiento: '2026-10-21T16:00:00.000Z', Dia: '2026-10-21' });
+
+        // Act
+        const r = combinarConEnVivo(historia, [ventaHoy, conteo, antes], corte);
+
+        // Assert: el ajuste es 11 - (15 - 2) = -2 y la existencia queda en 11 - 3.
+        const ajuste = r.find(x => x.TipoMovimiento === 0);
+        assert.equal(ajuste.Mov, -2);
+        assert.equal(existenciaActual(r, corte, null), 8);
+        assert.deepEqual(calcularSaldos(r, 8).slice(2).map(x => x.Exi), [13, 11, 8]);
+    });
+
+    it('sin corte deja la historia como está', () => {
+        const sinCorte = { ExiCorte: null, FechaCorte: null };
+
+        const r = combinarConEnVivo(historia, [ventaHoy], sinCorte);
+
+        assert.equal(r.length, 2);
     });
 });
