@@ -105,6 +105,12 @@ export interface CeldaComparacion {
      * hubo movimiento, aunque la transición cuadre.
      */
     movConsignacion?: number;
+    /**
+     * Costo unitario del día que se está cerrando (el del cierre anterior), con el
+     * que se valúa la diferencia de esta transición. Ausente en la primera columna
+     * y cuando el artículo no estaba en el cierre anterior.
+     */
+    costoCierre?: number;
 }
 
 export type EstadoFila = 'cuadra' | 'diferencia' | 'consignacion' | 'sin_verificacion';
@@ -254,7 +260,10 @@ function celda(
     if (!columna.corteRenovado) return { ...base, estado: 'sin_verificacion' };
     if (actual.Fuente === 'conteo') return { ...base, estado: 'conteo' };
 
-    const nota = efectoConsignacion !== 0 ? { movConsignacion: Math.abs(efectoConsignacion) } : {};
+    const nota = {
+        costoCierre: num(previo.Costo),
+        ...(efectoConsignacion !== 0 ? { movConsignacion: Math.abs(efectoConsignacion) } : {}),
+    };
     const diferencia = num(actual.ExiInicial) - num(previo.ExiFinal);
     if (Math.abs(diferencia) < EPSILON) return { ...base, ...nota, diferencia, estado: 'cuadra' };
 
@@ -280,6 +289,15 @@ function estadoFila(celdas: CeldaComparacion[]): EstadoFila {
     }
     if (celdas.some(c => c.estado === 'cuadra')) return 'cuadra';
     return 'sin_verificacion';
+}
+
+/** Valor de una diferencia: |diferencia| × costo del día que se cerró (o el de la fila). */
+function valorCelda(celda: CeldaComparacion, costoFila: number): number {
+    return Math.abs(celda.diferencia ?? 0) * (celda.costoCierre ?? costoFila);
+}
+
+function valorDiferencias(fila: FilaComparacion): number {
+    return fila.celdas.reduce((acc, c) => acc + valorCelda(c, fila.Costo), 0);
 }
 
 /** Pone en fila los cierres (ascendente por fecha) y el inventario de hoy. */
@@ -354,7 +372,8 @@ export function compararCierres(
         unidadesDiferencia: filas.reduce((acc, f) => acc + f.diferenciaTotal, 0),
         unidadesConsignacion: filas.reduce(
             (acc, f) => acc + f.celdas.reduce((a, c) => a + (c.consignacion ?? 0), 0), 0),
-        valorDiferencia: filas.reduce((acc, f) => acc + f.diferenciaTotal * f.Costo, 0),
+        // Cada transición se valúa con el costo del día que cierra, no con el de hoy.
+        valorDiferencia: filas.reduce((acc, f) => acc + valorDiferencias(f), 0),
     };
 
     return {

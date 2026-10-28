@@ -449,8 +449,12 @@ SELECT /*+ MAX_EXECUTION_TIME(${MAX_EXECUTION_MS}) */
     IFNULL(P.EntradasHoy, 0)                                               AS EntradasHoy,
     IFNULL(P.SalidasHoy, 0)                                                AS SalidasHoy,
     ${exiFinal}                                                            AS ExiFinal,
-    IFNULL(CI.PrecioBase, 0)                                               AS Costo,
-    (${exiFinal}) * IFNULL(CI.PrecioBase, 0)                               AS Total,
+    -- Costo VIGENTE del catálogo, no el de tblCostoInventario: ese lo regenera el
+    -- ERP en la madrugada y un cambio de costo del día no se vería hasta mañana.
+    -- Cada cierre graba este costo, así que un día anterior queda valuado con el
+    -- costo que tenía al cerrarse. Igual que modExistencias2026.bas del ERP.
+    IFNULL(A.PrecioBase, 0)                                                AS Costo,
+    (${exiFinal}) * IFNULL(A.PrecioBase, 0)                                AS Total,
     IFNULL(CI.Consignacion, 0)                                             AS Consignacion,
     IFNULL(P.NumMovimientos, 0)                                            AS NumMovimientos,
     X.FechaCorte,

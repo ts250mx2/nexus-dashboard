@@ -69,14 +69,14 @@ export function filasReporte(comp: Comparacion): FilaReporte[] {
                     Descripcion: f.Descripcion,
                     Marca: f.Marca,
                     Depto: f.Depto,
-                    Costo: f.Costo,
+                    Costo: ult.costoCierre ?? f.Costo,
                     CierreAnterior: ant?.exiFinal ?? '',
                     CorteERP: ult.exiInicial ?? '',
                     Entradas: ult.entradas,
                     Salidas: ult.salidas,
                     CierreHoy: ult.exiFinal ?? '',
                     Diferencia: dif ?? '',
-                    ValorDiferencia: dif === null ? '' : dif * f.Costo,
+                    ValorDiferencia: dif === null ? '' : dif * (ult.costoCierre ?? f.Costo),
                     Estado: ETIQUETA_ESTADO[ult.estado],
                 } as FilaReporte,
             };
@@ -99,7 +99,9 @@ export function resumenComparacion(comp: Comparacion): ResumenComparacion {
 
     const i = n - 1;
     const t = comp.transiciones[i - 1];
-    const valor = comp.filas.reduce((acc, f) => acc + Math.abs(f.celdas[i].diferencia ?? 0) * f.Costo, 0);
+    // Valuado con el costo del día que se cerró, igual que kpis.valorDiferencia.
+    const valor = comp.filas.reduce(
+        (acc, f) => acc + Math.abs(f.celdas[i].diferencia ?? 0) * (f.celdas[i].costoCierre ?? f.Costo), 0);
     return {
         anterior: comp.columnas[i - 1].fecha,
         corteRenovado: t.corteRenovado,

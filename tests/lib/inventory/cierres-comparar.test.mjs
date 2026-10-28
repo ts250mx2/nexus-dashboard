@@ -271,3 +271,46 @@ describe('compararCierres · consignaciones', () => {
         assert.equal(r.kpis.porConsignacion, 0);
     });
 });
+
+describe('compararCierres · valor de las diferencias', () => {
+    it('valúa cada transición con el costo del día que se está cerrando', () => {
+        // Arrange: el costo sube de 197 (24 y 25) a 205 (hoy, 26). La transición
+        // 24 -> 25 tiene 2 piezas de diferencia y la 25 -> hoy, 1.
+        const d24 = cierre('2026-08-24', [articulo(1, { ExiInicial: 10, ExiFinal: 10, Costo: 197 })]);
+        const d25 = cierre('2026-08-25', [articulo(1, { ExiInicial: 8, ExiFinal: 8, Costo: 199 })]);
+        const hoy = {
+            fecha: '2026-08-26',
+            calculadoEn: '2026-08-26T18:00:00.000Z',
+            fechaCorteERP: '2026-08-26T06:00:00.000Z',
+            detalle: [articulo(1, { ExiInicial: 7, ExiFinal: 7, Costo: 205 })],
+        };
+
+        // Act
+        const r = compararCierres([d24, d25], hoy);
+
+        // Assert: 2 × 197 (costo del 24) + 1 × 199 (costo del 25), no 3 × 205.
+        assert.equal(r.filas[0].celdas[1].costoCierre, 197);
+        assert.equal(r.filas[0].celdas[2].costoCierre, 199);
+        assert.equal(r.kpis.valorDiferencia, 2 * 197 + 1 * 199);
+    });
+
+    it('si el artículo no estaba en el cierre anterior usa el costo de la fila', () => {
+        // Arrange: el artículo 2 no existe en el cierre del 24.
+        const d24 = cierre('2026-08-24', [articulo(1)]);
+        const hoy = {
+            fecha: '2026-08-25',
+            calculadoEn: '2026-08-25T18:00:00.000Z',
+            fechaCorteERP: '2026-08-25T06:00:00.000Z',
+            detalle: [articulo(1), articulo(2, { Costo: 40 })],
+        };
+
+        // Act
+        const r = compararCierres([d24], hoy);
+
+        // Assert: sin cierre anterior no hay transición que valuar; el costo de
+        // respaldo es el de la fila.
+        const fila2 = r.filas.find(f => f.IdArticulo === 2);
+        assert.equal(fila2.celdas[1].costoCierre, undefined);
+        assert.equal(fila2.Costo, 40);
+    });
+});
