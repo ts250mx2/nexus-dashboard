@@ -59,6 +59,8 @@ interface InventoryFiltersProps {
     searchPlaceholder?: string;
     onExport?: () => void;
     exportDisabled?: boolean;
+    /** Mientras se arma el archivo del botón "Excel": lo bloquea y avisa que va en camino. */
+    exportLoading?: boolean;
     /** Segunda descarga opcional (por ejemplo, el mismo reporte con detalle). */
     onExportDetalle?: () => void;
     exportDetalleLabel?: string;
@@ -80,6 +82,7 @@ export default function InventoryFilters({
     onSearchChange,
     searchPlaceholder = 'Producto, código o marca',
     onExport,
+    exportLoading,
     exportDisabled = false,
     onExportDetalle,
     exportDetalleLabel = 'Excel con Detalle',
@@ -168,11 +171,13 @@ export default function InventoryFilters({
                 <button
                     type="button"
                     onClick={onExport}
-                    disabled={exportDisabled}
+                    disabled={exportDisabled || exportLoading}
                     className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-emerald-700 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
                 >
-                    <Download size={14} />
-                    Excel
+                    {exportLoading
+                        ? <Loader2 size={14} className="animate-spin" />
+                        : <Download size={14} />}
+                    {exportLoading ? 'Armando...' : 'Excel'}
                 </button>
             )}
 

@@ -155,6 +155,7 @@ const COLUMNAS_DETALLE = [
     colNumero('Mínimo', 'Minimo', 12),
     colDecimal('Salida/día', 'DemandaDiaria', 12),
     colNumero('Cobertura (días)', 'CoberturaRedondeada', 16),
+    colTexto('Última venta', 'UltimaVentaTexto', 22),
     colTexto('Fuente', 'Fuente', 14),
     colMoneda('Costo unitario', 'CostoUnitario', 16),
     colMoneda('Valor inventario', 'ValorInventario', 18),
@@ -175,6 +176,7 @@ function filasDetalle(filas: DetalleRow[]): Record<string, unknown>[] {
         ...r,
         EstadoEtiqueta: ESTADO_PILL[r.Estado]?.label ?? r.Estado,
         CoberturaRedondeada: r.Cobertura === null ? '' : Math.round(Number(r.Cobertura)),
+        UltimaVentaTexto: r.UltimaVenta ? `${formatDate(r.UltimaVenta)} ${formatHora(r.UltimaVenta)}` : 'Nunca',
     }));
 }
 

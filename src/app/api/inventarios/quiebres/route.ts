@@ -3,6 +3,7 @@ import { query } from '@/lib/db';
 import { getErrorMessage } from '@/lib/errors';
 import { buildBaseQuery } from '@/lib/inventory/base-query';
 import { parseFilters } from '@/lib/inventory/params';
+import { claveArticuloSucursal, ultimaVentaPorArticulo } from '@/lib/inventory/ultima-venta';
 
 /**
  * QUIEBRES DE STOCK
@@ -13,6 +14,10 @@ import { parseFilters } from '@/lib/inventory/params';
  * La venta perdida es una ESTIMACIÓN: se asume que el artículo lleva sin stock
  * desde su última venta (tope: la ventana de demanda) y se valúa a su precio
  * promedio de venta real del periodo.
+ *
+ * `ultimaVentaReal=1` (lo pide el Excel) completa la última venta de los artículos
+ * sin venta en la ventana de demanda. Es opcional porque recorre tblDetalleVentas
+ * y sumaría unos 5 s a cada carga de la pantalla.
  */
 
 /** Tope de filas que se traen para poder calcular KPIs exactos sin paginar en SQL. */
@@ -43,7 +48,8 @@ interface QuiebreRow {
 
 export async function GET(req: NextRequest) {
     try {
-        const filters = parseFilters(new URL(req.url).searchParams);
+        const searchParams = new URL(req.url).searchParams;
+        const filters = parseFilters(searchParams);
         const { sql: baseSql, params } = buildBaseQuery({
             dias: filters.dias,
             sucursales: filters.sucursales,
@@ -120,6 +126,19 @@ LIMIT ${MAX_FILAS}`;
 
         const porSucursal = [...porSucursalMap.values()].sort((a, b) => b.VentaPerdida - a.VentaPerdida);
 
+        // La UltimaVenta del reporte solo mira la ventana de demanda: vacía no quiere
+        // decir que nunca se vendió. Cuando existe ya es la correcta, así que solo se
+        // buscan las que faltan.
+        const mostradas = rows.slice(0, filters.limit);
+        const reales = searchParams.get('ultimaVentaReal') === '1'
+            ? await ultimaVentaPorArticulo(mostradas.filter(r => !r.UltimaVenta))
+            : null;
+        const filasMostradas = reales === null
+            ? mostradas
+            : mostradas.map(r => (r.UltimaVenta
+                ? r
+                : { ...r, UltimaVenta: reales.get(claveArticuloSucursal(r.IdArticulo, r.IdSucursal)) ?? null }));
+
         return NextResponse.json({
             success: true,
             meta: {
@@ -130,7 +149,7 @@ LIMIT ${MAX_FILAS}`;
             },
             kpis,
             porSucursal,
-            rows: rows.slice(0, filters.limit),
+            rows: filasMostradas,
         });
     } catch (error: unknown) {
         console.error('Error en reporte de quiebres de stock:', error);

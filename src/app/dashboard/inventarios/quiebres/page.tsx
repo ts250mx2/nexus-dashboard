@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { AlertTriangle, PackageX, TrendingDown, Wallet } from 'lucide-react';
+import { AlertTriangle, PackageX, TrendingDown, Wallet, X } from 'lucide-react';
 import {
     Bar,
     BarChart,
@@ -29,11 +29,13 @@ import {
     exportarExcel,
 } from '@/components/inventarios/export-excel';
 import { useInventoryReport } from '@/hooks/use-inventory-report';
+import { getErrorMessage } from '@/lib/errors';
 import {
     formatCurrency,
     formatCurrencyShort,
     formatDate,
     formatDecimal,
+    formatHora,
     formatInt,
 } from '@/lib/format';
 
@@ -83,12 +85,19 @@ interface QuiebresResponse {
 
 type EstadoFiltro = 'todos' | 'quiebre' | 'bajo_minimo';
 
+/** Renglones que se traen para la pantalla. */
+const LIMITE_FILAS = 1000;
+/** El Excel lleva todo el reporte: es el tope de filas que calcula el servidor (MAX_FILAS). */
+const LIMITE_EXCEL = 8000;
+
 export default function QuiebresStockPage() {
     const sucursales = useSucursales();
     const [selectedSucursales, setSelectedSucursales] = useState<string[]>([]);
     const [dias, setDias] = useState(90);
     const [search, setSearch] = useState('');
     const [estado, setEstado] = useState<EstadoFiltro>('todos');
+    const [exportando, setExportando] = useState(false);
+    const [errorExport, setErrorExport] = useState<string | null>(null);
 
     const { data, loading, refreshing, error, lastUpdated, refresh } = useInventoryReport<QuiebresResponse>(
         '/api/inventarios/quiebres',
@@ -96,7 +105,7 @@ export default function QuiebresStockPage() {
             sucursales: selectedSucursales.join(','),
             dias,
             search,
-            limit: 1000,
+            limit: LIMITE_FILAS,
         },
         'search'
     );
@@ -110,18 +119,18 @@ export default function QuiebresStockPage() {
         quiebres: s.Quiebres,
     }));
 
-    const handleExport = () => {
-        if (!data) return;
+    const descargarExcel = (reporte: QuiebresResponse) => {
+        const filas = estado === 'todos' ? reporte.rows : reporte.rows.filter(r => r.Estado === estado);
         exportarExcel({
             archivo: 'quiebres_de_stock',
             hoja: 'Quiebres',
             titulo: 'Quiebres de Stock',
             meta: [
                 { label: 'Sucursales', value: etiquetaSucursales(selectedSucursales, sucursales) },
-                { label: 'Historia de demanda', value: `${data.meta.dias} días` },
-                { label: 'SKUs en quiebre', value: formatInt(data.kpis.skusQuiebre) },
-                { label: 'SKUs bajo mínimo', value: formatInt(data.kpis.skusBajoMinimo) },
-                { label: 'Venta perdida estimada', value: formatCurrency(data.kpis.ventaPerdida) },
+                { label: 'Historia de demanda', value: `${reporte.meta.dias} días` },
+                { label: 'SKUs en quiebre', value: formatInt(reporte.kpis.skusQuiebre) },
+                { label: 'SKUs bajo mínimo', value: formatInt(reporte.kpis.skusBajoMinimo) },
+                { label: 'Venta perdida estimada', value: formatCurrency(reporte.kpis.ventaPerdida) },
             ],
             columnas: [
                 colTexto('Sucursal', 'Sucursal', 20),
@@ -136,14 +145,49 @@ export default function QuiebresStockPage() {
                 colNumero('Días sin stock', 'DiasSinStock', 14),
                 colMoneda('Venta perdida', 'VentaPerdida'),
                 colMoneda('Costo reposición', 'CostoReposicion', 18),
+                colTexto('Última venta', 'UltimaVentaTexto', 22),
             ],
-            filas: filteredRows.map(r => ({
+            filas: filas.map(r => ({
                 ...r,
                 EstadoTexto: r.Estado === 'quiebre' ? 'Quiebre' : 'Bajo mínimo',
                 MinimoRedondeado: Math.round(Number(r.Minimo || 0)),
                 FaltanteRedondeado: Math.round(Number(r.UnidadesFaltantes || 0)),
+                UltimaVentaTexto: r.UltimaVenta ? `${formatDate(r.UltimaVenta)} ${formatHora(r.UltimaVenta)}` : 'Nunca',
             })),
         });
+    };
+
+    /**
+     * Pide el reporte otra vez con la última venta completa: la de la pantalla solo
+     * mira la historia de demanda, y en el archivo un vacío se leería como "nunca".
+     */
+    const handleExport = async () => {
+        setExportando(true);
+        setErrorExport(null);
+        try {
+            const params = new URLSearchParams({
+                dias: String(dias),
+                limit: String(LIMITE_EXCEL),
+                ultimaVentaReal: '1',
+            });
+            if (selectedSucursales.length) params.set('sucursales', selectedSucursales.join(','));
+            if (search) params.set('search', search);
+
+            const response = await fetch(`/api/inventarios/quiebres?${params}`);
+            const json = await response.json();
+            if (!json.success) throw new Error(json.error || 'El servidor no pudo armar el reporte');
+            const reporte = json as QuiebresResponse;
+            descargarExcel(reporte);
+            if (reporte.meta.truncado) {
+                setErrorExport(
+                    `El reporte se cortó en ${formatInt(LIMITE_EXCEL)} renglones: el archivo puede estar incompleto.`
+                );
+            }
+        } catch (err: unknown) {
+            setErrorExport(getErrorMessage(err, 'No se pudo generar el Excel'));
+        } finally {
+            setExportando(false);
+        }
     };
 
     const columns: Column<QuiebreRow>[] = [
@@ -199,6 +243,7 @@ export default function QuiebresStockPage() {
                 onSearchChange={setSearch}
                 onExport={handleExport}
                 exportDisabled={!data || filteredRows.length === 0}
+                exportLoading={exportando}
             >
                 <div className="w-full lg:w-44">
                     <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5 block">
@@ -215,6 +260,20 @@ export default function QuiebresStockPage() {
                     </select>
                 </div>
             </InventoryFilters>
+
+            {errorExport && (
+                <div className="flex items-start gap-2 px-4 py-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 rounded-xl text-xs font-semibold text-amber-800 dark:text-amber-300">
+                    <span className="flex-1">{errorExport}</span>
+                    <button
+                        type="button"
+                        onClick={() => setErrorExport(null)}
+                        aria-label="Cerrar aviso"
+                        className="text-amber-600 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-300 cursor-pointer"
+                    >
+                        <X size={14} />
+                    </button>
+                </div>
+            )}
 
             {error && <ErrorState message={error} onRetry={refresh} />}
 

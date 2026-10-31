@@ -10,6 +10,9 @@ import { query } from '@/lib/db';
  *
  * Se topa con NOW() porque la base tiene tickets con fecha futura (hay uno de
  * 2029): sin el tope, ese artículo diría que se vendió dentro de tres años.
+ *
+ * Solo cuenta líneas con cantidad positiva: una negativa es una devolución en
+ * ticket, no una venta, y se haría pasar por la venta más reciente del artículo.
  */
 
 /** Clave del mapa; artículo y sucursal juntos, que es como se identifica una existencia. */
@@ -47,6 +50,7 @@ export async function ultimaVentaPorArticulo(filas: FilaConArticulo[]): Promise<
                AND V.IdSucursal = DV.IdSucursal
         WHERE V.Status = 0
           AND V.FechaVenta <= NOW()
+          AND DV.Cantidad > 0
           AND DV.IdArticulo IN (${articulos.join(',')})
           AND DV.IdSucursal IN (${sucursales.join(',')})
         GROUP BY DV.IdArticulo, DV.IdSucursal
