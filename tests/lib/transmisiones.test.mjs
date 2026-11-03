@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import {
     formatTranscurrido,
+    formatTranscurridoCorto,
     nivelTransmision,
     ordenarPorUrgencia,
     ultimaSenal,
@@ -38,6 +39,17 @@ describe('formatTranscurrido', () => {
         assert.equal(formatTranscurrido(2 * 60 * MIN + 14 * MIN), 'hace 2 h 14 min');
         assert.equal(formatTranscurrido(3 * 24 * 60 * MIN + 4 * 60 * MIN), 'hace 3 d 4 h');
         assert.equal(formatTranscurrido(null), 'sin registro');
+    });
+});
+
+describe('formatTranscurridoCorto', () => {
+    it('cabe en un recuadro chico', () => {
+        assert.equal(formatTranscurridoCorto(30), '<1m');
+        assert.equal(formatTranscurridoCorto(4 * MIN), '4m');
+        assert.equal(formatTranscurridoCorto(3 * 60 * MIN + 32 * MIN), '3h 32m');
+        assert.equal(formatTranscurridoCorto(5 * 24 * 60 * MIN + 10 * 60 * MIN), '5d 10h');
+        assert.equal(formatTranscurridoCorto(2 * 60 * MIN), '2h');
+        assert.equal(formatTranscurridoCorto(null), '—');
     });
 });
 

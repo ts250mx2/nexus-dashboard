@@ -236,8 +236,6 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ st
                 ))}
             </div>
 
-            <MonitorTransmisiones />
-
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div>
                     <DashboardChart data={ventasSucursal} startDate={startDate} endDate={endDate} />
@@ -247,6 +245,8 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ st
                     <VentasTable data={ventasSucursal} startDate={startDate} endDate={endDate} />
                 </div>
             </div>
+
+            <MonitorTransmisiones />
         </div>
     );
 }

@@ -64,6 +64,18 @@ export function formatTranscurrido(segundos: number | null): string {
     return h > 0 ? `hace ${d} d ${h} h` : `hace ${d} d`;
 }
 
+/** Versión corta para un recuadro chico: '<1m', '4m', '3h 32m', '5d 10h'. */
+export function formatTranscurridoCorto(segundos: number | null): string {
+    if (segundos === null || !Number.isFinite(segundos)) return '—';
+    const s = Math.max(0, Math.floor(segundos));
+    if (s < MIN) return '<1m';
+    if (s < HORA) return `${Math.floor(s / MIN)}m`;
+    const [mayor, unidadMayor, resto, unidadResto] = s < DIA
+        ? [Math.floor(s / HORA), 'h', Math.floor((s % HORA) / MIN), 'm']
+        : [Math.floor(s / DIA), 'd', Math.floor((s % DIA) / HORA), 'h'];
+    return resto > 0 ? `${mayor}${unidadMayor} ${resto}${unidadResto}` : `${mayor}${unidadMayor}`;
+}
+
 /** La más reciente de las dos señales (fechas ISO 8601) y de cuál salió. */
 export function ultimaSenal(senales: { transmision: string | null; ticket: string | null }): {
     fecha: string | null;
