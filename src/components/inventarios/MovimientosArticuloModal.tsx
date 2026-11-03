@@ -95,6 +95,14 @@ const COLUMNAS: Column<MovimientoRow>[] = [
                         En vivo
                     </span>
                 )}
+                {r.EnVivo === 3 && (
+                    <span
+                        title={`Documento del ${formatDateTime(r.FechaDocumento)} que llegó al servidor central después del corte del ERP; se cuenta desde que llegó`}
+                        className="px-1 rounded bg-violet-50 dark:bg-violet-950/40 text-violet-700 dark:text-violet-400 border border-violet-100 dark:border-violet-900/60 text-[9px] font-black uppercase"
+                    >
+                        Llegó tarde
+                    </span>
+                )}
                 {r.Editado === 1 && (
                     <span
                         title={`Modificado: ${formatDateTime(r.FechaAct)}`}
@@ -320,7 +328,9 @@ export default function MovimientosArticuloModal({ articulo, onClose }: Props) {
                 Tipo: etiquetaTipo(r.TipoMovimiento),
                 Usuario: r.Usuario ?? '',
                 EditadoTexto: r.Editado ? 'Sí' : '',
-                EnVivoTexto: r.EnVivo !== undefined ? 'Sí' : '',
+                EnVivoTexto: r.EnVivo === 3
+                    ? `Llegó tarde (documento del ${formatDateTime(r.FechaDocumento)})`
+                    : r.EnVivo !== undefined ? 'Sí' : '',
             }));
         exportarExcel({
             archivo: `movimientos_${codigo}_${sucursal}`,
@@ -342,7 +352,7 @@ export default function MovimientosArticuloModal({ articulo, onClose }: Props) {
                 colNumero('Exi', 'Exi', 10),
                 colTexto('Usuario', 'Usuario', 24),
                 colTexto('Editado', 'EditadoTexto', 10),
-                colTexto('En vivo', 'EnVivoTexto', 10),
+                colTexto('En vivo', 'EnVivoTexto', 34),
             ],
             filas,
         });

@@ -57,8 +57,10 @@ type MovimientoSinSaldo = Omit<MovimientoRow, 'Exi'> & { ExiConteo?: number | nu
 function normalizarEnVivo(fila: Fila): MovimientoSinSaldo {
     return {
         ...normalizarMovimiento(fila),
-        EnVivo: num(fila.Reversion) === 1 ? 2 : 1,
+        // Reversion: 0 documento posterior al corte, 1 cancelación/cierre, 2 llegó tarde.
+        EnVivo: ({ 1: 2, 2: 3 } as Record<number, number>)[num(fila.Reversion)] ?? 1,
         ExiConteo: numOrNull(fila.ExiConteo),
+        FechaDocumento: toIso(fila.FechaDocumento),
     };
 }
 

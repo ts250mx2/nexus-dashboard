@@ -49,10 +49,13 @@ export interface MovimientoRow extends MovimientoBase {
     Exi: number;
     /**
      * Renglón leído en vivo de las tablas origen porque es posterior al corte
-     * (1 = documento, 2 = cancelación o cierre de uno anterior al corte). Ausente
-     * en lo que viene de tblReporteMovimientos.
+     * (1 = documento, 2 = cancelación o cierre de uno anterior al corte, 3 =
+     * documento anterior al corte que llegó al servidor después de la corrida).
+     * Ausente en lo que viene de tblReporteMovimientos.
      */
     EnVivo?: number;
+    /** Fecha del documento cuando difiere de cuándo surtió efecto (tardíos y reversiones). */
+    FechaDocumento?: string | null;
 }
 
 export interface ArticuloSucursalInfo extends CorteInfo {
@@ -223,10 +226,11 @@ SELECT
     P.FechaAct,
     DATE_FORMAT(P.Fecha, '%Y-%m-%d') AS Dia,
     CASE WHEN P.FechaAct IS NOT NULL AND DATE(P.FechaAct) <> DATE(P.Fecha) THEN 1 ELSE 0 END AS Editado,
-    NULL        AS ExiConteo
+    NULL        AS ExiConteo,
+    P.FechaDoc  AS FechaDocumento
 FROM (
     SELECT Tipo, Folio, Iteracion, Reversion, Absorbido, IdUsuario,
-           MIN(Fecha) AS Fecha, MAX(FechaAct) AS FechaAct, SUM(Mov) AS Mov
+           MIN(Fecha) AS Fecha, MAX(FechaAct) AS FechaAct, SUM(Mov) AS Mov, MIN(FechaDoc) AS FechaDoc
     FROM posteriores_detalle
     GROUP BY Tipo, Folio, Iteracion, Reversion, Absorbido, IdUsuario
 ) P
@@ -252,7 +256,8 @@ SELECT
     NULL,
     DATE_FORMAT(X.FechaConteoPosterior, '%Y-%m-%d'),
     0,
-    X.ExiInicial
+    X.ExiInicial,
+    NULL
 FROM base X
 LEFT JOIN tblUsuarios U ON U.IdUsuario = X.UsuarioConteo
 WHERE X.FechaConteoPosterior IS NOT NULL`,

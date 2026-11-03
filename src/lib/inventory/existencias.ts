@@ -49,7 +49,7 @@
  * Todas las consultas son SOLO LECTURA.
  */
 
-import { SUCURSAL_EXCLUSION, TIPO_MOVIMIENTO_CONSIGNACION, cteCorte } from './source';
+import { SUCURSAL_EXCLUSION, TIPO_MOVIMIENTO_AJUSTE, TIPO_MOVIMIENTO_CONSIGNACION, cteCorte } from './source';
 
 /**
  * Tope de ejecución en el servidor MySQL. La consulta no se puede cancelar desde
@@ -211,7 +211,9 @@ base AS (
  *   Fecha     = cuándo surtió efecto (fecha del documento; en reversiones, FechaAct)
  *   FechaDoc  = fecha del documento
  *   Mov       = movimiento con signo
- *   Reversion = 1 si deshace un documento anterior al corte cancelado/cerrado después
+ *   Reversion = 0 documento posterior al corte
+ *             = 1 deshace un documento que el corte contó y que se canceló/cerró después
+ *             = 2 documento anterior al corte que el corte no trae (llegó tarde)
  *   Tipo, Folio, Iteracion, IdUsuario, FechaAct = qué documento es, con los
  *             tipos y folios de tblReporteMovimientos, para listarlo
  *
@@ -224,6 +226,31 @@ base AS (
  * reversiones usan FechaAct como fecha del efecto: es cuando el ERP registró la
  * cancelación o el cierre.
  */
+/**
+ * El corte trae el documento: tiene su renglón en tblReporteMovimientos, donde el
+ * ERP escribe uno por documento y artículo (la llave incluye tipo, folio e
+ * iteración). `soloContados` exige además que el corte lo haya sumado (vigente y
+ * con efecto), que es lo único que una reversión puede deshacer.
+ */
+function enCorte(sucursal: number, tipo: number, folio: string, iteracion = '0', soloContados = false): string {
+    const contados = soloContados ? ' AND M.Status = 0 AND M.EfectoInventario = 1' : '';
+    return `EXISTS (SELECT 1 FROM tblReporteMovimientos M
+            WHERE M.IdArticulo = A.IdArticulo AND M.IdSucursal = ${sucursal}
+              AND M.TipoMovimiento = ${tipo} AND M.Folio = ${folio} AND M.Iteracion = ${iteracion}${contados})`;
+}
+
+/**
+ * Un conteo físico vigente del artículo, del mismo momento o posterior al
+ * documento: el ERP no aplica documentos anteriores a su último conteo
+ * (EfectoInventario = 0) porque lo contado ya los refleja.
+ */
+function absorbidoPorConteo(sucursal: number, fechaDoc: string): string {
+    return `EXISTS (SELECT 1 FROM tblReporteMovimientos J
+            WHERE J.IdArticulo = A.IdArticulo AND J.IdSucursal = ${sucursal}
+              AND J.TipoMovimiento = ${TIPO_MOVIMIENTO_AJUSTE} AND IFNULL(J.Status, 0) = 0
+              AND J.FechaMovimiento >= ${fechaDoc})`;
+}
+
 export function cteDocumentosPosteriores(sucursal: number, ventana: VentanaDocumentos = {}, articulo?: number): string {
     validarSucursal(sucursal);
     validarArticulo(articulo);
@@ -283,44 +310,82 @@ documentos AS (
       AND B.FechaConsignacion > ${desde} AND B.FechaConsignacion <= ${hasta}${fa}
 
     UNION ALL
-    -- REVERSIÓN: ventas anteriores al corte canceladas después
-    SELECT A.IdArticulo, B.FechaAct, B.FechaVenta, A.Cantidad, 1, 1, B.IdVenta, 0, B.IdUsuarioVenta, B.FechaAct
+    -- Ventas tocadas después del corte (FechaAct), en un solo recorrido:
+    --   REVERSIÓN (Reversion = 1): canceladas que el corte había contado;
+    --   TARDÍO (Reversion = 2): vigentes fechadas antes del corte que el corte no
+    --   trae porque llegaron al servidor después de la corrida (ver abajo).
+    SELECT A.IdArticulo, B.FechaAct, B.FechaVenta,
+           IF(B.Status <> 0, A.Cantidad, -A.Cantidad), IF(B.Status <> 0, 1, 2),
+           1, B.IdVenta, 0, B.IdUsuarioVenta, B.FechaAct
     FROM tblVentas B
     INNER JOIN tblDetalleVentas A ON A.IdVenta = B.IdVenta AND A.IdSucursal = B.IdSucursal
-    WHERE B.IdSucursal = ${s} AND B.Status <> 0 AND A.Defecto <> 1
+    WHERE B.IdSucursal = ${s} AND A.Defecto <> 1
       AND B.FechaVenta <= ${hasta} AND B.FechaAct > ${desde} AND B.FechaAct <= ${hasta}${fa}
+      AND (
+            (B.Status <> 0 AND ${enCorte(s, 1, 'B.IdVenta', '0', true)})
+         OR (B.Status = 0 AND B.FechaVenta <= ${desde}
+             AND NOT ${enCorte(s, 1, 'B.IdVenta')} AND NOT ${absorbidoPorConteo(s, 'B.FechaVenta')})
+      )
 
     UNION ALL
-    -- REVERSIÓN: recibos anteriores al corte cancelados después
-    SELECT A.IdArticulo, B.FechaAct, B.FechaRecibo, -A.Rec, 1, 2, B.IdOrdenCompra, B.Iteracion, B.IdUsuarioOrdenCompra, B.FechaAct
+    -- REVERSIÓN (1) y TARDÍO (2) en un recorrido: recibos anteriores al corte cancelados después,
+    -- o vigentes fechados antes del corte que el corte no trae (llegaron tarde).
+    SELECT A.IdArticulo, B.FechaAct, B.FechaRecibo, IF(B.Status <> 0, -A.Rec, A.Rec), IF(B.Status <> 0, 1, 2),
+           2, B.IdOrdenCompra, B.Iteracion, B.IdUsuarioOrdenCompra, B.FechaAct
     FROM tblOrdenesCompra B
     INNER JOIN tblDetalleOrdenesCompra A ON A.IdOrdenCompra = B.IdOrdenCompra AND A.Iteracion = B.Iteracion
-    WHERE B.IdSucursal = ${s} AND B.Status <> 0 AND B.IdTraspaso = 0 AND B.IdUsuarioRecibo > 0
+    WHERE B.IdSucursal = ${s} AND B.IdTraspaso = 0 AND B.IdUsuarioRecibo > 0
       AND B.FechaRecibo <= ${hasta} AND B.FechaAct > ${desde} AND B.FechaAct <= ${hasta}${fa}
+      AND (
+            (B.Status <> 0 AND ${enCorte(s, 2, 'B.IdOrdenCompra', 'B.Iteracion', true)})
+         OR (B.Status = 0 AND B.FechaRecibo <= ${desde}
+             AND NOT ${enCorte(s, 2, 'B.IdOrdenCompra', 'B.Iteracion')} AND NOT ${absorbidoPorConteo(s, 'B.FechaRecibo')})
+      )
 
     UNION ALL
-    -- REVERSIÓN: traspasos enviados antes del corte cancelados después
-    SELECT A.IdArticulo, B.FechaAct, B.FechaTraspaso, A.Cantidad, 1, 3, B.IdTraspaso, 0, B.IdUsuarioTraspaso, B.FechaAct
+    -- REVERSIÓN (1) y TARDÍO (2) en un recorrido: traspasos enviados antes del corte cancelados después,
+    -- o vigentes fechados antes del corte que el corte no trae (llegaron tarde).
+    SELECT A.IdArticulo, B.FechaAct, B.FechaTraspaso, IF(B.Status <> 0, A.Cantidad, -A.Cantidad), IF(B.Status <> 0, 1, 2),
+           3, B.IdTraspaso, 0, B.IdUsuarioTraspaso, B.FechaAct
     FROM tblTraspasos B
     INNER JOIN tblDetalleTraspasos A ON A.IdTraspaso = B.IdTraspaso
-    WHERE B.IdSucursal = ${s} AND B.Status <> 0
+    WHERE B.IdSucursal = ${s}
       AND B.FechaTraspaso <= ${hasta} AND B.FechaAct > ${desde} AND B.FechaAct <= ${hasta}${fa}
+      AND (
+            (B.Status <> 0 AND ${enCorte(s, 3, 'B.IdTraspaso', '0', true)})
+         OR (B.Status = 0 AND B.FechaTraspaso <= ${desde}
+             AND NOT ${enCorte(s, 3, 'B.IdTraspaso', '0')} AND NOT ${absorbidoPorConteo(s, 'B.FechaTraspaso')})
+      )
 
     UNION ALL
-    -- REVERSIÓN: traspasos recibidos antes del corte cancelados después
-    SELECT A.IdArticulo, B.FechaAct, B.FechaRecibo, -A.Cantidad, 1, 4, B.IdTraspaso, 0, B.IdUsuarioTraspaso, B.FechaAct
+    -- REVERSIÓN (1) y TARDÍO (2) en un recorrido: traspasos recibidos antes del corte cancelados después,
+    -- o vigentes fechados antes del corte que el corte no trae (llegaron tarde).
+    SELECT A.IdArticulo, B.FechaAct, B.FechaRecibo, IF(B.Status <> 0, -A.Cantidad, A.Cantidad), IF(B.Status <> 0, 1, 2),
+           4, B.IdTraspaso, 0, B.IdUsuarioTraspaso, B.FechaAct
     FROM tblTraspasos B
     INNER JOIN tblDetalleTraspasos A ON A.IdTraspaso = B.IdTraspaso
-    WHERE B.IdSucursalDestino = ${s} AND B.Status <> 0 AND B.IdUsuarioRecibo > 0
+    WHERE B.IdSucursalDestino = ${s} AND B.IdUsuarioRecibo > 0
       AND B.FechaRecibo <= ${hasta} AND B.FechaAct > ${desde} AND B.FechaAct <= ${hasta}${fa}
+      AND (
+            (B.Status <> 0 AND ${enCorte(s, 4, 'B.IdTraspaso', '0', true)})
+         OR (B.Status = 0 AND B.FechaRecibo <= ${desde}
+             AND NOT ${enCorte(s, 4, 'B.IdTraspaso', '0')} AND NOT ${absorbidoPorConteo(s, 'B.FechaRecibo')})
+      )
 
     UNION ALL
-    -- REVERSIÓN: devoluciones anteriores al corte canceladas después
-    SELECT A.IdArticulo, B.FechaAct, B.FechaDevolucion, -A.Dev, 1, 5, B.IdDevolucion, 0, B.IdUsuarioDevolucion, B.FechaAct
+    -- REVERSIÓN (1) y TARDÍO (2) en un recorrido: devoluciones anteriores al corte canceladas después,
+    -- o vigentes fechados antes del corte que el corte no trae (llegaron tarde).
+    SELECT A.IdArticulo, B.FechaAct, B.FechaDevolucion, IF(B.Status <> 0, -A.Dev, A.Dev), IF(B.Status <> 0, 1, 2),
+           5, B.IdDevolucion, 0, B.IdUsuarioDevolucion, B.FechaAct
     FROM tblDevoluciones B
     INNER JOIN tblDetalleDevoluciones A ON A.IdDevolucion = B.IdDevolucion AND A.IdSucursal = B.IdSucursal
-    WHERE B.IdSucursal = ${s} AND B.Status <> 0 AND B.ConDefecto = 0
+    WHERE B.IdSucursal = ${s} AND B.ConDefecto = 0
       AND B.FechaDevolucion <= ${hasta} AND B.FechaAct > ${desde} AND B.FechaAct <= ${hasta}${fa}
+      AND (
+            (B.Status <> 0 AND ${enCorte(s, 5, 'B.IdDevolucion', '0', true)})
+         OR (B.Status = 0 AND B.FechaDevolucion <= ${desde}
+             AND NOT ${enCorte(s, 5, 'B.IdDevolucion', '0')} AND NOT ${absorbidoPorConteo(s, 'B.FechaDevolucion')})
+      )
 
     UNION ALL
     -- REVERSIÓN: consignaciones que el corte descargó y que se cerraron o cancelaron
@@ -348,6 +413,23 @@ documentos AS (
            AND M.EfectoInventario  = 1
     WHERE B.IdSucursal = ${s} AND (B.Cerrada > 0 OR B.Status <> 0)
       AND B.FechaConsignacion <= ${hasta} AND B.FechaAct > ${desde} AND B.FechaAct <= ${hasta}${fa}
+
+    UNION ALL
+    -- TARDÍOS (Reversion = 2): documentos vigentes fechados ANTES del corte que el
+    -- corte no trae porque llegaron al servidor central después de la corrida
+    -- nocturna (una sucursal que transmite tarde). El ERP los tomará en su próxima
+    -- corrida; mientras, se cuentan aquí desde que llegaron (FechaAct). Se excluye
+    -- lo que un conteo físico posterior al documento ya absorbió, igual que el ERP
+    -- (EfectoInventario = 0). Caso: ticket NXL-T-3652 de LEON, fechado el 2-nov a
+    -- las 16:31 y recibido el 3-nov a las 11:24, tras la corrida de las 00:10.
+    -- Los demás tardíos van junto con sus reversiones, arriba; aquí solo las
+    -- consignaciones abiertas, cuya reversión mide contra el corte de otra forma.
+    SELECT A.IdArticulo, B.FechaAct, B.FechaConsignacion, -A.CantidadSalida, 2, 6, B.IdConsignacion, 0, B.IdUsuarioConsignacion, B.FechaAct
+    FROM tblConsignaciones B
+    INNER JOIN tblDetalleConsignaciones A ON A.IdConsignacion = B.IdConsignacion AND A.IdSucursal = B.IdSucursal
+    WHERE B.IdSucursal = ${s} AND B.Status = 0 AND B.Cerrada = 0
+      AND B.FechaConsignacion <= ${desde} AND B.FechaAct > ${desde} AND B.FechaAct <= ${hasta}${fa}
+      AND NOT ${enCorte(s, TIPO_MOVIMIENTO_CONSIGNACION, 'B.IdConsignacion')} AND NOT ${absorbidoPorConteo(s, 'B.FechaConsignacion')}
 )`;
 }
 
@@ -363,7 +445,7 @@ const CONDICION_POSTERIOR = `D.Mov <> 0
       AND D.Fecha > X.Desde
       AND (
             (D.Reversion = 0 AND D.FechaDoc > X.Desde)
-         OR (D.Reversion = 1 AND D.FechaDoc <= X.Desde AND X.FechaConteoPosterior IS NULL)
+         OR (D.Reversion IN (1, 2) AND D.FechaDoc <= X.Desde AND X.FechaConteoPosterior IS NULL)
       )`;
 
 export function ctePosteriores(): string {
