@@ -30,8 +30,6 @@ import type { SucursalTransmision, TransmisionesResponse } from '@/app/api/dashb
 const REFRESCO_MS = 60_000;
 /** Cada cuánto avanza el tiempo en pantalla entre una consulta y otra. */
 const TIC_MS = 15_000;
-/** Puntos de computadora que se dibujan por recuadro; el resto se cuenta. */
-const MAX_PUNTOS = 8;
 
 /** Niveles de menor a mayor: el medidor se llena hasta el nivel actual. */
 const ESCALA: NivelTransmision[] = ['ok', 'atencion', 'alerta', 'grave', 'critico'];
@@ -122,16 +120,6 @@ const ESTILO: Record<NivelTransmision, Estilo> = {
     },
 };
 
-/** Color de cada computadora según SU propio tiempo; en el recuadro crítico, sobre fondo rojo. */
-const PUNTO_EQUIPO: Record<NivelTransmision, string> = {
-    ok: 'bg-emerald-500',
-    atencion: 'bg-amber-400',
-    alerta: 'bg-orange-500',
-    grave: 'bg-rose-500',
-    critico: 'bg-rose-700',
-    inactiva: 'bg-slate-300 dark:bg-slate-600',
-};
-
 const ORDEN_RESUMEN: NivelTransmision[] = ['critico', 'grave', 'alerta', 'atencion', 'ok'];
 
 type Vista = SucursalTransmision & { seg: number | null; nivel: NivelTransmision };
@@ -157,15 +145,10 @@ function Senal({ icono: Icono, etiqueta, iso, ahora, activa, e }: {
     );
 }
 
-function Recuadro({ s, transcurrido, ahora }: { s: Vista; transcurrido: number; ahora: number }) {
+function Recuadro({ s, ahora }: { s: Vista; ahora: number }) {
     const e = ESTILO[s.nivel];
     const Icono = e.icono;
     const nivelIdx = ESCALA.indexOf(s.nivel);
-    const equipos = s.computadoras.map(c => {
-        const seg = c.segundos === null ? null : c.segundos + transcurrido;
-        return { ...c, seg, nivel: nivelTransmision(seg) };
-    });
-    const alDia = equipos.filter(c => c.nivel === 'ok').length;
 
     return (
         <div className={cn('relative rounded-xl border p-3 transition-all hover:-translate-y-0.5 hover:shadow-md', e.caja)}>
@@ -197,27 +180,6 @@ function Recuadro({ s, transcurrido, ahora }: { s: Vista; transcurrido: number; 
                 <Senal icono={Radio} etiqueta="Transmisión" iso={s.ultimaTransmision} ahora={ahora} activa={s.fuente === 'transmision'} e={e} />
                 <Senal icono={Receipt} etiqueta="Último ticket" iso={s.ultimoTicket} ahora={ahora} activa={s.fuente === 'ticket'} e={e} />
             </div>
-
-            {equipos.length > 0 && (
-                <div className="mt-2.5 flex items-center gap-2">
-                    <div className="flex flex-wrap gap-1">
-                        {equipos.slice(0, MAX_PUNTOS).map(c => (
-                            <span
-                                key={c.Computadora}
-                                title={`${c.Computadora} (${c.Version ?? 's/v'}): ${formatTranscurrido(c.seg)}`}
-                                className={cn(
-                                    'w-2.5 h-2.5 rounded-full',
-                                    PUNTO_EQUIPO[c.nivel],
-                                    s.nivel === 'critico' && 'ring-1 ring-white/70'
-                                )}
-                            />
-                        ))}
-                    </div>
-                    <span className={cn('ml-auto text-[10px] font-semibold whitespace-nowrap', e.tenue)}>
-                        {alDia}/{equipos.length} equipos al día
-                    </span>
-                </div>
-            )}
         </div>
     );
 }
@@ -333,7 +295,7 @@ export default function MonitorTransmisiones() {
 
             {activas.length > 0 && (
                 <div className={cn('mt-3', GRID)}>
-                    {activas.map(s => <Recuadro key={s.IdSucursal} s={s} transcurrido={transcurrido} ahora={ahora} />)}
+                    {activas.map(s => <Recuadro key={s.IdSucursal} s={s} ahora={ahora} />)}
                 </div>
             )}
 
@@ -341,7 +303,7 @@ export default function MonitorTransmisiones() {
                 <div className={cn('mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-[10px]', 'text-slate-400 dark:text-slate-500')}>
                     <span className="inline-flex items-center gap-1"><Radio size={11} /> registro de transmisión de las computadoras</span>
                     <span className="inline-flex items-center gap-1"><Receipt size={11} /> llegada del último ticket al servidor</span>
-                    <span>en negritas, la señal más reciente · un punto por computadora, con su propio color</span>
+                    <span>en negritas, la señal más reciente</span>
                 </div>
             )}
 
@@ -357,7 +319,7 @@ export default function MonitorTransmisiones() {
                     </button>
                     {verInactivas && (
                         <div className={cn('mt-2', GRID)}>
-                            {inactivas.map(s => <Recuadro key={s.IdSucursal} s={s} transcurrido={transcurrido} ahora={ahora} />)}
+                            {inactivas.map(s => <Recuadro key={s.IdSucursal} s={s} ahora={ahora} />)}
                         </div>
                     )}
                 </div>
