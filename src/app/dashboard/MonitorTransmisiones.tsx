@@ -1,9 +1,21 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { ChevronDown, Radio, RefreshCw } from 'lucide-react';
+import {
+    ChevronDown,
+    CircleCheck,
+    Clock3,
+    LucideIcon,
+    MoonStar,
+    OctagonAlert,
+    Radio,
+    Receipt,
+    RefreshCw,
+    Siren,
+    TriangleAlert,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { formatDateTime } from '@/lib/format';
+import { formatHora } from '@/lib/format';
 import {
     ETIQUETA_NIVEL,
     NivelTransmision,
@@ -18,124 +30,199 @@ import type { SucursalTransmision, TransmisionesResponse } from '@/app/api/dashb
 const REFRESCO_MS = 60_000;
 /** Cada cuánto avanza el tiempo en pantalla entre una consulta y otra. */
 const TIC_MS = 15_000;
+/** Puntos de computadora que se dibujan por recuadro; el resto se cuenta. */
+const MAX_PUNTOS = 8;
+
+/** Niveles de menor a mayor: el medidor se llena hasta el nivel actual. */
+const ESCALA: NivelTransmision[] = ['ok', 'atencion', 'alerta', 'grave', 'critico'];
+const UMBRAL_TEXTO = 'Al día hasta 15 min · Atención 15-30 min · Alerta 30-60 min · Grave 1-4 h · Crítico más de 4 h';
+
+interface Estilo {
+    icono: LucideIcon;
+    caja: string;
+    tiempo: string;
+    texto: string;
+    tenue: string;
+    pastilla: string;
+    segmento: string;
+    segmentoVacio: string;
+    punto: string;
+}
 
 /**
- * Entre más tiempo sin transmitir, más intenso el recuadro y más llena su barra.
- * El crítico va en sólido para que se vea desde lejos.
+ * Entre más tiempo sin transmitir, más intenso el recuadro. El crítico va en
+ * rojo sólido para que se vea desde lejos; ahí todo el texto pasa a claro.
  */
-const ESTILO: Record<NivelTransmision, { caja: string; tiempo: string; nombre: string; punto: string; barra: string; lleno: string }> = {
+const ESTILO: Record<NivelTransmision, Estilo> = {
     ok: {
-        caja: 'bg-emerald-50/60 border-emerald-200/70 dark:bg-emerald-950/20 dark:border-emerald-900/50',
+        icono: CircleCheck,
+        caja: 'bg-white border-emerald-200 dark:bg-slate-900 dark:border-emerald-900/60',
         tiempo: 'text-emerald-600 dark:text-emerald-400',
-        nombre: 'text-slate-600 dark:text-slate-300',
+        texto: 'text-slate-700 dark:text-slate-200',
+        tenue: 'text-slate-400 dark:text-slate-500',
+        pastilla: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-900/60',
+        segmento: 'bg-emerald-500',
+        segmentoVacio: 'bg-slate-200 dark:bg-slate-700',
         punto: 'bg-emerald-500',
-        barra: 'bg-emerald-500',
-        lleno: 'w-1/5',
     },
     atencion: {
-        caja: 'bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-900/60',
+        icono: Clock3,
+        caja: 'bg-amber-50/70 border-amber-300 dark:bg-amber-950/25 dark:border-amber-800/60',
         tiempo: 'text-amber-600 dark:text-amber-400',
-        nombre: 'text-slate-600 dark:text-slate-300',
+        texto: 'text-slate-700 dark:text-slate-200',
+        tenue: 'text-amber-900/50 dark:text-amber-200/50',
+        pastilla: 'bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800/60',
+        segmento: 'bg-amber-400',
+        segmentoVacio: 'bg-amber-200/60 dark:bg-amber-900/40',
         punto: 'bg-amber-400',
-        barra: 'bg-amber-400',
-        lleno: 'w-2/5',
     },
     alerta: {
-        caja: 'bg-orange-100 border-orange-300 dark:bg-orange-950/40 dark:border-orange-800/60',
+        icono: TriangleAlert,
+        caja: 'bg-orange-50 border-orange-300 dark:bg-orange-950/35 dark:border-orange-800/60',
         tiempo: 'text-orange-600 dark:text-orange-400',
-        nombre: 'text-orange-900/80 dark:text-orange-200',
+        texto: 'text-orange-950/80 dark:text-orange-100',
+        tenue: 'text-orange-900/50 dark:text-orange-200/50',
+        pastilla: 'bg-orange-100 text-orange-800 border-orange-300 dark:bg-orange-950/60 dark:text-orange-300 dark:border-orange-800/60',
+        segmento: 'bg-orange-500',
+        segmentoVacio: 'bg-orange-200/60 dark:bg-orange-900/40',
         punto: 'bg-orange-500',
-        barra: 'bg-orange-500',
-        lleno: 'w-3/5',
     },
     grave: {
-        caja: 'bg-rose-100 border-rose-300 dark:bg-rose-950/50 dark:border-rose-800/60',
+        icono: OctagonAlert,
+        caja: 'bg-rose-50 border-rose-300 dark:bg-rose-950/40 dark:border-rose-800/60',
         tiempo: 'text-rose-600 dark:text-rose-400',
-        nombre: 'text-rose-900/80 dark:text-rose-200',
+        texto: 'text-rose-950/80 dark:text-rose-100',
+        tenue: 'text-rose-900/50 dark:text-rose-200/50',
+        pastilla: 'bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800/60',
+        segmento: 'bg-rose-500',
+        segmentoVacio: 'bg-rose-200/60 dark:bg-rose-900/40',
         punto: 'bg-rose-500',
-        barra: 'bg-rose-500',
-        lleno: 'w-4/5',
     },
     critico: {
-        caja: 'bg-rose-600 border-rose-700 shadow-sm shadow-rose-500/40 dark:bg-rose-700 dark:border-rose-500',
+        icono: Siren,
+        caja: 'bg-gradient-to-br from-rose-600 to-rose-700 border-rose-700 shadow-md shadow-rose-500/30 dark:border-rose-500',
         tiempo: 'text-white',
-        nombre: 'text-rose-50',
+        texto: 'text-rose-50',
+        tenue: 'text-rose-100/70',
+        pastilla: 'bg-white/15 text-white border-white/30',
+        segmento: 'bg-white',
+        segmentoVacio: 'bg-white/25',
         punto: 'bg-white',
-        barra: 'bg-rose-900/60',
-        lleno: 'w-full',
     },
     inactiva: {
+        icono: MoonStar,
         caja: 'bg-slate-50 border-slate-200 dark:bg-slate-900/60 dark:border-slate-700',
         tiempo: 'text-slate-400 dark:text-slate-500',
-        nombre: 'text-slate-400 dark:text-slate-500',
+        texto: 'text-slate-500 dark:text-slate-400',
+        tenue: 'text-slate-400 dark:text-slate-500',
+        pastilla: 'bg-slate-100 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700',
+        segmento: 'bg-slate-300 dark:bg-slate-600',
+        segmentoVacio: 'bg-slate-200 dark:bg-slate-700',
         punto: 'bg-slate-300 dark:bg-slate-600',
-        barra: 'bg-slate-300 dark:bg-slate-700',
-        lleno: 'w-0',
     },
+};
+
+/** Color de cada computadora según SU propio tiempo; en el recuadro crítico, sobre fondo rojo. */
+const PUNTO_EQUIPO: Record<NivelTransmision, string> = {
+    ok: 'bg-emerald-500',
+    atencion: 'bg-amber-400',
+    alerta: 'bg-orange-500',
+    grave: 'bg-rose-500',
+    critico: 'bg-rose-700',
+    inactiva: 'bg-slate-300 dark:bg-slate-600',
 };
 
 const ORDEN_RESUMEN: NivelTransmision[] = ['critico', 'grave', 'alerta', 'atencion', 'ok'];
 
-const PASTILLA: Record<NivelTransmision, string> = {
-    ok: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-900/60',
-    atencion: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-900/60',
-    alerta: 'bg-orange-100 text-orange-800 border-orange-300 dark:bg-orange-950/50 dark:text-orange-300 dark:border-orange-800/60',
-    grave: 'bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800/60',
-    critico: 'bg-rose-600 text-white border-rose-700',
-    inactiva: 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700',
-};
-
-const FUENTE: Record<string, string> = {
-    transmision: 'registro de transmisión',
-    ticket: 'último ticket recibido',
-};
-
 type Vista = SucursalTransmision & { seg: number | null; nivel: NivelTransmision };
 
-/** El detalle (fecha, fuente y computadoras) va en el globo al pasar el mouse. */
-function detalle(s: Vista, transcurrido: number): string {
-    const lineas = [
-        `${s.Sucursal} · ${ETIQUETA_NIVEL[s.nivel]}`,
-        s.ultima
-            ? `Última: ${formatDateTime(s.ultima)} (${formatTranscurrido(s.seg)})${s.fuente ? ` · ${FUENTE[s.fuente]}` : ''}`
-            : 'Nunca ha transmitido',
-    ];
-    if (s.computadoras.length > 0) {
-        lineas.push('', 'Computadoras:');
-        for (const c of s.computadoras) {
-            const seg = c.segundos === null ? null : c.segundos + transcurrido;
-            lineas.push(`  ${c.Computadora} (${c.Version ?? 's/v'}): ${formatTranscurrido(seg)}`);
-        }
-    }
-    return lineas.join('\n');
+/** Hora si fue hoy; si no, día y hora. */
+function cuando(iso: string | null, ahora: number): string {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return '—';
+    if (d.toDateString() === new Date(ahora).toDateString()) return formatHora(d);
+    return d.toLocaleString('es-MX', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
 }
 
-function Recuadro({ s, transcurrido }: { s: Vista; transcurrido: number }) {
-    const e = ESTILO[s.nivel];
-    const parpadea = s.nivel === 'critico' || s.nivel === 'grave';
+function Senal({ icono: Icono, etiqueta, iso, ahora, activa, e }: {
+    icono: LucideIcon; etiqueta: string; iso: string | null; ahora: number; activa: boolean; e: Estilo;
+}) {
     return (
-        <div
-            title={detalle(s, transcurrido)}
-            className={cn('relative overflow-hidden rounded-lg border px-2.5 pt-2 pb-2.5 cursor-default transition-transform hover:-translate-y-0.5', e.caja)}
-        >
-            <div className="flex items-center gap-1.5 min-w-0">
-                <span className="relative flex w-2 h-2 shrink-0">
-                    {parpadea && <span className={cn('absolute inline-flex h-full w-full rounded-full opacity-75 animate-ping', e.punto)} />}
-                    <span className={cn('relative inline-flex w-2 h-2 rounded-full', e.punto)} />
-                </span>
-                <span className={cn('text-[10px] font-black uppercase tracking-wider truncate', e.nombre)}>{s.Sucursal}</span>
-            </div>
-            <p className={cn('text-lg font-extrabold tracking-tight leading-tight mt-1 tabular-nums', e.tiempo)}>
-                {formatTranscurridoCorto(s.seg)}
-            </p>
-            <div className="absolute inset-x-0 bottom-0 h-1 bg-black/5 dark:bg-white/5">
-                <div className={cn('h-full', e.barra, e.lleno)} />
-            </div>
+        <div className={cn('flex items-center gap-1.5 text-[11px]', activa ? e.texto : e.tenue)}>
+            <Icono size={12} className="shrink-0" />
+            <span className="truncate">{etiqueta}</span>
+            <span className={cn('ml-auto tabular-nums whitespace-nowrap', activa && 'font-bold')}>{cuando(iso, ahora)}</span>
         </div>
     );
 }
 
-const GRID = 'grid gap-2 grid-cols-[repeat(auto-fill,minmax(7.5rem,1fr))]';
+function Recuadro({ s, transcurrido, ahora }: { s: Vista; transcurrido: number; ahora: number }) {
+    const e = ESTILO[s.nivel];
+    const Icono = e.icono;
+    const nivelIdx = ESCALA.indexOf(s.nivel);
+    const equipos = s.computadoras.map(c => {
+        const seg = c.segundos === null ? null : c.segundos + transcurrido;
+        return { ...c, seg, nivel: nivelTransmision(seg) };
+    });
+    const alDia = equipos.filter(c => c.nivel === 'ok').length;
+
+    return (
+        <div className={cn('relative rounded-xl border p-3 transition-all hover:-translate-y-0.5 hover:shadow-md', e.caja)}>
+            <div className="flex items-start justify-between gap-2">
+                <span className={cn('text-[11px] font-black uppercase tracking-wider truncate', e.texto)} title={s.Sucursal}>
+                    {s.Sucursal}
+                </span>
+                <span className={cn('inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md border text-[9px] font-black uppercase tracking-wider whitespace-nowrap', e.pastilla)}>
+                    <Icono size={10} className={cn((s.nivel === 'critico' || s.nivel === 'grave') && 'animate-pulse')} />
+                    {ETIQUETA_NIVEL[s.nivel]}
+                </span>
+            </div>
+
+            <div className="mt-1.5 flex items-baseline gap-1.5" title={s.ultima ? formatTranscurrido(s.seg) : undefined}>
+                <span className={cn('text-2xl font-extrabold tracking-tight tabular-nums leading-none', e.tiempo)}>
+                    {formatTranscurridoCorto(s.seg)}
+                </span>
+                <span className={cn('text-[10px] font-semibold', e.tenue)}>{s.ultima ? 'sin transmitir' : 'sin registro'}</span>
+            </div>
+
+            {/* Medidor: en qué umbral va. */}
+            <div className="mt-2 flex gap-0.5" title={UMBRAL_TEXTO}>
+                {ESCALA.map((n, i) => (
+                    <span key={n} className={cn('h-1.5 flex-1 rounded-full', i <= nivelIdx ? e.segmento : e.segmentoVacio)} />
+                ))}
+            </div>
+
+            <div className="mt-2.5 space-y-1">
+                <Senal icono={Radio} etiqueta="Transmisión" iso={s.ultimaTransmision} ahora={ahora} activa={s.fuente === 'transmision'} e={e} />
+                <Senal icono={Receipt} etiqueta="Último ticket" iso={s.ultimoTicket} ahora={ahora} activa={s.fuente === 'ticket'} e={e} />
+            </div>
+
+            {equipos.length > 0 && (
+                <div className="mt-2.5 flex items-center gap-2">
+                    <div className="flex flex-wrap gap-1">
+                        {equipos.slice(0, MAX_PUNTOS).map(c => (
+                            <span
+                                key={c.Computadora}
+                                title={`${c.Computadora} (${c.Version ?? 's/v'}): ${formatTranscurrido(c.seg)}`}
+                                className={cn(
+                                    'w-2.5 h-2.5 rounded-full',
+                                    PUNTO_EQUIPO[c.nivel],
+                                    s.nivel === 'critico' && 'ring-1 ring-white/70'
+                                )}
+                            />
+                        ))}
+                    </div>
+                    <span className={cn('ml-auto text-[10px] font-semibold whitespace-nowrap', e.tenue)}>
+                        {alDia}/{equipos.length} equipos al día
+                    </span>
+                </div>
+            )}
+        </div>
+    );
+}
+
+const GRID = 'grid gap-3 grid-cols-[repeat(auto-fill,minmax(13rem,1fr))]';
 
 export default function MonitorTransmisiones() {
     const [data, setData] = useState<TransmisionesResponse | null>(null);
@@ -182,23 +269,47 @@ export default function MonitorTransmisiones() {
     const activas = vistas.filter(v => v.nivel !== 'inactiva');
     const inactivas = vistas.filter(v => v.nivel === 'inactiva');
     const conteo = (n: NivelTransmision) => activas.filter(v => v.nivel === n).length;
+    const enAlerta = activas.length - conteo('ok');
 
     return (
         <section className="bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-700/60 rounded-xl p-4 shadow-xs">
             <div className="flex flex-wrap items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
-                    <Radio size={16} className="text-indigo-500 dark:text-indigo-400" />
-                    <h2 className="text-xs font-black text-slate-800 dark:text-slate-100 uppercase tracking-wider">Última transmisión</h2>
-                    <span className="hidden sm:inline text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                        · alerta pasados 15 min
-                    </span>
+                <div className="flex items-center gap-2.5">
+                    <div className={cn(
+                        'flex items-center justify-center w-8 h-8 rounded-lg border',
+                        enAlerta > 0
+                            ? 'bg-rose-500/10 text-rose-500 border-rose-500/20 dark:text-rose-400'
+                            : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20 dark:text-emerald-400'
+                    )}>
+                        <Radio size={16} />
+                    </div>
+                    <div>
+                        <h2 className="text-xs font-black text-slate-800 dark:text-slate-100 uppercase tracking-wider">Última transmisión</h2>
+                        <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                            {data
+                                ? enAlerta > 0
+                                    ? `${enAlerta} de ${activas.length} sucursales con atraso`
+                                    : `Las ${activas.length} sucursales al día`
+                                : 'Alerta pasados 15 min sin transmitir'}
+                        </p>
+                    </div>
                 </div>
                 <div className="flex flex-wrap items-center gap-1.5">
-                    {ORDEN_RESUMEN.filter(n => conteo(n) > 0).map(n => (
-                        <span key={n} className={cn('px-1.5 py-0.5 rounded-md border text-[10px] font-black uppercase tracking-wider', PASTILLA[n])}>
-                            {conteo(n)} {ETIQUETA_NIVEL[n]}
-                        </span>
-                    ))}
+                    {ORDEN_RESUMEN.filter(n => conteo(n) > 0).map(n => {
+                        const Icono = ESTILO[n].icono;
+                        return (
+                            <span
+                                key={n}
+                                className={cn(
+                                    'inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md border text-[10px] font-black uppercase tracking-wider',
+                                    n === 'critico' ? 'bg-rose-600 text-white border-rose-700' : ESTILO[n].pastilla
+                                )}
+                            >
+                                <Icono size={10} />
+                                {conteo(n)} {ETIQUETA_NIVEL[n]}
+                            </span>
+                        );
+                    })}
                     <button
                         type="button"
                         onClick={cargar}
@@ -222,7 +333,15 @@ export default function MonitorTransmisiones() {
 
             {activas.length > 0 && (
                 <div className={cn('mt-3', GRID)}>
-                    {activas.map(s => <Recuadro key={s.IdSucursal} s={s} transcurrido={transcurrido} />)}
+                    {activas.map(s => <Recuadro key={s.IdSucursal} s={s} transcurrido={transcurrido} ahora={ahora} />)}
+                </div>
+            )}
+
+            {data && (
+                <div className={cn('mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-[10px]', 'text-slate-400 dark:text-slate-500')}>
+                    <span className="inline-flex items-center gap-1"><Radio size={11} /> registro de transmisión de las computadoras</span>
+                    <span className="inline-flex items-center gap-1"><Receipt size={11} /> llegada del último ticket al servidor</span>
+                    <span>en negritas, la señal más reciente · un punto por computadora, con su propio color</span>
                 </div>
             )}
 
@@ -238,7 +357,7 @@ export default function MonitorTransmisiones() {
                     </button>
                     {verInactivas && (
                         <div className={cn('mt-2', GRID)}>
-                            {inactivas.map(s => <Recuadro key={s.IdSucursal} s={s} transcurrido={transcurrido} />)}
+                            {inactivas.map(s => <Recuadro key={s.IdSucursal} s={s} transcurrido={transcurrido} ahora={ahora} />)}
                         </div>
                     )}
                 </div>
