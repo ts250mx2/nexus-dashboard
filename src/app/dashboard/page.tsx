@@ -14,6 +14,7 @@ import { query } from '@/lib/db';
 import DateSelector from './DateSelector';
 import DashboardChart from './DashboardChart';
 import VentasTable from './VentasTable';
+import MonitorTransmisiones from './MonitorTransmisiones';
 import DatePresets from '@/components/DatePresets';
 
 export const dynamic = 'force-dynamic';
@@ -234,6 +235,8 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ st
                     </div>
                 ))}
             </div>
+
+            <MonitorTransmisiones />
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div>
