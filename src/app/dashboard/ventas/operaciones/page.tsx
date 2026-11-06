@@ -37,6 +37,10 @@ interface OpeningDetail {
     cancelacionesMonto: number;
     RawFechaApertura: string;
     RawFechaCierre: string | null;
+    /** 1 si se abrió un día anterior al consultado y seguía abierta al empezar el día. */
+    DiaAnterior: number;
+    /** 1 si todavía no se cierra. */
+    SigueAbierta: number;
 }
 
 interface BranchOp {
@@ -46,12 +50,20 @@ interface BranchOp {
     ventas: number;
     ventasCount: number;
     ticketPromedio: number;
+    aperturasDiaAnterior: number;
     details: {
         openings: OpeningDetail[];
         cancelaciones: number;
         cancelacionesMonto: number;
         cortes: number;
     }
+}
+
+/** "05 nov, 19:17": día y hora de una apertura de un día anterior. */
+function fechaApertura(value: string): string {
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return value;
+    return d.toLocaleString('es-MX', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false });
 }
 
 // --- Store Color Palette Map ---
@@ -361,6 +373,12 @@ export default function OperationsKanbanPage() {
                                             <h4 className="text-[13px] font-black text-slate-800 dark:text-slate-100 leading-tight uppercase truncate">
                                                 {store.name}
                                             </h4>
+                                            {store.aperturasDiaAnterior > 0 && (
+                                                <span className="self-start inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md border border-orange-300 dark:border-orange-800/60 bg-orange-50 dark:bg-orange-950/40 text-orange-700 dark:text-orange-300 text-[9px] font-black uppercase tracking-wider">
+                                                    <AlertCircle size={10} />
+                                                    {store.aperturasDiaAnterior === 1 ? '1 apertura de día anterior' : `${store.aperturasDiaAnterior} aperturas de día anterior`}
+                                                </span>
+                                            )}
 
                                             <div className="grid grid-cols-2 gap-x-4 gap-y-2 pt-3 border-t border-slate-100 dark:border-slate-800">
                                                 <div className="flex flex-col">
@@ -392,14 +410,35 @@ export default function OperationsKanbanPage() {
                                                     <div className="p-3 border-r border-slate-200 dark:border-slate-700 w-1/4 shrink-0 flex flex-col justify-center min-w-0">
                                                         <div
                                                             onClick={() => handleOpenSalesModal(store.id, store.name, op.IdApertura, op.Caja)}
-                                                            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-amber-300 dark:hover:border-amber-700/60 hover:bg-amber-50/40 dark:hover:bg-amber-950/40 px-4 py-3 flex flex-col gap-2 rounded-xl transition-all cursor-pointer hover:shadow-sm hover:scale-[1.01] active:scale-[0.99]"
+                                                            title={Number(op.DiaAnterior) === 1
+                                                                ? `Caja abierta el ${fechaApertura(op.RawFechaApertura)}, un día anterior, ${Number(op.SigueAbierta) === 1 ? 'y sigue sin cerrarse' : 'y cerrada después'}`
+                                                                : undefined}
+                                                            className={cn(
+                                                                "border px-4 py-3 flex flex-col gap-2 rounded-xl transition-all cursor-pointer hover:shadow-sm hover:scale-[1.01] active:scale-[0.99]",
+                                                                Number(op.DiaAnterior) !== 1
+                                                                    ? "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:border-amber-300 dark:hover:border-amber-700/60 hover:bg-amber-50/40 dark:hover:bg-amber-950/40"
+                                                                    : Number(op.SigueAbierta) === 1
+                                                                        ? "bg-rose-50 dark:bg-rose-950/40 border-rose-300 dark:border-rose-800/60 ring-1 ring-rose-300 dark:ring-rose-800/60"
+                                                                        : "bg-orange-50 dark:bg-orange-950/30 border-orange-300 dark:border-orange-800/60 ring-1 ring-orange-200 dark:ring-orange-900/60"
+                                                            )}
                                                         >
                                                             <div className="flex items-center justify-between">
                                                                 <span className="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 text-amber-700 dark:text-amber-400 text-[10px] px-2 py-0.5 font-black rounded-md">Z: {op.Z}</span>
                                                                 <Monitor size={12} className="text-amber-500 dark:text-amber-400" />
                                                             </div>
+                                                            {Number(op.DiaAnterior) === 1 && (
+                                                                <div className={cn(
+                                                                    "flex items-center gap-1 text-[9px] font-black uppercase tracking-wider",
+                                                                    Number(op.SigueAbierta) === 1 ? "text-rose-700 dark:text-rose-300" : "text-orange-700 dark:text-orange-300"
+                                                                )}>
+                                                                    <AlertCircle size={11} className={cn(Number(op.SigueAbierta) === 1 && "animate-pulse")} />
+                                                                    Abierta día anterior
+                                                                </div>
+                                                            )}
                                                             <div className="mt-0.5">
-                                                                <span className="text-[13px] font-black text-slate-700 dark:text-slate-200">Hora: {op.HoraApertura}</span>
+                                                                <span className="text-[13px] font-black text-slate-700 dark:text-slate-200">
+                                                                    {Number(op.DiaAnterior) === 1 ? `Abrió: ${fechaApertura(op.RawFechaApertura)}` : `Hora: ${op.HoraApertura}`}
+                                                                </span>
                                                             </div>
                                                             <div>
                                                                 <p className="text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-0.5">Cajero Responsable</p>
@@ -474,7 +513,7 @@ export default function OperationsKanbanPage() {
                                                         ) : (
                                                             <div className="text-center text-amber-500 dark:text-amber-400 text-[10px] font-black uppercase tracking-widest py-4 flex items-center justify-center gap-1.5">
                                                                 <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping"></span>
-                                                                <span>Caja Abierta</span>
+                                                                <span>{Number(op.DiaAnterior) === 1 ? `Caja abierta desde ${fechaApertura(op.RawFechaApertura)}` : 'Caja Abierta'}</span>
                                                             </div>
                                                         )}
                                                     </div>
