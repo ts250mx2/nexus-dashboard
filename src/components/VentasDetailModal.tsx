@@ -4,7 +4,28 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { X, Download, FileSpreadsheet, Loader2, Store, Maximize, Minimize, ArrowUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import * as XLSX from 'xlsx';
+import { formatDateTime } from '@/lib/format';
 import VentasItemDetailModal from './VentasItemDetailModal';
+
+/**
+ * Las fechas llegan del servidor como ISO 8601 en UTC ("2026-11-03T19:12:29.000Z"):
+ * pintadas tal cual salen seis horas adelantadas. Se muestran y se filtran en la
+ * hora local, como las ve el usuario.
+ */
+const FECHA_ISO = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/;
+const esFecha = (v: unknown): v is string => typeof v === 'string' && FECHA_ISO.test(v);
+const textoCelda = (v: unknown): unknown => (esFecha(v) ? formatDateTime(v) : v);
+
+/**
+ * Número de fecha de Excel con la hora LOCAL. No se le pasa un Date a XLSX: lo
+ * convierte con el desfase histórico de la zona y en México lo corre 36 segundos.
+ */
+function serialExcel(iso: string): number {
+    const d = new Date(iso);
+    const local = Date.UTC(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds());
+    return (local - Date.UTC(1899, 11, 30)) / 86_400_000;
+}
+const FORMATO_FECHA_EXCEL = 'dd/mm/yyyy hh:mm:ss';
 
 interface VentasDetailModalProps {
     isOpen: boolean;
@@ -63,7 +84,7 @@ export default function VentasDetailModal({
                 result = result.filter(item => {
                     const rowValue = item[key];
                     if (rowValue === null || rowValue === undefined) return false;
-                    return String(rowValue).toLowerCase().includes(searchTerm);
+                    return String(textoCelda(rowValue)).toLowerCase().includes(searchTerm);
                 });
             }
         });
@@ -132,10 +153,23 @@ export default function VentasDetailModal({
         // El usuario pidió explícitamente ocultar IdVenta e IdSucursal
         const exportData = sortedAndFilteredData.map(row => {
             const { IdVenta, IdSucursal, ...rest } = row;
-            return rest;
+            return Object.fromEntries(
+                Object.entries(rest).map(([k, v]) => [k, esFecha(v) ? serialExcel(v) : v])
+            );
         });
 
         const worksheet = XLSX.utils.json_to_sheet(exportData);
+        // Las columnas de fecha van como fecha de Excel (se pueden ordenar y filtrar).
+        const columnas = Object.keys(exportData[0] ?? {});
+        const columnasFecha = columnas
+            .map((k, c) => ({ k, c }))
+            .filter(({ k }) => sortedAndFilteredData.some(row => esFecha(row[k])));
+        exportData.forEach((_, i) => {
+            for (const { c } of columnasFecha) {
+                const celda = worksheet[XLSX.utils.encode_cell({ r: i + 1, c })];
+                if (celda && typeof celda.v === 'number') celda.z = FORMATO_FECHA_EXCEL;
+            }
+        });
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "DetalleVentas");
 
@@ -266,9 +300,10 @@ export default function VentasDetailModal({
                                             return (
                                                 <td key={col} className={cn(
                                                     "px-5 py-3 text-xs",
-                                                    isCurrency ? "text-right font-bold text-slate-800 dark:text-slate-100" : "text-slate-600 dark:text-slate-300 font-semibold"
+                                                    isCurrency ? "text-right font-bold text-slate-800 dark:text-slate-100" : "text-slate-600 dark:text-slate-300 font-semibold",
+                                                    esFecha(val) && "whitespace-nowrap"
                                                 )}>
-                                                    {val !== null && val !== undefined ? (isCurrency ? formatCurrency(val) : val) : '-'}
+                                                    {val !== null && val !== undefined ? (isCurrency ? formatCurrency(val) : String(textoCelda(val))) : '-'}
                                                 </td>
                                             );
                                         })}
